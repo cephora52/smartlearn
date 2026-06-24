@@ -1,0 +1,23 @@
+# =============================================================================
+# MbemNova — Prometheus configuration
+# Scrappe les métriques Micrometer depuis /actuator/prometheus
+# =============================================================================
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "mbemnova-api"
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["localhost:8080"]
+    # En production, utiliser le nom du service Docker
+    # targets: ["app:8080"]
+
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["localhost:9187"]   # postgres_exporter
+
+  - job_name: "redis"
+    static_configs:
+      - targets: ["localhost:9121"]   # redis_exporter

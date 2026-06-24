@@ -1,0 +1,229 @@
+<!-- hero.component.html -->
+<section
+  class="relative bg-[#0f172a] overflow-hidden min-h-[calc(100vh-70px)] flex items-center"
+  aria-label="MbemX — Plateforme de formation tech en Afrique Centrale"
+>
+
+  <!-- ── Background atmosphere ── -->
+  <!-- Grid pattern -->
+  <div
+    class="absolute inset-0 opacity-[0.035] pointer-events-none"
+    style="background-image:linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);background-size:56px 56px"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Radial blobs -->
+  <div class="absolute top-[-80px] right-[-60px] w-[520px] h-[520px] rounded-full pointer-events-none"
+       style="background:radial-gradient(circle,rgba(99,102,241,0.13) 0%,transparent 70%)"
+       aria-hidden="true"></div>
+  <div class="absolute bottom-[-80px] left-[-80px] w-[440px] h-[440px] rounded-full pointer-events-none"
+       style="background:radial-gradient(circle,rgba(49,46,129,0.18) 0%,transparent 70%)"
+       aria-hidden="true"></div>
+  <!-- Center glow behind image on desktop -->
+  <div class="absolute top-1/2 right-[10%] -translate-y-1/2 w-[460px] h-[460px] rounded-full pointer-events-none hidden lg:block"
+       style="background:radial-gradient(circle,rgba(99,102,241,0.10) 0%,transparent 65%)"
+       aria-hidden="true"></div>
+
+  <!-- ── Main content ── -->
+  <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+
+      <!-- ══ LEFT — Copy ══════════════════════════════════════════════════════ -->
+      <div class="flex flex-col hero-left">
+
+        <!-- Social proof badge -->
+        <div
+          class="hero-badge inline-flex items-center gap-2.5 self-start
+                 bg-white/[0.04] border border-indigo-500/25
+                 rounded-full px-4 py-2 mb-7 backdrop-blur-sm"
+        >
+          <!-- Avatar stack -->
+          <div class="flex -space-x-2 flex-shrink-0">
+            <div *ngFor="let a of avatars; let i = index"
+                 [style.zIndex]="avatars.length - i"
+                 class="w-6 h-6 rounded-full border-2 border-[#0f172a] flex items-center justify-center text-white text-[10px] font-bold"
+                 [ngClass]="a.color">{{ a.initial }}</div>
+          </div>
+          <!-- Live indicator -->
+          <span class="flex items-center gap-1.5 text-sm text-slate-300">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </span>
+            <strong class="text-white font-semibold">{{ stats[0].value }}</strong>&nbsp;  déjà en formation active
+          </span>
+        </div>
+
+        <!-- H1 — SEO headline -->
+        <h1 class="hero-title text-[24px] sm:text-3xl lg:text-[2rem] xl:text-[2.6rem]
+                   font-black text-white leading-[1.08] tracking-tight mb-5">
+        Dans quelques mois, vous pouvez devenir
+          <span class="relative inline-block text-transparent bg-clip-text"
+                style="background-image:linear-gradient(135deg,#818cf8 0%,#6366f1 40%,#a5b4fc 100%)">
+          compétent et employable dans la tech
+          </span>
+          <!-- <span class="text-slate-300 font-extrabold">  ou rester bloqué là où vous êtes aujourd’hui.</span> -->
+        </h1>
+
+        <!-- Sub-headline — SEO rich, benefit-focused -->
+        <p class="hero-sub text-[14px]   sm:text-base lg:text-[18px] text-slate-400 leading-relaxed mb-8 max-w-xl">
+           Apprends le <strong class="text-slate-200">Développement d'application</strong>,
+          <strong class="text-slate-200">cybersécurité</strong> et
+          <strong class="text-slate-200">cloud </strong>
+        avec des projets réels et un accompagnement personnalisé.<br>
+  <span class="text-slate-300">
+    Tu passes de débutant à un profil prêt pour le marché.
+  </span>
+
+        </p>
+
+        <!-- Trust signals row -->
+        <div class="hero-trust flex flex-wrap items-center gap-4 mb-9 text-sm text-slate-500">
+          <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <span>Projets réels + accompagnement expert</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <span>Aucune expérience requise</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <span>En ligne ou présentiel, à votre rythme</span>
+          </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="hero-cta flex justify-center sm:justify-start flex-wrap gap-3 mb-10">
+          <a routerLink="/bootcamps"
+             class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full
+                    font-semibold text-sm text-white
+                    bg-gradient-to-r from-indigo-600 to-[#312e81]
+                    shadow-lg shadow-indigo-900/40
+                    hover:shadow-indigo-700/50 hover:scale-[1.03]
+                    transition-all duration-200 ease-out">
+            Voir les bootcamps
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a routerLink="/cours-gratuits"
+             class="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full
+                    font-semibold text-sm text-slate-300
+                    border border-white/10 hover:border-indigo-500/50
+                    hover:text-white hover:bg-white/[0.04]
+                    transition-all duration-200">
+            Cours gratuits
+            <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+
+        <!-- Stats strip -->
+        <!-- <div class="hero-stats grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5
+                     border-t border-white/[0.06]">
+          <div *ngFor="let s of stats; let i = index" class="stat-item">
+            <p class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              {{ s.value }}
+            </p>
+            <p class="text-xs text-slate-500 mt-0.5 leading-snug">{{ s.label }}</p>
+          </div>
+        </div> -->
+      </div>
+      <!-- ══ END LEFT ══════════════════════════════════════════════════════════ -->
+
+      <!-- ══ RIGHT — Visual ════════════════════════════════════════════════════ -->
+      <div class="hero-right relative z-1  lg:flex items-center justify-center">
+
+        <!-- Decorative ring -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+          <div class="w-[420px] h-[420px] rounded-full border border-indigo-500/10"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+          <div class="w-[520px] h-[520px] rounded-full border border-indigo-500/[0.05]"></div>
+        </div>
+
+        <!-- Image container -->
+        <div class="relative    -z-10 w-full max-w-[500px] xl:max-w-[520px] aspect-[4/4.5]
+                    rounded-3xl overflow-hidden
+                    ring-1 ring-white/10 shadow-2xl shadow-indigo-950/60
+                    hero-image-wrap">
+
+          <!-- Skeleton loader -->
+          <div *ngIf="imageLoading"
+               class="absolute inset-0 bg-[#1e293b] animate-pulse flex items-center justify-center"
+               aria-hidden="true">
+            <svg class="w-12 h-12 text-indigo-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+
+          <!-- Hero image -->
+          <img
+            src="/hero.png"
+            alt="Étudiant MbemX apprenant le développement web et la data science en Afrique Centrale"
+            class=" h-full z-50 object-cover object-top transition-opacity duration-500"
+            [class.opacity-0]="imageLoading"
+            [class.opacity-100]="!imageLoading"
+            (load)="onImageLoad()"
+            (error)="onImageError()"
+            loading="eager"
+            fetchpriority="high"
+          />
+
+          <!-- Gradient overlay bottom -->
+          <div class="absolute inset-x-0 bottom-0 h-28
+                      bg-gradient-to-t from-[#0f172a]/90 to-transparent
+                      pointer-events-none"></div>
+        </div>
+
+        <!-- Floating card — taux de placement -->
+        <div class="floating-card absolute bottom-12 -left-8 xl:-left-14
+                    bg-[#1e293b]/90 backdrop-blur-md
+                    border border-white/10 rounded-2xl
+                    px-4 py-3 shadow-xl shadow-indigo-950/40
+                    flex items-center gap-3 min-w-[200px]">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white font-bold text-base leading-none">87% employés</p>
+            <p class="text-slate-400 text-xs mt-0.5">en moins de 6 mois</p>
+          </div>
+        </div>
+
+        <!-- Floating card — note -->
+        <div class="floating-card-2 absolute top-10 -right-4 xl:-right-8
+                    bg-[#1e293b]/90 backdrop-blur-md
+                    border border-white/10 rounded-2xl
+                    px-4 py-3 shadow-xl shadow-indigo-950/40
+                    flex items-center gap-3 min-w-[170px]">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white font-bold text-base leading-none">4.1 / 5</p>
+            <p class="text-slate-400 text-xs mt-0.5">Note Trustpilot</p>
+          </div>
+        </div>
+
+      </div>
+      <!-- ══ END RIGHT ═════════════════════════════════════════════════════════ -->
+
+    </div>
+  </div>
+
+  <!-- ── Wave transition ── -->
+  <div class="absolute bottom-0 left-0 right-0 h-14 pointer-events-none" aria-hidden="true"
+       style="background:#ffffff;clip-path:none">
+    <svg viewBox="0 0 1440 56" fill="none" xmlns="http://www.w3.org/2000/svg"
+         class="absolute bottom-0 w-full" preserveAspectRatio="none">
+      <path d="M0 56L1440 56L1440 28C1200 56 960 0 720 0C480 0 240 56 0 28L0 56Z"
+            fill="#1e293b" fill-opacity="0.25"/>
+    </svg>
+  </div>
+
+</section>

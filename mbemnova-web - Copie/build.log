@@ -1,0 +1,904 @@
+[33m❯[39m Building...
+
+  polyfills.server.mjs      482.8kb
+  polyfills.server.mjs.map  798.7kb
+
+Done in 4185ms
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:53:2:
+      53 │   {
+         ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "INTERMEDIAIRE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:64:2:
+      64 │   {
+         ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:75:2:
+      75 │   {
+         ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "INTERMEDIAIRE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:86:2:
+      86 │   {
+         ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:97:2:
+      97 │   {
+         ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "AVANCE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:108:2:
+      108 │   {
+          ╵   ^
+
+X [ERROR] TS2739: Type '{ id: string; titre: string; descriptionCourte: string; descriptionLongue: string; niveau: "DEBUTANT"; langue: string; imageCouverture: null; imageCouvertureThumbnail: null; slug: string; nbModules: number; ... 9 more ...; modules: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'CoursDetailResponse': description, prixAffichage, statut [plugin angular-compiler]
+
+    src/app/core/services/mock.data.ts:122:13:
+      122 │ export const MOCK_COURS_DETAIL: CoursDetailResponse = {
+          ╵              ~~~~~~~~~~~~~~~~~
+
+X [ERROR] TS2339: Property 'estActif' does not exist on type 'CoursResponse'. [plugin angular-compiler]
+
+    src/app/features/instructor/dashboard/instructor-dashboard.component.ts:97:37:
+      97 │ ...           <span [class]="c.estActif ? 'badge-green' : 'badge-s...
+         ╵                                ~~~~~~~~
+
+X [ERROR] TS2339: Property 'estActif' does not exist on type 'CoursResponse'. [plugin angular-compiler]
+
+    src/app/features/instructor/dashboard/instructor-dashboard.component.ts:98:27:
+      98 │                       {{ c.estActif ? 'Publié' : 'Brouillon' }}
+         ╵                            ~~~~~~~~
+
+X [ERROR] TS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:81:36:
+      81 │       @for (d of devoirs(); track d.id; let i = $index) {
+         ╵                                     ~~
+
+X [ERROR] TS2339: Property 'titre' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:108:73:
+      108 │ ... class="font-bold text-slate-900 leading-snug">{{ d.titre }}</h2>
+          ╵                                                        ~~~~~
+
+X [ERROR] TS2339: Property 'dateRemise' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:129:45:
+      129 │                     Remise : {{ formatDate(d.dateRemise) }}
+          ╵                                              ~~~~~~~~~~
+
+X [ERROR] TS2339: Property 'consignes' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:138:89:
+      138 │ ...te-700 leading-relaxed whitespace-pre-line">{{ d.consignes }}</p>
+          ╵                                                     ~~~~~~~~~
+
+X [ERROR] TS2339: Property 'lienRessources' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:139:21:
+      139 │               @if (d.lienRessources) {
+          ╵                      ~~~~~~~~~~~~~~
+
+X [ERROR] TS2339: Property 'lienRessources' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:140:29:
+      140 │ ...           <a [href]="d.lienRessources" target="_blank" rel="n...
+          ╵                            ~~~~~~~~~~~~~~
+
+X [ERROR] TS2339: Property 'noteColor' does not exist on type 'AssignmentsComponent'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:158:37:
+      158 │                             [class]="noteColor(d.rendu!.note!)">
+          ╵                                      ~~~~~~~~~
+
+X [ERROR] TS2339: Property 'noteBadge' does not exist on type 'AssignmentsComponent'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:164:35:
+      164 │                     <span [class]="noteBadge(d.rendu!.note!)">
+          ╵                                    ~~~~~~~~~
+
+X [ERROR] TS2339: Property 'noteLabel' does not exist on type 'AssignmentsComponent'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:165:25:
+      165 │                       {{ noteLabel(d.rendu!.note!) }}
+          ╵                          ~~~~~~~~~
+
+X [ERROR] TS2339: Property 'titre' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:251:35:
+      251 │                 {{ activeDevoir()?.titre }}
+          ╵                                    ~~~~~
+
+X [ERROR] TS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:389:40:
+      389 │       devoirId:    this.activeDevoir()!.id,
+          ╵                                         ~~
+
+X [ERROR] TS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:399:40:
+      399 │           id: 'r-new', devoirId: devoir.id, apprenantId: '',
+          ╵                                         ~~
+
+X [ERROR] TS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:405:12:
+      405 │           d.id === devoir.id ? { ...d, rendu } : d
+          ╵             ~~
+
+X [ERROR] TS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:405:26:
+      405 │           d.id === devoir.id ? { ...d, rendu } : d
+          ╵                           ~~
+
+X [ERROR] TS2304: Cannot find name 'noteColor'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:2:
+      452 │   noteColor(note: number): string {
+          ╵   ~~~~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:12:
+      452 │   noteColor(note: number): string {
+          ╵             ~~~~
+
+X [ERROR] TS1005: ',' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:16:
+      452 │   noteColor(note: number): string {
+          ╵                 ^
+
+X [ERROR] TS2693: 'number' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:18:
+      452 │   noteColor(note: number): string {
+          ╵                   ~~~~~~
+
+X [ERROR] TS1005: ';' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:25:
+      452 │   noteColor(note: number): string {
+          ╵                          ^
+
+X [ERROR] TS1434: Unexpected keyword or identifier. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:27:
+      452 │   noteColor(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2693: 'string' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:452:27:
+      452 │   noteColor(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:453:8:
+      453 │     if (note >= 16) return 'text-green-600';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:454:8:
+      454 │     if (note >= 12) return 'text-blue-600';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:455:8:
+      455 │     if (note >= 10) return 'text-amber-600';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'noteBadge'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:2:
+      459 │   noteBadge(note: number): string {
+          ╵   ~~~~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:12:
+      459 │   noteBadge(note: number): string {
+          ╵             ~~~~
+
+X [ERROR] TS1005: ',' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:16:
+      459 │   noteBadge(note: number): string {
+          ╵                 ^
+
+X [ERROR] TS2693: 'number' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:18:
+      459 │   noteBadge(note: number): string {
+          ╵                   ~~~~~~
+
+X [ERROR] TS1005: ';' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:25:
+      459 │   noteBadge(note: number): string {
+          ╵                          ^
+
+X [ERROR] TS1434: Unexpected keyword or identifier. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:27:
+      459 │   noteBadge(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2693: 'string' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:459:27:
+      459 │   noteBadge(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:460:8:
+      460 │     if (note >= 16) return 'badge-green';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:461:8:
+      461 │     if (note >= 12) return 'badge-blue';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:462:8:
+      462 │     if (note >= 10) return 'badge-amber';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'noteLabel'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:2:
+      466 │   noteLabel(note: number): string {
+          ╵   ~~~~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:12:
+      466 │   noteLabel(note: number): string {
+          ╵             ~~~~
+
+X [ERROR] TS1005: ',' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:16:
+      466 │   noteLabel(note: number): string {
+          ╵                 ^
+
+X [ERROR] TS2693: 'number' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:18:
+      466 │   noteLabel(note: number): string {
+          ╵                   ~~~~~~
+
+X [ERROR] TS1005: ';' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:25:
+      466 │   noteLabel(note: number): string {
+          ╵                          ^
+
+X [ERROR] TS1434: Unexpected keyword or identifier. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:27:
+      466 │   noteLabel(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2693: 'string' only refers to a type, but is being used as a value here. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:466:27:
+      466 │   noteLabel(note: number): string {
+          ╵                            ~~~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:467:8:
+      467 │     if (note >= 16) return 'Excellent';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:468:8:
+      468 │     if (note >= 14) return 'Très bien';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:469:8:
+      469 │     if (note >= 12) return 'Bien';
+          ╵         ~~~~
+
+X [ERROR] TS2304: Cannot find name 'note'. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:470:8:
+      470 │     if (note >= 10) return 'Passable';
+          ╵         ~~~~
+
+X [ERROR] TS1005: '}' expected. [plugin angular-compiler]
+
+    src/app/features/learner/assignments/assignments.component.ts:474:0:
+      474 │ 
+          ╵ ^
+
+X [ERROR] TS2339: Property '$_' does not exist on type 'CoursePlayerComponent'. [plugin angular-compiler]
+
+    src/app/features/learner/course-player/course-player.component.ts:112:36:
+      112 │           @for (_ of [1,2,3]; track $_) {
+          ╵                                     ~~
+
+X [ERROR] NG8004: No pipe found with name 'number'.
+To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component. [plugin angular-compiler]
+
+    src/app/features/learner/course-player/course-player.component.ts:235:84:
+      235 │ ...ck text-white">{{ detail()?.prixFcfa | number:'1.0-0' }} FCFA</p>
+          ╵                                           ~~~~~~
+
+X [ERROR] TS2305: Module '"../../../core/models"' has no exported member 'MoratoireRequest'. [plugin angular-compiler]
+
+    src/app/features/learner/payment/payment.component.ts:14:18:
+      14 │   StatutPaiement, MoratoireRequest,
+         ╵                   ~~~~~~~~~~~~~~~~
+
+X [ERROR] TS2339: Property 'getParrainage' does not exist on type 'TalentService'. [plugin angular-compiler]
+
+    src/app/features/learner/referral/referral.component.ts:149:14:
+      149 │     this.#svc.getParrainage().subscribe({
+          ╵               ~~~~~~~~~~~~~
+
+X [ERROR] TS7006: Parameter 'r' implicitly has an 'any' type. [plugin angular-compiler]
+
+    src/app/features/learner/referral/referral.component.ts:150:12:
+      150 │       next: r => { if (r.success && r.data) this.referral.set(r.d...
+          ╵             ^
+
+X [ERROR] TS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax [plugin angular-compiler]
+
+    src/app/features/learner/sessions/sessions.component.ts:275:12:
+      275 │             { id: 'c1', sessionId: s.id, jourSemaine: 'Lundi',   ...
+          ╵             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+X [ERROR] TS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax [plugin angular-compiler]
+
+    src/app/features/learner/sessions/sessions.component.ts:276:12:
+      276 │             { id: 'c2', sessionId: s.id, jourSemaine: 'Mercredi',...
+          ╵             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+X [ERROR] TS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax [plugin angular-compiler]
+
+    src/app/features/learner/sessions/sessions.component.ts:277:12:
+      277 │             { id: 'c3', sessionId: s.id, jourSemaine: 'Samedi',  ...
+          ╵             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+X [ERROR] TS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax [plugin angular-compiler]
+
+    src/app/features/learner/sessions/sessions.component.ts:278:12:
+      278 │             { id: 'c4', sessionId: s.id, jourSemaine: 'Vendredi',...
+          ╵             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+● [DEBUG] This call to "require" will not be bundled because the argument is not a string literal [unsupported-require-call]
+
+    node_modules/express/lib/view.js:81:13:
+      81 │     var fn = require(mod).__express
+         ╵              ~~~~~~~
+
+● [DEBUG] Resolving import "supports-color" in directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\debug\\src" of type "require-call"
+
+  Checking for package alias matches
+    Failed to find any package alias matches
+  Checking "supports-color" against the external pattern "*/main.server.mjs"
+  Read 4 entries for directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\debug\\src"
+  Searching for "supports-color" in "node_modules" directories starting from "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\debug\\src"
+    Parsed package name "supports-color" and package subpath "."
+    Checking for a package in the directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color"
+    Read 346 entries for directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules"
+    Failed to read directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color": open C:\Users\Mega Soft Tech\Pictures\MbemNova\ProjetMbemNova\mbemlevel\code\fond-end\mbemnova-web - Copie\node_modules\supports-color: Le fichier spécifié est introuvable.
+    Failed to read directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color"
+    Attempting to load "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color" as a file
+      Checking for file "supports-color"
+      Checking for file "supports-color.mjs"
+      Checking for file "supports-color.js"
+      Checking for file "supports-color.cjs"
+      Checking for file "supports-color.ts"
+      Checking for file "supports-color.tsx"
+      Failed to find file "supports-color"
+    Attempting to load "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color" as a directory
+      Failed to read directory "C:\\Users\\Mega Soft Tech\\Pictures\\MbemNova\\ProjetMbemNova\\mbemlevel\\code\\fond-end\\mbemnova-web - Copie\\node_modules\\supports-color"
+
+● [DEBUG] Importing "supports-color" was allowed even though it could not be resolved because dynamic import failures appear to be handled here: [ignored-dynamic-import]
+
+    node_modules/debug/src/node.js:32:31:
+      32 │   const supportsColor = require('supports-color');
+         ╵                                 ~~~~~~~~~~~~~~~~
+
+  The handler for dynamic import failures is here:
+
+    node_modules/debug/src/node.js:114:2:
+      114 │ } catch (error) {
+          ╵   ~~~~~
+
+
+  server.mjs               1.9mb
+  chunk-WGL44MGO.mjs      39.2kb
+  chunk-FJZYZ6CP.mjs       2.8kb
+  server.mjs.map           3.2mb
+  chunk-WGL44MGO.mjs.map  60.5kb
+  ...and 1 more output file...
+
+Done in 33563ms
+64 errors
+
+  main.server.mjs     989.0kb
+  chunk-GQVHJDGC.mjs  891.1kb
+  chunk-NJBQ5G3W.mjs  492.7kb
+  chunk-7P4MZ3BC.mjs  150.2kb
+  chunk-CNYIFIJI.mjs  149.3kb
+  ...and 97 more output files...
+
+Done in 35663ms
+[32m✔[39m Building...
+[35mPrerendered 0 static routes.[39m
+Application bundle generation failed. [36.475 seconds] - 2026-05-02T19:14:58.634Z
+
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:53:2:
+[37m      53 │   [32m{[37m
+         ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "INTERMEDIAIRE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:64:2:
+[37m      64 │   [32m{[37m
+         ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:75:2:
+[37m      75 │   [32m{[37m
+         ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "INTERMEDIAIRE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:86:2:
+[37m      86 │   [32m{[37m
+         ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "DEBUTANT"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:97:2:
+[37m      97 │   [32m{[37m
+         ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; slug: string; titre: string; descriptionCourte: string; niveau: "AVANCE"; langue: string; imageCouvertureThumbnail: null; prixFcfa: number; seuilPaiement: number; nbApprenants: number; ... 4 more ...; statut: string; }' is missing the following properties from type 'CoursResponse': description, prixAffichage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:108:2:
+[37m      108 │   [32m{[37m
+          ╵   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; titre: string; descriptionCourte: string; descriptionLongue: string; niveau: "DEBUTANT"; langue: string; imageCouverture: null; imageCouvertureThumbnail: null; slug: string; nbModules: number; ... 9 more ...; modules: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'CoursDetailResponse': description, prixAffichage, statut[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/mock.data.ts:122:13:
+[37m      122 │ export const [32mMOCK_COURS_DETAIL[37m: CoursDetailResponse = {
+          ╵              [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'estActif' does not exist on type 'CoursResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/instructor/dashboard/instructor-dashboard.component.ts:97:37:
+[37m      97 │ ...           <span [class]="c.[32mestActif[37m ? 'badge-green' : 'badge-s...
+         ╵                                [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'estActif' does not exist on type 'CoursResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/instructor/dashboard/instructor-dashboard.component.ts:98:27:
+[37m      98 │                       {{ c.[32mestActif[37m ? 'Publié' : 'Brouillon' }}
+         ╵                            [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:81:36:
+[37m      81 │       @for (d of devoirs(); track d.[32mid[37m; let i = $index) {
+         ╵                                     [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'titre' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:108:73:
+[37m      108 │ ... class="font-bold text-slate-900 leading-snug">{{ d.[32mtitre[37m }}</h2>
+          ╵                                                        [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dateRemise' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:129:45:
+[37m      129 │                     Remise : {{ formatDate(d.[32mdateRemise[37m) }}
+          ╵                                              [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'consignes' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:138:89:
+[37m      138 │ ...te-700 leading-relaxed whitespace-pre-line">{{ d.[32mconsignes[37m }}</p>
+          ╵                                                     [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'lienRessources' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:139:21:
+[37m      139 │               @if (d.[32mlienRessources[37m) {
+          ╵                      [32m~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'lienRessources' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:140:29:
+[37m      140 │ ...           <a [href]="d.[32mlienRessources[37m" target="_blank" rel="n...
+          ╵                            [32m~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'noteColor' does not exist on type 'AssignmentsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:158:37:
+[37m      158 │                             [class]="[32mnoteColor[37m(d.rendu!.note!)">
+          ╵                                      [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'noteBadge' does not exist on type 'AssignmentsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:164:35:
+[37m      164 │                     <span [class]="[32mnoteBadge[37m(d.rendu!.note!)">
+          ╵                                    [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'noteLabel' does not exist on type 'AssignmentsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:165:25:
+[37m      165 │                       {{ [32mnoteLabel[37m(d.rendu!.note!) }}
+          ╵                          [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'titre' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:251:35:
+[37m      251 │                 {{ activeDevoir()?.[32mtitre[37m }}
+          ╵                                    [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:389:40:
+[37m      389 │       devoirId:    this.activeDevoir()!.[32mid[37m,
+          ╵                                         [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:399:40:
+[37m      399 │           id: 'r-new', devoirId: devoir.[32mid[37m, apprenantId: '',
+          ╵                                         [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:405:12:
+[37m      405 │           d.[32mid[37m === devoir.id ? { ...d, rendu } : d
+          ╵             [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'id' does not exist on type 'DevoirSuiviResponse'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:405:26:
+[37m      405 │           d.id === devoir.[32mid[37m ? { ...d, rendu } : d
+          ╵                           [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'noteColor'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:2:
+[37m      452 │   [32mnoteColor[37m(note: number): string {
+          ╵   [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:12:
+[37m      452 │   noteColor([32mnote[37m: number): string {
+          ╵             [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ',' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:16:
+[37m      452 │   noteColor(note[32m:[37m number): string {
+          ╵                 [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'number' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:18:
+[37m      452 │   noteColor(note: [32mnumber[37m): string {
+          ╵                   [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ';' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:25:
+[37m      452 │   noteColor(note: number)[32m:[37m string {
+          ╵                          [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1434: Unexpected keyword or identifier.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:27:
+[37m      452 │   noteColor(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'string' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:452:27:
+[37m      452 │   noteColor(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:453:8:
+[37m      453 │     if ([32mnote[37m >= 16) return 'text-green-600';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:454:8:
+[37m      454 │     if ([32mnote[37m >= 12) return 'text-blue-600';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:455:8:
+[37m      455 │     if ([32mnote[37m >= 10) return 'text-amber-600';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'noteBadge'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:2:
+[37m      459 │   [32mnoteBadge[37m(note: number): string {
+          ╵   [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:12:
+[37m      459 │   noteBadge([32mnote[37m: number): string {
+          ╵             [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ',' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:16:
+[37m      459 │   noteBadge(note[32m:[37m number): string {
+          ╵                 [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'number' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:18:
+[37m      459 │   noteBadge(note: [32mnumber[37m): string {
+          ╵                   [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ';' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:25:
+[37m      459 │   noteBadge(note: number)[32m:[37m string {
+          ╵                          [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1434: Unexpected keyword or identifier.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:27:
+[37m      459 │   noteBadge(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'string' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:459:27:
+[37m      459 │   noteBadge(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:460:8:
+[37m      460 │     if ([32mnote[37m >= 16) return 'badge-green';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:461:8:
+[37m      461 │     if ([32mnote[37m >= 12) return 'badge-blue';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:462:8:
+[37m      462 │     if ([32mnote[37m >= 10) return 'badge-amber';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'noteLabel'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:2:
+[37m      466 │   [32mnoteLabel[37m(note: number): string {
+          ╵   [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:12:
+[37m      466 │   noteLabel([32mnote[37m: number): string {
+          ╵             [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ',' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:16:
+[37m      466 │   noteLabel(note[32m:[37m number): string {
+          ╵                 [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'number' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:18:
+[37m      466 │   noteLabel(note: [32mnumber[37m): string {
+          ╵                   [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: ';' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:25:
+[37m      466 │   noteLabel(note: number)[32m:[37m string {
+          ╵                          [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1434: Unexpected keyword or identifier.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:27:
+[37m      466 │   noteLabel(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2693: 'string' only refers to a type, but is being used as a value here.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:466:27:
+[37m      466 │   noteLabel(note: number): [32mstring[37m {
+          ╵                            [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:467:8:
+[37m      467 │     if ([32mnote[37m >= 16) return 'Excellent';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:468:8:
+[37m      468 │     if ([32mnote[37m >= 14) return 'Très bien';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:469:8:
+[37m      469 │     if ([32mnote[37m >= 12) return 'Bien';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2304: Cannot find name 'note'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:470:8:
+[37m      470 │     if ([32mnote[37m >= 10) return 'Passable';
+          ╵         [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS1005: '}' expected.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/assignments/assignments.component.ts:474:0:
+[37m      474 │ [32m[37m
+          ╵ [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property '$_' does not exist on type 'CoursePlayerComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/course-player/course-player.component.ts:112:36:
+[37m      112 │           @for (_ of [1,2,3]; track [32m$_[37m) {
+          ╵                                     [32m~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8004: No pipe found with name 'number'.
+To fix this, import the "DecimalPipe" class from "@angular/common" and add it to the "imports" array of the component.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/course-player/course-player.component.ts:235:84:
+[37m      235 │ ...ck text-white">{{ detail()?.prixFcfa | [32mnumber[37m:'1.0-0' }} FCFA</p>
+          ╵                                           [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2305: Module '"../../../core/models"' has no exported member 'MoratoireRequest'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/payment/payment.component.ts:14:18:
+[37m      14 │   StatutPaiement, [32mMoratoireRequest[37m,
+         ╵                   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'getParrainage' does not exist on type 'TalentService'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/referral/referral.component.ts:149:14:
+[37m      149 │     this.#svc.[32mgetParrainage[37m().subscribe({
+          ╵               [32m~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'r' implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/referral/referral.component.ts:150:12:
+[37m      150 │       next: [32mr[37m => { if (r.success && r.data) this.referral.set(r.d...
+          ╵             [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/sessions/sessions.component.ts:275:12:
+[37m      275 │             [32m{ id: 'c1', sessionId: s.id, jourSemaine: 'Lundi',   [37m...
+          ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/sessions/sessions.component.ts:276:12:
+[37m      276 │             [32m{ id: 'c2', sessionId: s.id, jourSemaine: 'Mercredi',[37m...
+          ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/sessions/sessions.component.ts:277:12:
+[37m      277 │             [32m{ id: 'c3', sessionId: s.id, jourSemaine: 'Samedi',  [37m...
+          ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2739: Type '{ id: string; sessionId: string; jourSemaine: string; heureDebut: string; heureFin: string; placesRestantes: number; }' is missing the following properties from type 'CreneauResponse': dureeMinutes, capaciteMax[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/learner/sessions/sessions.component.ts:278:12:
+[37m      278 │             [32m{ id: 'c4', sessionId: s.id, jourSemaine: 'Vendredi',[37m...
+          ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

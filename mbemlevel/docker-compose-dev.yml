@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+
+  # =========================
+  # 🐘 POSTGRESQL
+  # =========================
+  postgres:
+    image: postgres:16
+    container_name: mbem-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mbemnova_dev
+      POSTGRES_USER: mbemnova
+      POSTGRES_PASSWORD: mbemnova_dev_123
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mbem-network
+
+  # =========================
+  # 🟥 REDIS
+  # =========================
+  redis:
+    image: redis:7
+    container_name: mbem-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - mbem-network
+
+  # =========================
+  # 🧠 PGADMIN (optionnel mais utile)
+  # =========================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: mbem-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mbem.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - mbem-network
+
+# =========================
+# VOLUMES
+# =========================
+volumes:
+  postgres_data:
+
+# =========================
+# NETWORK
+# =========================
+networks:
+  mbem-network:
+    driver: bridge

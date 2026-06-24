@@ -1,0 +1,354 @@
+/* dashboard.component.css */
+/* ═══════════════════════════════════════════════════════════════
+   Thème dark glassmorphism — toutes les classes utilisées dans
+   dashboard.component.html sont définies ici
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Root & background ──────────────────────────────────────── */
+.db-root {
+  background: #0f172a;
+  min-height: 100vh;
+  color: #e2e8f0;
+}
+
+/* ── Tokens couleur ─────────────────────────────────────────── */
+.db-text-primary  { color: #f1f5f9; }
+.db-text-secondary { color: #cbd5e1; }
+.db-text-muted    { color: #64748b; }
+
+/* ── Topbar ─────────────────────────────────────────────────── */
+.db-topbar {
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Avatar ─────────────────────────────────────────────────── */
+.db-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* ── Streak chip ─────────────────────────────────────────────── */
+.db-streak-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+}
+
+/* ── Icon button (cloche notif) ─────────────────────────────── */
+.db-icon-btn {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.db-icon-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Notification badge ─────────────────────────────────────── */
+.db-notif-badge {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  width: 1rem;
+  height: 1rem;
+  background: #6366f1;
+  border-radius: 9999px;
+  font-size: 9px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0f172a;
+}
+
+/* ── Alert warning ───────────────────────────────────────────── */
+.db-alert-warning {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+}
+
+.db-btn-warning-sm {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  transition: background-color 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.db-btn-warning-sm:hover { background: rgba(251, 191, 36, 0.18); }
+
+/* ── Base card ──────────────────────────────────────────────── */
+.db-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.db-card:hover {
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+/* ── Hoverable card (suggestions) ───────────────────────────── */
+.db-card-hover {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  display: flex;
+}
+.db-card-hover:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+}
+
+/* ── KPI icon containers ─────────────────────────────────────── */
+.db-kpi-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.db-kpi-icon--amber  { background: rgba(251, 191, 36, 0.1);  border-color: rgba(251, 191, 36, 0.15); }
+.db-kpi-icon--indigo { background: rgba(99, 102, 241, 0.1);  border-color: rgba(99, 102, 241, 0.15); }
+.db-kpi-icon--emerald{ background: rgba(52, 211, 153, 0.1);  border-color: rgba(52, 211, 153, 0.15); }
+.db-kpi-icon--violet { background: rgba(139, 92, 246, 0.1);  border-color: rgba(139, 92, 246, 0.15); }
+
+/* ── Progress bar ───────────────────────────────────────────── */
+.db-progress {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.db-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.db-progress-bar--amber   { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.db-progress-bar--indigo  { background: linear-gradient(90deg, #6366f1, #818cf8); }
+.db-progress-bar--emerald { background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* ── Pills ───────────────────────────────────────────────────── */
+.db-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+.db-pill--indigo  { background: rgba(99, 102, 241, 0.12);  color: #a5b4fc; border-color: rgba(99, 102, 241, 0.2); }
+.db-pill--violet  { background: rgba(139, 92, 246, 0.12);  color: #c4b5fd; border-color: rgba(139, 92, 246, 0.2); }
+.db-pill--emerald { background: rgba(52, 211, 153, 0.1);   color: #6ee7b7; border-color: rgba(52, 211, 153, 0.2); }
+.db-pill--amber   { background: rgba(251, 191, 36, 0.1);   color: #fcd34d; border-color: rgba(251, 191, 36, 0.2); }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.db-btn-primary {
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+.db-btn-primary:hover {
+  background: #4f46e5;
+  transform: scale(1.02);
+}
+
+.db-btn-amber {
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  background: rgba(245, 158, 11, 0.85);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+.db-btn-amber:hover { background: rgba(217, 119, 6, 0.9); }
+
+.db-btn-outline-violet {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.db-btn-outline-violet:hover {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.db-btn-tirage {
+  padding: 0.625rem 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 3px 14px rgba(217, 119, 6, 0.3);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.db-btn-tirage:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 20px rgba(217, 119, 6, 0.4);
+}
+
+/* ── Links ───────────────────────────────────────────────────── */
+.db-link-indigo {
+  color: #818cf8;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+.db-link-indigo:hover { color: #a5b4fc; }
+
+.db-link-emerald {
+  color: #34d399;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+.db-link-emerald:hover { color: #6ee7b7; }
+
+.db-link-violet {
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+.db-link-violet:hover { color: #c4b5fd; }
+
+.db-link-muted {
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+.db-link-muted:hover { color: #94a3b8; }
+
+/* ── Notification item ───────────────────────────────────────── */
+.db-notif-item {
+  border-radius: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  text-decoration: none;
+  transition: background-color 0.1s ease;
+}
+.db-notif-item:hover { background: rgba(255, 255, 255, 0.04); }
+
+/* ── Tirage card accents ─────────────────────────────────────── */
+.db-tirage-top-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d97706 30%, #fbbf24 50%, #d97706 70%, transparent);
+}
+.db-tirage-header {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), transparent);
+}
+
+/* ── Skeleton shimmer ───────────────────────────────────────── */
+.db-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: dbShimmer 1.6s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes dbShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Entrance animations ────────────────────────────────────── */
+.animate-fade-up {
+  opacity: 0;
+  animation: dbFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes dbFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utilities ───────────────────────────────────────────────── */
+.w-4\.5 { width: 1.125rem; }
+.h-4\.5 { height: 1.125rem; }
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.7);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .db-card, .db-card-hover { border-radius: 0.75rem; }
+}

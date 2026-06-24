@@ -1,0 +1,88 @@
+/* formations.component.css */
+
+/* ── Scrollbar hide for filter strip ─────────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Filter chips ─────────────────────────────────────────────────────────── */
+.filter-chip {
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.active-chip {
+  background: linear-gradient(135deg, #4f46e5, #312e81);
+  color: #fff;
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.inactive-chip {
+  background: rgba(255, 255, 255, 0.03);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.inactive-chip:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: #c7d2fe;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── Skeleton shimmer ─────────────────────────────────────────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton-card {
+  animation: skeletonPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+
+/* ── Course card entrance ─────────────────────────────────────────────────── */
+.course-card {
+  opacity: 0;
+  animation: cardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Freemium bar transition ──────────────────────────────────────────────── */
+/* The width is set via [style.width.%] and transitions via Tailwind's duration-700 */
+
+/* ── Trust strip icon size fix ────────────────────────────────────────────── */
+.w-4\.5 {
+  width: 1.125rem;
+}
+.h-4\.5 {
+  height: 1.125rem;
+}

@@ -1,0 +1,77 @@
+package com.mbem.mbemlevel.api.controller;
+import com.mbem.mbemlevel.api.dto.request.TerminerLeconRequest;
+import com.mbem.mbemlevel.api.dto.response.*;
+import com.mbem.mbemlevel.application.usecase.progression.*;
+import com.mbem.mbemlevel.domain.progression.Progression;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+/**
+ * API Progression — S05 (commencer), S06 (leçon+QCM), S07 (seuil).
+ * Tous les endpoints nécessitent une authentification.
+ */
+@RestController
+@RequestMapping("/api/v1/progression")
+@Tag(name="Progression", description="Avancement dans les cours")
+@RequiredArgsConstructor
+public class ProgressionController {
+    private final CommencerCoursUseCase  commencerUC;
+    private final TerminerLeconUseCase   terminerLeconUC;
+    private final GetProgressionUseCase  getUC;
+
+    /** POST /api/v1/progression/cours/{coursId}/commencer — S05 */
+    @PostMapping("/cours/{coursId}/commencer")
+    @Operation(summary="Commencer ou reprendre un cours (S05)")
+    public ResponseEntity<ApiResponse<ProgressionResponse>> commencer(
+            @PathVariable UUID coursId,
+            @AuthenticationPrincipal String userId) {
+        Progression p = commencerUC.executer(UUID.fromString(userId), coursId);
+        return ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p), "Cours commencé !"));
+    }
+
+    /** POST /api/v1/progression/cours/{coursId}/terminer-lecon — S06 */
+    @PostMapping("/cours/{coursId}/terminer-lecon")
+    @Operation(summary="Marquer une leçon terminée — calcule XP et progression (S06)")
+    public ResponseEntity<ApiResponse<ProgressionResponse>> terminerLecon(
+            @PathVariable UUID coursId,
+            @Valid @RequestBody TerminerLeconRequest req,
+            @AuthenticationPrincipal String userId,
+            @RequestHeader(value="X-User-Prenom", defaultValue="Apprenant") String prenom,
+            @RequestHeader(value="X-User-Email",  defaultValue="") String email) {
+        Progression p = terminerLeconUC.executer(
+            UUID.fromString(userId), coursId, req.leconId(),
+            req.nbLeconsTotales(), req.nbLeconsTerminees(), req.xpLecon(),
+            prenom, email, req.telephone(), req.nomCours());
+        String msg = p.seuilAtteint() && !p.isEstPaye()
+            ? "Seuil atteint ! Débloquez la suite." : "+"+req.xpLecon()+" XP gagnés !";
+        return ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p), msg));
+    }
+
+    /** GET /api/v1/progression — Toutes les progressions de l'apprenant */
+    @GetMapping
+    @Operation(summary="Toutes les progressions de l'apprenant connecté")
+    public ResponseEntity<ApiResponse<List<ProgressionResponse>>> mesPrgressions(
+            @AuthenticationPrincipal String userId) {
+        List<ProgressionResponse> list = getUC.toutesParApprenant(UUID.fromString(userId))
+            .stream().map(ProgressionResponse::from).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok(list));
+    }
+
+    /** GET /api/v1/progression/cours/{coursId} — Progression sur un cours */
+    @GetMapping("/cours/{coursId}")
+    @Operation(summary="Progression sur un cours spécifique")
+    public ResponseEntity<ApiResponse<ProgressionResponse>> parCours(
+            @PathVariable UUID coursId,
+            @AuthenticationPrincipal String userId) {
+        return getUC.parCoursId(UUID.fromString(userId), coursId)
+            .map(p -> ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p))))
+            .orElse(ResponseEntity.notFound().build());
+    }
+}

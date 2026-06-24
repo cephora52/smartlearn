@@ -1,0 +1,142 @@
+/* blockticket.component.css */
+
+/* ── Wrapper entrance ─────────────────────────────────────────────────────── */
+.ticket-wrapper {
+  animation: ticketSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ticketSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
+}
+
+/* ── Noise texture ────────────────────────────────────────────────────────── */
+.noise-bg {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* ── Particle float animation ─────────────────────────────────────────────── */
+.particle {
+  animation: particleFloat linear infinite;
+  opacity: 0;
+}
+
+@keyframes particleFloat {
+  0%   { transform: translateY(0) scale(0);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+}
+
+/* ── Ticket icon ──────────────────────────────────────────────────────────── */
+.ticket-icon-wrap {
+  width: 56px;
+  height: 56px;
+}
+
+.ticket-icon {
+  animation: ticketFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.25));
+}
+
+@keyframes ticketFloat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%       { transform: translateY(-4px) rotate(1deg); }
+}
+
+/* ── Pulse ring ───────────────────────────────────────────────────────────── */
+.pulse-ring {
+  animation: pulseRing 2.5s ease-out infinite;
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1);   opacity: 0.4; }
+  70%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── Countdown blocks ─────────────────────────────────────────────────────── */
+.countdown-block {
+  min-width: 44px;
+}
+
+.countdown-number {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fbbf24;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+  animation: numberFlip 0.15s ease-out;
+}
+
+@keyframes numberFlip {
+  0%   { transform: translateY(-4px); opacity: 0.5; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+.countdown-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(251, 191, 36, 0.35);
+  margin-top: 2px;
+}
+
+/* ── CTA Button ───────────────────────────────────────────────────────────── */
+.ticket-cta {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 60%, #b45309 100%);
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.3),
+    0 4px 20px rgba(217, 119, 6, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
+}
+
+.ticket-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ticket-cta:hover::before {
+  opacity: 0.3;
+}
+
+.ticket-cta:hover {
+  transform: scale(1.04);
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.5),
+    0 6px 28px rgba(217, 119, 6, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ticket-cta:active {
+  transform: scale(0.98);
+}
+
+/* ── Responsive: hide countdown labels on very small screens ──────────────── */
+@media (max-width: 400px) {
+  .countdown-number {
+    font-size: 1.2rem;
+  }
+  .countdown-block {
+    min-width: 34px;
+  }
+}

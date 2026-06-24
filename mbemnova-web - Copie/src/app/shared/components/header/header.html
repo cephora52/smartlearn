@@ -1,0 +1,384 @@
+<!-- header.component.html -->
+<header
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+  [class.scrolled]="isScrolled"
+ [ngClass]="isScrolled 
+  ? 'bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#312e81] backdrop-blur-md shadow-[0_2px_24px_0_rgba(49,46,129,0.18)]' 
+  : 'bg-white'"
+>
+  <!-- Top accent bar -->
+  <div class="h-[2px] w-full bg-gradient-to-r from-[#312e81] via-indigo-400 to-[#0f172a]"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-[70px]">
+
+      <!-- ── Logo ── -->
+      <a routerLink="/" class="flex items-center gap-2 group flex-shrink-0">
+        <div class="relative w-8 h-8 flex items-center justify-center">
+          <!-- Hexagon logo mark -->
+          <svg viewBox="0 0 32 32" fill="none" class="w-8 h-8 transition-transform duration-300 group-hover:rotate-12">
+            <polygon
+              points="16,2 28,9 28,23 16,30 4,23 4,9"
+              fill="url(#logoGrad)"
+              stroke="#6366f1"
+              stroke-width="1"
+            />
+            <polygon
+              points="16,8 23,12 23,20 16,24 9,20 9,12"
+              fill="#0f172a"
+              opacity="0.6"
+            />
+            <text x="16" y="20" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="sans-serif">M</text>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#312e81"/>
+                <stop offset="100%" stop-color="#6366f1"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="text-xl font-black tracking-tight text-[#312e81]"
+        >
+          mbem<span [ngClass]="isScrolled ? 'text-white' : 'text-[#0f172a]'">X</span>
+        </span>
+      </a>
+
+      <!-- ── Desktop Nav ── -->
+      <nav class="hidden lg:flex items-center gap-1">
+
+        <!-- Bootcamps dropdown -->
+        <div class="relative" (mouseenter)="openDropdown('bootcamps')" (mouseleave)="closeDropdown()">
+          <button
+            class="nav-link flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium   hover:text-[#312e81] hover:bg-white/5 transition-all duration-200"
+            [class.text-white]="activeDropdown === 'bootcamps'"
+            [class.bg-indigo-600]="activeDropdown === 'bootcamps'"
+           [ngClass]="isScrolled 
+    ? '!text-white hover:text-white hover:bg-white/10' 
+    : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'"
+          >
+            Formations
+            <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'bootcamps'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <!-- Bootcamps Mega Dropdown -->
+        <div
+  class="dropdown-panel absolute left-1/2   translate-x-[22%]  xl:translate-x-[12%] top-full mt-5 w-[900px] xl:w-[900px] bg-white border border-white/10 min-h-92 shadow-xl overflow-hidden"
+  [class.open]="activeDropdown === 'bootcamps'"
+>
+            <div class="grid grid-cols-3 gap-0">
+              <!-- Left: Categories -->
+              <div class="col-span-1 bg-white p-4 border-r border-white/10">
+                <p class="text-xs font-semibold text-indigo-600 uppercase tracking-widest mb-3">Domaines</p>
+                <ul class="space-y-1">
+                  <li *ngFor="let cat of bootcampCategories">
+                    <button
+                      class="w-full text-[#0f172a] text-left px-3 py-2 rounded-lg text-sm transition-all duration-150 flex items-center justify-between group"
+                      [class.bg-indigo-600]="activeCat === cat.id"
+                      [class.text-white]="activeCat === cat.id"
+                      [class.text-slate-600]="activeCat !== cat.id"
+                      [class.hover:bg-white/5]="activeCat !== cat.id"
+                      (mouseenter)="activeCat = cat.id"
+                    >
+                      <span   >{{ cat.label }}</span>
+                      <span  class="text-xs opacity-60">{{ cat.count }}</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Right: Cards -->
+              <div class="col-span-2 p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-semibold text-slate-800 uppercase tracking-widest">{{ getActiveCatLabel() }}</p>
+                  <a href="#" class="text-xs text-indigo-600 hover:text-indigo-300 transition-colors">Voir tous →</a>
+                </div>
+                <div class="space-y-2">
+                  <a
+                    *ngFor="let bc of getActiveBootcamps()"
+                    href="#"
+                    class="flex items-start justify-between p-3 rounded-xl border border-transparent hover:border-indigo-500/40 hover:bg-indigo-600/10 transition-all duration-150 group"
+                  >
+                    <div>
+                      <p class="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">{{ bc.title }}</p>
+                      <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ bc.duration }}
+                      </p>
+                    </div>
+                    <span class="text-xs font-semibold text-indigo-600 whitespace-nowrap ml-2 mt-0.5">{{ bc.price }}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cours Gratuits dropdown -->
+        <div class="relative" (mouseenter)="openDropdown('cours')" (mouseleave)="closeDropdown()">
+          <button
+            class="nav-link flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium     hover:bg-white/5 transition-all duration-200"
+            [class.text-white]="activeDropdown === 'cours'"
+            [class.bg-white/5]="activeDropdown === 'cours'"
+           [ngClass]="isScrolled 
+    ? '!text-white hover:text-white hover:bg-white/10' 
+    : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'"
+          >
+            Cours gratuits
+            <!-- <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'cours'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg> -->
+          </button>
+
+          <!-- <div
+            class="dropdown-panel absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 bg-[#1e293b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            [class.open]="activeDropdown === 'cours'"
+          >
+            <div class="p-4 space-y-1">
+              <a *ngFor="let item of freeCourses" href="#"
+                class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-150 group">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/20 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600/40 transition-colors">
+                  <span class="text-base">{{ item.icon }}</span>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-white">{{ item.label }}</p>
+                  <p class="text-xs text-slate-500">{{ item.desc }}</p>
+                </div>
+              </a>
+            </div>
+          </div> -->
+        </div>
+
+        <!-- Ressources dropdown -->
+        <div class="relative" (mouseenter)="openDropdown('ressources')" (mouseleave)="closeDropdown()">
+          <button
+            class="nav-link flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium       transition-all duration-200"
+            [class.text-white]="activeDropdown === 'ressources'"
+            [class.bg-white/5]="activeDropdown === 'ressources'"
+           [ngClass]="isScrolled 
+    ? '!text-white hover:text-white hover:bg-white/10' 
+    : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'"
+          >
+            Blog
+            <!-- <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="activeDropdown === 'ressources'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg> -->
+          </button>
+
+          <!-- <div
+            class="dropdown-panel absolute left-1/2 -translate-x-1/2 top-full mt-2 w-96 bg-[#1e293b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            [class.open]="activeDropdown === 'ressources'"
+          >
+            <div class="p-2">
+              <div class="px-3 py-2 mb-1">
+                <p class="text-xs font-semibold text-indigo-400 uppercase tracking-widest">Nos Ressources</p>
+                <p class="text-xs text-slate-500 mt-0.5">Apprenez plus avec nos ressources gratuites</p>
+              </div>
+              <div class="grid grid-cols-2 gap-1">
+                <a *ngFor="let r of resources" href="#"
+                  class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-150 group">
+                  <div class="w-8 h-8 rounded-lg bg-[#312e81]/30 flex items-center justify-center flex-shrink-0 group-hover:bg-[#312e81]/60 transition-colors">
+                    <span class="text-base">{{ r.icon }}</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wide">{{ r.tag }}</p>
+                    <p class="text-sm font-medium text-white">{{ r.label }}</p>
+                    <p class="text-xs text-slate-500 mt-0.5 leading-tight">{{ r.desc }}</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div> -->
+        </div>
+
+        <!-- Talents simple link -->
+        <a
+          routerLink="/talents"[ngClass]="isScrolled 
+    ? 'text-white hover:text-white hover:bg-white/10' 
+    : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'"
+          class="px-4 py-2 rounded-lg text-sm font-medium   hover:text-[#312e81] hover:bg-white/5 transition-all duration-200"
+        >
+          Talents
+        </a>
+      </nav>
+
+      <!-- ── Desktop CTA ── -->
+      <div class="hidden lg:flex items-center gap-3">
+        <!-- Parler à un conseiller -->
+        <!-- <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-600 to-[#312e81] text-white text-sm font-semibold shadow-lg shadow-indigo-900/40 hover:shadow-indigo-700/50 hover:scale-105 transition-all duration-200">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.557 4.126 1.533 5.86L0 24l6.335-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.013-1.378l-.36-.214-3.732.89.93-3.64-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+          Parler à un conseiller
+        </button> -->
+
+        @if (!isAuth()) {
+          <a routerLink="/auth/connexion" [ngClass]="isScrolled
+      ? 'text-white hover:text-white/90 hover:bg-white/0'
+      : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'" class="text-sm font-semibold hover:text-indigo-500 transition-colors duration-200">
+            Se connecter
+          </a>
+          <a routerLink="/auth/inscription"
+        [ngClass]="isScrolled
+      ? 'text-white hover:text-white hover:bg-white/10'
+      : 'text-[#0f172a] hover:text-[#312e81]'"
+            class="px-4 py-2 rounded-full border text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200">
+            Commencer gratuitement
+          </a>
+        } @else {
+          <a [routerLink]="dashboardLink()" [ngClass]="isScrolled
+      ? 'text-white hover:text-white/90 hover:bg-white/0'
+      : 'text-[#0f172a] hover:text-[#312e81] hover:bg-white/5'" class="text-sm font-semibold transition-colors duration-200">
+            {{ dashboardLabel() }}
+          </a>
+          <button (click)="logout()"
+        [ngClass]="isScrolled
+      ? 'text-white hover:text-white hover:bg-white/10'
+      : 'text-[#0f172a] hover:text-[#312e81]'"
+            class="px-4 py-2 rounded-full border text-indigo-600 text-sm font-semibold hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200">
+            Se deconnecter
+          </button>
+        }
+      </div>
+
+      <!-- ── Mobile burger ── -->
+      <button
+        class="lg:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-lg hover:bg-white/5 transition-colors duration-200"
+        (click)="toggleMobileMenu()"
+        aria-label="Menu"
+      >
+        <span
+         [ngClass]="isScrolled ? 'bg-white' : 'bg-[#0f172a]'"
+          class="block w-5 h-[2px]   rounded-full transition-all duration-300 origin-center"
+          [class.rotate-45]="mobileOpen"
+          [class.translate-y-[7px]]="mobileOpen"
+        ></span>
+        <span
+         [ngClass]="isScrolled ? 'bg-white' : 'bg-[#0f172a]'"
+          class="block w-5 h-[2px]   rounded-full transition-all duration-300"
+          [class.opacity-0]="mobileOpen"
+          [class.scale-x-0]="mobileOpen"
+        ></span>
+        <span
+         [ngClass]="isScrolled ? 'bg-white' : 'bg-[#0f172a]'"
+          class="block w-5 h-[2px]  rounded-full transition-all duration-300 origin-center"
+          [class.-rotate-45]="mobileOpen"
+          [class.-translate-y-[7px]]="mobileOpen"
+        ></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Mobile menu ── -->
+  <div
+    class="lg:hidden overflow-hidden transition-all duration-300 ease-in-out"
+    [class.max-h-0]="!mobileOpen"
+    [class.max-h-screen]="mobileOpen"
+    [class.opacity-0]="!mobileOpen"
+    [class.opacity-100]="mobileOpen"
+  >
+    <div class="bg-white/10 border-t border-white/10 px-4 py-4 space-y-1">
+
+      <!-- Mobile: Bootcamps -->
+      <div>
+        <button
+          class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-800 hover:bg-white/5 transition-colors"
+          (click)="toggleMobileSection('bootcamps')"
+        >
+          <span>Bootcamps</span>
+          <!-- <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="mobileSection === 'bootcamps'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg> -->
+        </button>
+     <div 
+          class="overflow-hidden transition-all duration-300"
+          [class.max-h-0]="mobileSection !== 'bootcamps'"
+          [class.max-h-96]="mobileSection === 'bootcamps'"
+        >
+          <div class="pl-4 py-2 space-y-1">
+            <a *ngFor="let cat of bootcampCategories" href="#"
+              class="flex items-center justify-between px-4 py-2 rounded-lg text-sm text-[#0f172a] hover:text-white hover:bg-white/5 transition-all">
+              <span>{{ cat.label }}</span>
+              <span class="text-xs text-indigo-400">{{ cat.count }}</span>
+            </a>
+          </div>
+        </div> 
+      </div>
+
+      <!-- Mobile: Cours gratuits -->
+      <div>
+        <button
+          class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-800 hover:bg-white/5 transition-colors"
+          (click)="toggleMobileSection('cours')"
+        >
+          <span>Cours gratuits</span>
+          <!-- <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="mobileSection === 'cours'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>-->
+        </button> 
+        <!-- <div
+          class="overflow-hidden transition-all duration-300"
+          [class.max-h-0]="mobileSection !== 'cours'"
+          [class.max-h-96]="mobileSection === 'cours'"
+        >
+          <div class="pl-4 py-2 space-y-1">
+            <a *ngFor="let item of freeCourses" href="#"
+              class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+              <span>{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </a>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- Mobile: Ressources -->
+      <div>
+        <button
+          class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-800 hover:bg-white/5 transition-colors"
+          (click)="toggleMobileSection('ressources')"
+        >
+          <span>Ressources</span>
+          <!-- <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="mobileSection === 'ressources'" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>-->
+        </button> 
+        <!-- <div
+          class="overflow-hidden transition-all duration-300"
+          [class.max-h-0]="mobileSection !== 'ressources'"
+          [class.max-h-96]="mobileSection === 'ressources'"
+        >
+          <div class="pl-4 py-2 space-y-1">
+            <a *ngFor="let r of resources" href="#"
+              class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+              <span>{{ r.icon }}</span>
+              <div>
+                <p class="font-medium text-white">{{ r.label }}</p>
+                <p class="text-xs text-slate-500">{{ r.desc }}</p>
+              </div>
+            </a>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- Mobile: Talents -->
+      <a routerLink="/talents" class="block px-4 py-3 rounded-xl text-sm font-medium text-slate-800 hover:bg-white/5 transition-colors">
+        Talents
+      </a>
+
+      <!-- Mobile: CTAs -->
+      <div class="pt-3 border-t border-white/10 space-y-2">
+        <button class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-[#312e81] text-white text-sm font-semibold shadow-lg">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+          Parler à un conseiller
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          @if (!isAuth()) {
+            <a routerLink="/auth/connexion" class="text-center px-4 py-2.5 rounded-full text-sm font-semibold text-indigo-400 hover:text-indigo-300 border border-white/10 hover:bg-white/5 transition-all">
+              Se connecter
+            </a>
+            <a routerLink="/auth/inscription" class="text-center px-4 py-2.5 rounded-full border border-indigo-500 text-indigo-300 text-sm font-semibold hover:bg-indigo-600 hover:text-white transition-all">
+              Commencer
+            </a>
+          } @else {
+            <a [routerLink]="dashboardLink()" class="text-center px-4 py-2.5 rounded-full text-sm font-semibold text-indigo-400 hover:text-indigo-300 border border-white/10 hover:bg-white/5 transition-all">
+              Dashboard
+            </a>
+            <button (click)="logout()" class="text-center px-4 py-2.5 rounded-full border border-indigo-500 text-indigo-300 text-sm font-semibold hover:bg-indigo-600 hover:text-white transition-all">
+              Deconnexion
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Spacer so content doesn't hide under fixed header -->
+<div class="h-[68px] lg:h-[72px]"></div>

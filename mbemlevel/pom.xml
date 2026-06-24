@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       PARENT Spring Boot 4.0.5
+       Gère automatiquement les versions de toutes les dépendances
+       Spring. Ne JAMAIS surcharger une version gérée par ce BOM
+       sans raison impérative.
+       ═══════════════════════════════════════════════════════════════ -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.0.5</version>
+    <relativePath/>
+  </parent>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       IDENTITÉ
+       ═══════════════════════════════════════════════════════════════ -->
+  <groupId>com.mbem</groupId>
+  <artifactId>mbemlevel</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>MbemNova</name>
+  <description>Plateforme EdTech — Formation tech Afrique Centrale</description>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       PROPRIÉTÉS — Toutes les versions non-BOM centralisées ici.
+       Modifier une version : changer UNE ligne dans cette section.
+       ═══════════════════════════════════════════════════════════════ -->
+  <properties>
+    <!-- Runtime -->
+    <java.version>17</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Versions hors BOM Spring Boot 4 (explicites obligatoires) -->
+    <mapstruct.version>1.6.3</mapstruct.version>
+    <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    <bucket4j.version>8.10.1</bucket4j.version>
+    <resilience4j.version>2.3.0</resilience4j.version>
+    <springdoc.version>2.8.9</springdoc.version>
+    <itext.version>6.3.2</itext.version>
+    <awssdk.version>2.29.50</awssdk.version>
+    <archunit.version>1.3.0</archunit.version>
+    <jasypt.version>3.0.5</jasypt.version>
+    <commons-io.version>2.18.0</commons-io.version>
+
+    <!-- Versions plugins Maven -->
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+    <jacoco.version>0.8.12</jacoco.version>
+    <owasp-dependency-check.version>11.1.1</owasp-dependency-check.version>
+    <spring-cloud.version>2025.1.1</spring-cloud.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SPRING BOOT — Web MVC (REST)
+         Utilise spring-boot-starter-web (MVC + Tomcat embarqué).
+         NE PAS ajouter spring-webflux : incompatible dans le même
+         contexte applicatif que spring-boot-starter-web.
+         ═══════════════════════════════════════════════════════════ -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- Validation Jakarta EE 11 (@NotBlank, @Email…) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <!-- AOP — @Aspect pour Audit, Performance, Sécurité -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+      <version>4.0.0-M2</version>
+    </dependency>
+
+    <!-- Processor @ConfigurationProperties (génère metadata IDE) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BASE DE DONNÉES
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Spring Data JPA + Hibernate 7 (jakarta.persistence.*) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Driver PostgreSQL -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Flyway Core — migrations versionnées -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+
+    <!--
+      OBLIGATOIRE depuis Flyway 10 : module spécifique PostgreSQL.
+      Sans cette dépendance, Flyway lève une erreur au démarrage :
+      "No Flyway Community Edition extension found for postgresql"
+    -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CACHE — Redis (Lettuce client inclus dans le starter)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Spring Data Redis -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- Annotations @Cacheable @CacheEvict @CachePut -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SÉCURITÉ — Spring Security 7 + JWT (Nimbus JOSE)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Spring Security 7 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    <!--
+      OAuth2 Resource Server inclut nimbus-jose-jwt.
+      Fournit JwtDecoder, JwtEncoder, BearerTokenAuthenticationFilter.
+      Ne pas ajouter nimbus-jose-jwt séparément : doublon de version.
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         RATE LIMITING — Bucket4j (algorithme token bucket)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j-core</artifactId>
+      <version>${bucket4j.version}</version>
+    </dependency>
+
+    <!-- Stockage distribué des buckets dans Redis -->
+    <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j-redis</artifactId>
+      <version>${bucket4j.version}</version>
+    </dependency>
+
+    <!-- <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency> -->
+
+    <!-- ═══════════════════════════════════════════════════════════
+         RÉSILIENCE — Circuit Breaker, Retry (Resilience4j)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!--
+      Utiliser spring-boot3 même pour Spring Boot 4 (API compatible).
+      Le suffix -boot3 signifie "compatible Spring Boot 3/4 + Jakarta EE".
+    -->
+    <dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-spring-boot3</artifactId>
+      <version>${resilience4j.version}</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MONITORING — Actuator + Prometheus
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- /actuator/health · /actuator/metrics · /actuator/prometheus -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Export métriques Prometheus (scraping par Grafana) -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+    </dependency>
+
+    <!-- Distributed tracing pour corréler les logs -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-tracing-bridge-brave</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.coobird</groupId>
+      <artifactId>thumbnailator</artifactId>
+      <version>0.4.20</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         EMAIL + TEMPLATES HTML (Thymeleaf)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         PDF — iText 8 (factures + certificats)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- BOM iText (importer les modules séparément) -->
+    <!--    <dependency>-->
+    <!--      <groupId>com.itextpdf</groupId>-->
+    <!--      <artifactId>itext-core</artifactId>-->
+    <!--      <version>9.6.0</version>-->
+    <!--    </dependency>-->
+
+    <!-- Conversion HTML → PDF (templates Thymeleaf → PDF) -->
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>html2pdf</artifactId>
+      <version>6.3.2</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         STOCKAGE OBJET — AWS SDK S3 v2 (compatible MinIO)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>${awssdk.version}</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MAPPING — MapStruct + Lombok
+         ORDRE CRITIQUE dans annotationProcessorPaths :
+         Lombok → lombok-mapstruct-binding → MapStruct
+         Inverser cet ordre = getters non trouvés à la compilation
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.30</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- ═══════════════════════════════════════════════════════════
+         DOCUMENTATION API — SpringDoc OpenAPI 3 (Swagger UI)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>${springdoc.version}</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CHIFFREMENT — Jasypt (champs sensibles en BDD)
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>com.github.ulisesbocchio</groupId>
+      <artifactId>jasypt-spring-boot-starter</artifactId>
+      <version>${jasypt.version}</version>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         UTILITAIRES
+         ═══════════════════════════════════════════════════════════ -->
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+    </dependency>
+
+    <!-- Module Jackson pour java.time.* (LocalDateTime → JSON ISO) -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         TESTS
+         ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Spring Boot Test (MockMvc, @SpringBootTest, Mockito) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- @WithMockUser, SecurityMockMvcRequestPostProcessors -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testcontainers — intégration Spring Boot (gère le lifecycle) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+      <version>1.21.4</version>
+    </dependency>
+
+    <!-- PostgreSQL réel en test d'intégration -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+      <version>1.21.4</version>
+
+    </dependency>
+
+    <!-- ArchUnit — validation architecture hexagonale à la compilation -->
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- H2 — base mémoire pour tests unitaires ultra-rapides -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       BUILD — PLUGINS
+       ═══════════════════════════════════════════════════════════════ -->
+  <build>
+    <plugins>
+
+      <!-- Spring Boot Maven Plugin — JAR exécutable -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- Exclure Lombok du JAR final (compile-time uniquement) -->
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <!-- Génère META-INF/build-info.properties (version, git commit) -->
+            <goals>
+              <goal>build-info</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- ───────────────────────────────────────────────────────
+           Compilateur Java 17
+           ORDRE annotationProcessorPaths CRITIQUE :
+           1. Lombok  → génère getters/setters/constructeurs
+           2. Binding → compatibilité Lombok + MapStruct
+           3. MapStruct → utilise les getters Lombok
+           4. SB Config → génère metadata @ConfigurationProperties
+           ─────────────────────────────────────────────────────── -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>17</source>
+          <target>17</target>
+          <encoding>UTF-8</encoding>
+          <!-- Option MapStruct : toujours utiliser Spring comme componentModel -->
+          <compilerArgs>
+            <arg>-Amapstruct.defaultComponentModel=spring</arg>
+            <arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <!-- 1. Lombok en premier — obligatoire -->
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.30</version>
+            </path>
+            <!-- 2. Binding Lombok-MapStruct — assure la compatibilité -->
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>${lombok-mapstruct-binding.version}</version>
+            </path>
+            <!-- 3. MapStruct processor — après Lombok -->
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+            <!-- 4. Spring Boot Config Processor -->
+            <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+              <version>4.0.5</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <!-- Tests unitaires (exclu les *IT.java) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <configuration>
+          <argLine>${argLine}</argLine>
+          <excludes>
+            <exclude>**/*IT.java</exclude>
+            <exclude>**/*IntegrationTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- Tests d'intégration (*IT.java — Testcontainers) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+        <configuration>
+          <argLine>${argLine}</argLine>
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*IntegrationTest.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        JaCoCo — Couverture de code.
+        Seuil minimum : 80% sur domain/ et application/usecase/
+        (le cœur métier doit être bien testé).
+      -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>PACKAGE</element>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.80</minimum>
+                    </limit>
+                  </limits>
+                  <includes>
+                    <include>com/mbem/mbemlevel/domain/**</include>
+                    <include>com/mbem/mbemlevel/application/usecase/**</include>
+                  </includes>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        OWASP Dependency Check — CVE scan.
+        Lancer manuellement : mvn dependency-check:check
+        Activé automatiquement dans le profil "prod".
+      -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${owasp-dependency-check.version}</version>
+        <configuration>
+          <failBuildOnCVSS>7</failBuildOnCVSS>
+          <skipTestScope>true</skipTestScope>
+          <formats>
+            <format>HTML</format>
+            <format>JSON</format>
+          </formats>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       PROFILS MAVEN
+       ═══════════════════════════════════════════════════════════════ -->
+  <profiles>
+
+    <!-- Développement local (actif par défaut) -->
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <!-- CI/CD (tests automatisés) -->
+    <profile>
+      <id>ci</id>
+      <properties>
+        <spring.profiles.active>test</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <!-- Production — active l'OWASP check obligatoire -->
+    <profile>
+      <id>prod</id>
+      <properties>
+        <spring.profiles.active>prod</spring.profiles.active>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

@@ -1,0 +1,52 @@
+/* header.component.css */
+
+/* ── Dropdown panel animation ────────────────────────────────────────────── */
+.dropdown-panel {
+  opacity: 0;
+  transform: translateY(-6px) translateX(-50%);
+  pointer-events: none;
+  transition:
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  /* override Tailwind's translate-x-1/2 since we handle it here */
+  left: 50%;
+}
+
+.dropdown-panel.open {
+  opacity: 1;
+  transform: translateY(0) translateX(-50%);
+  pointer-events: auto;
+}
+
+/* ── Nav link active underline ───────────────────────────────────────────── */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 60%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #6366f1, #818cf8);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ── Burger icon lines ────────────────────────────────────────────────────── */
+/* Tailwind handles the transforms via class binding, but we add transform-origin */
+button span {
+  transform-origin: center;
+}
+
+/* ── Scrolled header elevation ────────────────────────────────────────────── */
+header.scrolled {
+  border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+}

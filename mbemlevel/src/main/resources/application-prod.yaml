@@ -1,0 +1,100 @@
+# =============================================================================
+# MbemNova — Profil PROD (production VPS)
+# Activé par : SPRING_PROFILES_ACTIVE=prod
+#
+# RÈGLE ABSOLUE : Aucune valeur en dur ici.
+# TOUTES les valeurs sensibles viennent des variables d'environnement.
+# Utiliser .env.example comme référence → copier en .env local (jamais commité).
+#
+# Valeurs manquantes → l'application refusera de démarrer (fail-fast).
+# =============================================================================
+
+spring:
+  # ── Base de données PostgreSQL ────────────────────────────────────────────────
+  datasource:
+    # Format : jdbc:postgresql://host:5432/dbname?sslmode=require
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: HikariPool-Prod
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      # Détecte les connexions abandonnées (fuites)
+      leak-detection-threshold: 60000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate             # Flyway gère le schéma — validate seulement
+    show-sql: false                  # Jamais de SQL en prod (performance + sécurité)
+
+  # ── Redis avec TLS ───────────────────────────────────────────────────────────
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: true                # TLS obligatoire en prod
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 2
+
+  # ── Email SMTP sécurisé ──────────────────────────────────────────────────────
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:padol5342@gmail.com}
+    password: ${MAIL_PASSWORD:dodt jrfv ccdu ivmo}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.timeout: 10000
+      mail.smtp.connectiontimeout: 10000
+
+  thymeleaf:
+    cache: true                      # Cache templates en prod (perf)
+
+# ── Actuator sécurisé ────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        # Exposer uniquement le nécessaire pour Prometheus et la santé
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: when-authorized   # Détails réservés aux admins
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:0.05}  # 5% par défaut (configurable)
+
+# ── Swagger DÉSACTIVÉ en prod ────────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    enabled: false                   # JAMAIS exposer Swagger en production
+  api-docs:
+    enabled: false
+
+# ── JWT — secrets depuis les variables d'environnement ───────────────────────
+security:
+  jwt:
+    secret: ${JWT_SECRET}                                  # Min 32 chars / 256 bits
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}           # 24h par défaut
+    refresh-expiration-ms: ${JWT_REFRESH_MS:2592000000}    # 30j par défaut
+
+# ── Logs structurés JSON pour ELK (Elasticsearch/Logstash) ───────────────────
+logging:
+  level:
+    root: WARN
+    com.mbem.mbemlevel: INFO
+  # Les logs JSON sont configurés dans logback-spring.xml
+  # (le pattern console est ignoré en prod au profit du JSON appender)

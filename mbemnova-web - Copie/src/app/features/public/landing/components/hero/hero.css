@@ -1,0 +1,99 @@
+/* hero.component.css */
+
+/* ── Entrance animations ─────────────────────────────────────────────────── */
+
+.hero-badge,
+.hero-title,
+.hero-sub,
+.hero-trust,
+.hero-cta,
+.hero-stats,
+.hero-right {
+  opacity: 0;
+  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-badge   { animation-delay: 0.05s; }
+.hero-title   { animation-delay: 0.15s; }
+.hero-sub     { animation-delay: 0.25s; }
+.hero-trust   { animation-delay: 0.32s; }
+.hero-cta     { animation-delay: 0.38s; }
+.hero-stats   { animation-delay: 0.45s; }
+.hero-right   { animation-delay: 0.20s; }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Stat items stagger ──────────────────────────────────────────────────── */
+.stat-item {
+  opacity: 0;
+  animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.stat-item:nth-child(1) { animation-delay: 0.50s; }
+.stat-item:nth-child(2) { animation-delay: 0.58s; }
+.stat-item:nth-child(3) { animation-delay: 0.66s; }
+.stat-item:nth-child(4) { animation-delay: 0.74s; }
+
+/* ── Floating cards ──────────────────────────────────────────────────────── */
+.floating-card {
+  opacity: 0;
+  animation: floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  animation-name: floatInLeft;
+}
+
+.floating-card-2 {
+  opacity: 0;
+  animation: floatInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.75s forwards;
+}
+
+@keyframes floatInLeft {
+  from { opacity: 0; transform: translateX(-16px) translateY(8px); }
+  to   { opacity: 1; transform: translateX(0) translateY(0); }
+}
+
+@keyframes floatInRight {
+  from { opacity: 0; transform: translateX(16px) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(0) translateY(0); }
+}
+
+/* Subtle float loop on cards after entrance */
+.floating-card {
+  animation:
+    floatInLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards,
+    floatLoop 4s ease-in-out 1.2s infinite;
+}
+
+.floating-card-2 {
+  animation:
+    floatInRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.75s forwards,
+    floatLoop2 5s ease-in-out 1.4s infinite;
+}
+
+@keyframes floatLoop {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes floatLoop2 {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* ── Hero image wrap subtle entrance ────────────────────────────────────── */
+.hero-image-wrap {
+  opacity: 0;
+  animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}

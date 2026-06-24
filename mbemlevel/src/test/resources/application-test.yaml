@@ -1,0 +1,41 @@
+# =============================================================================
+# MbemNova — Surcharge de configuration pour les tests
+# Testcontainers gère la datasource via l'URL TC jdbc.
+# =============================================================================
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///mbemnova_test?TC_REUSABLE=true
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    clean-disabled: false
+  mail:
+    host: localhost
+    port: 25
+    properties:
+      mail.smtp.auth: false
+
+mbemnova:
+  whatsapp:
+    enabled: false
+  app:
+    url: http://localhost:8080
+
+security:
+  jwt:
+    secret: mbemnova-test-secret-key-fixed-for-reproducibility-256bits
+    expiration-ms: 3600000
+    refresh-expiration-ms: 86400000
+
+logging:
+  level:
+    root: WARN
+    com.mbem.mbemlevel: INFO
+    org.flywaydb: WARN
+
+springdoc:
+  swagger-ui:
+    enabled: false

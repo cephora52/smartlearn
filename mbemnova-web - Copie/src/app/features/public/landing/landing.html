@@ -1,0 +1,60 @@
+<div class="bg-white">
+
+  <!-- ── HERO (style Xarala — fond sombre + badge + stats) ── -->
+  <app-hero />
+
+  <!-- ── DOMAINES (filtre rapide) ──────────────────────── -->
+   <app-foramtions />
+
+  <!-- ── TIRAGE AU SORT ─────────────────────────────────── -->
+<!-- Ajoute ngSkipHydration sur le composant -->
+<app-blockticket ngSkipHydration />
+
+  <!-- ── MÉTHODE PÉDAGOGIQUE ───────────────────────────── -->
+  <!-- <section class="section bg-slate-50">
+    <div class="container">
+      <div class="text-center mb-12">
+        <p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mb-2">Notre méthode</p>
+        <h2 class="h2">Une méthode qui transforme les<br>
+          <span class="text-blue-600">débutants en professionnels</span>
+        </h2>
+        <p class="text-slate-500 mt-3 max-w-xl mx-auto">
+          Pas de cours passifs. Pas de théorie sans pratique. Chaque approche est pensée pour l'Afrique, avec les contraintes de l'Afrique.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (m of methode; track m.title; let i = $index) {
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-200
+                      hover:shadow-md transition-all duration-200 animate-fade-up"
+               [style]="'animation-delay:' + (i * 60) + 'ms'">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-2xl mb-4" aria-hidden="true">
+              {{ m.icon }}
+            </div>
+            <h3 class="font-bold text-slate-900 mb-2">{{ m.title }}</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">{{ m.desc }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section> -->
+
+  <!-- ── TÉMOIGNAGES / TOP TALENTS ─────────────────────── -->
+ <app-profil/>
+
+  <!-- ── PARTENAIRES / RECRUTEURS ─────────────────────── -->
+  <section class="py-10 bg-slate-50 border-y border-slate-100">
+    <div class="container text-center">
+      <p class="text-sm text-slate-400 mb-6">+50 entreprises recrutent nos diplômés</p>
+      <div class="flex flex-wrap justify-center items-center gap-8">
+        @for (p of partenaires; track p) {
+          <span class="text-slate-400 font-bold text-sm hover:text-slate-600 transition-colors">{{ p }}</span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA FINAL ─────────────────────────────────────── -->
+ <app-appel-action/>
+
+</div>

@@ -1,0 +1,106 @@
+/* ============================================================
+   MBEMNOVA · Design Tokens · Source de vérité unique
+   Pour changer l'UI : modifier ce fichier uniquement.
+   ============================================================ */
+
+:root {
+  /* ── Bleu primaire (confiance, apprentissage) ──────────── */
+  --p-50:  #eff6ff;
+  --p-100: #dbeafe;
+  --p-200: #bfdbfe;
+  --p-300: #93c5fd;
+  --p-400: #60a5fa;
+  --p-500: #3b82f6;
+  --p-600: #2563eb;   /* ← Action principale */
+  --p-700: #1d4ed8;   /* ← Hover */
+  --p-800: #1e40af;   /* ← Navbar / éléments forts */
+  --p-900: #1e3a8a;
+
+  /* ── Vert succès (progression, XP, certificat) ─────────── */
+  --s-50:  #f0fdf4;
+  --s-100: #dcfce7;
+  --s-500: #22c55e;
+  --s-600: #16a34a;   /* ← Badges succès */
+  --s-700: #15803d;
+
+  /* ── Ambre (relances, délais, avertissements) ───────────── */
+  --a-50:  #fffbeb;
+  --a-100: #fef3c7;
+  --a-500: #f59e0b;
+  --a-600: #d97706;   /* ← Badges warning */
+
+  /* ── Rouge (erreurs, suspension, retard) ───────────────── */
+  --r-50:  #fef2f2;
+  --r-100: #fee2e2;
+  --r-500: #ef4444;
+  --r-600: #dc2626;   /* ← Danger */
+
+  /* ── Or (gamification, XP, tirage) ────────────────────── */
+  --g-400: #fbbf24;
+  --g-500: #f59e0b;
+  --g-600: #d97706;
+
+  /* ── Violet (instructor, formateur) ────────────────────── */
+  --v-50:  #faf5ff;
+  --v-600: #9333ea;
+  --v-700: #7e22ce;
+
+  /* ── Neutres (surfaces, textes) ────────────────────────── */
+  --bg:         #ffffff;   /* Fond principal */
+  --bg-subtle:  #f8fafc;   /* Fond cartes */
+  --bg-muted:   #f1f5f9;   /* Fond inputs */
+  --border:     #e2e8f0;   /* Bordures */
+  --border-md:  #cbd5e1;   /* Bordures hover */
+
+  --tx:         #0f172a;   /* Texte principal */
+  --tx-sec:     #475569;   /* Texte secondaire */
+  --tx-muted:   #94a3b8;   /* Placeholder */
+  --tx-inv:     #ffffff;   /* Texte sur fond coloré */
+
+  /* ── Typographie ──────────────────────────────────────── */
+  --font:       'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Ombres ───────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0/.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0/.08),0 1px 2px -1px rgb(0 0 0/.06);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0/.07),0 2px 4px -2px rgb(0 0 0/.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0/.07),0 4px 6px -4px rgb(0 0 0/.05);
+  --shadow-focus: 0 0 0 3px rgb(37 99 235/.25);
+
+  /* ── Transitions ──────────────────────────────────────── */
+  --t-fast:   150ms ease;
+  --t-base:   200ms ease;
+  --t-slow:   300ms ease;
+  --t-spring: 350ms cubic-bezier(0.34,1.56,0.64,1);
+
+  /* ── Z-index ──────────────────────────────────────────── */
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-modal:    300;
+  --z-toast:    400;
+}
+
+/* ── Mode sombre — variables overrides ──────────────────── */
+.dark {
+  /* Surfaces */
+  --bg:         #0f172a;   /* Fond principal sombre */
+  --bg-subtle:  #1e293b;   /* Fond cartes sombre */
+  --bg-muted:   #334155;   /* Fond inputs sombre */
+  --border:     #1e293b;   /* Bordures sombre */
+  --border-md:  #334155;   /* Bordures hover sombre */
+
+  /* Textes */
+  --tx:         #f1f5f9;   /* Texte principal clair */
+  --tx-sec:     #94a3b8;   /* Texte secondaire */
+  --tx-muted:   #475569;   /* Texte désactivé */
+
+  /* Primaire reste la même teinte — juste plus lumineuse */
+  --p-600: #3b82f6;
+  --p-700: #2563eb;
+}
+
+/* Transitions douces pour le changement de thème */
+html {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

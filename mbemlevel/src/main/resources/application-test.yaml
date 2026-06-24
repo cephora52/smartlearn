@@ -1,0 +1,70 @@
+# =============================================================================
+# MbemNova — Profil TEST (Testcontainers + CI/CD)
+# Activé par : SPRING_PROFILES_ACTIVE=test
+#
+# Testcontainers démarre automatiquement PostgreSQL dans Docker.
+# L'URL JDBC tc:postgresql:// est interceptée par Testcontainers.
+# Redis : en mémoire via EmbeddedRedis ou Testcontainers Redis.
+# =============================================================================
+
+spring:
+  # ── PostgreSQL Testcontainers ────────────────────────────────────────────────
+  datasource:
+    # TC_REUSABLE=true : réutilise le container entre les tests (plus rapide)
+    url: jdbc:tc:postgresql:16:///mbemnova_test?TC_REUSABLE=true
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    hikari:
+      pool-name: HikariPool-Test
+      maximum-pool-size: 5
+      minimum-idle: 1
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false                   # Silencieux en CI
+
+  # ── Flyway — autoriser clean uniquement en test ──────────────────────────────
+  flyway:
+    clean-disabled: false             # Permet @Sql(scripts = "cleanup.sql")
+
+  # ── Email — désactivé en test ────────────────────────────────────────────────
+  mail:
+    host: localhost
+    port: 25
+    properties:
+      mail.smtp.auth: false
+
+  # ── Thymeleaf — cache en test ────────────────────────────────────────────────
+  thymeleaf:
+    cache: true
+
+# ── Actuator — minimal en test ────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  tracing:
+    sampling:
+      probability: 0.0              # Pas de tracing en test
+
+# ── Swagger désactivé en test ────────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+# ── JWT test (clé fixe pour reproductibilité) ────────────────────────────────
+security:
+  jwt:
+    secret: mbemnova-test-secret-key-fixed-for-reproducible-tests-256bits
+    expiration-ms: 3600000            # 1h en test (court pour tester l'expiration)
+    refresh-expiration-ms: 86400000   # 24h
+
+# ── Logs — warnings seulement en CI ──────────────────────────────────────────
+logging:
+  level:
+    root: WARN
+    com.mbem.mbemlevel: INFO
+    org.flywaydb: WARN

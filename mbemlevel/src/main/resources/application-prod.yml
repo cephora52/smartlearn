@@ -1,0 +1,161 @@
+# =============================================================================
+# MbemNova — Configuration PRODUCTION
+# Objectif : 500-2000 apprenants simultanés, p95 < 200ms
+# =============================================================================
+
+spring:
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:padol5342@gmail.com}
+    password: ${MAIL_PASSWORD:dodt jrfv ccdu ivmo}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.timeout: 10000
+      mail.smtp.connectiontimeout: 10000
+
+  # ── Virtual Threads Java 21 ─────────────────────────────────────────────────
+  # Active les threads virtuels pour TOUS les servlets, @Async et @Scheduled
+  # Impact : x5-x10 sur les I/O bound (lecture DB, appels API externes)
+  # Prérequis : Java 21+ (déjà dans le Dockerfile)
+  threads:
+    virtual:
+      enabled: true
+
+  # ── Base de données — Hikari Connection Pool optimisé ───────────────────────
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      pool-name: HikariPool-Prod
+
+      # Formule : (nb_cores × 2) + nb_disques = 8×2+1 = 17 → arrondi 20
+      # Pour un VPS 4 cores standard : 4×2+1 = 9 → mettre 15 pour la marge
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:8}
+
+      # Temps max d'attente pour obtenir une connexion (30s = erreur rapide)
+      connection-timeout: 30000
+
+      # Connexion inactive fermée après 10 min
+      idle-timeout: 600000
+
+      # Connexion recyclée après 30 min (évite les connexions zombies)
+      max-lifetime: 1800000
+
+      # ⚠️ CRITIQUE : détecte les connexions jamais fermées (fuites mémoire)
+      # Si une requête prend > 60s → WARNING dans les logs
+      leak-detection-threshold: 60000
+
+      # Keepalive pour éviter que la DB coupe les connexions inactives
+      keepalive-time: 30000
+
+      # Validation rapide de la connexion avant utilisation
+      connection-test-query: SELECT 1
+
+  # ── JPA — Optimisations production ──────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: validate          # JAMAIS create/update en prod
+      default_batch_fetch_size: 25  # Batch loading pour collections (anti N+1)
+    open-in-view: false           # DÉSACTIVÉ — évite les connexions ouvertes trop longtemps
+    show-sql: false               # PAS de SQL dans les logs prod (performances)
+    properties:
+      hibernate:
+        # Statistiques Hibernate (désactivées en prod pour les perfs)
+        generate_statistics: false
+
+        # ⚠️ SLOW QUERY DETECTION — log tout > 100ms
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 100
+
+        # Batch inserts/updates (crucial pour les imports en masse)
+        jdbc:
+          batch_size: 25
+          batch_versioned_data: true
+          order_inserts: true
+          order_updates: true
+
+        # Format du cache de 2ème niveau (pas utilisé maintenant mais prêt)
+        cache:
+          use_second_level_cache: false
+
+  # ── Redis — Pool de connexions optimisé ─────────────────────────────────────
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20      # Connexions simultanées max vers Redis
+          min-idle: 5         # Connexions maintenues en veille
+          max-idle: 10
+          max-wait: 1000ms    # Attente max si pool saturé
+
+  # ── Cache Spring — TTL par type de cache ────────────────────────────────────
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000   # TTL par défaut : 30 min (override par CacheConfig)
+      cache-null-values: false # Ne cache PAS les nulls
+
+  # ── Compression HTTP ─────────────────────────────────────────────────────────
+  # Nginx gère déjà la compression — Spring aussi pour les cas sans nginx
+  server:
+    compression:
+      enabled: true
+      mime-types: application/json,text/html,text/plain,text/css
+      min-response-size: 1024   # Seulement si > 1Ko
+
+    # HTTP/2 activé
+    http2:
+      enabled: true
+
+    # Tomcat tuning pour virtual threads
+    tomcat:
+      threads:
+        max: 200                # Threads Tomcat (avec virtual threads : illimités)
+      connection-timeout: 20000
+      max-connections: 10000
+      accept-count: 200
+
+  # ── Upload fichiers ───────────────────────────────────────────────────────────
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
+# ── Logging production ───────────────────────────────────────────────────────
+logging:
+  level:
+    root: WARN
+    com.mbem.mbemlevel: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    # ⚠️ Active pour détecter les slow queries
+    org.hibernate.stat: INFO
+  file:
+    name: /var/log/mbemnova/app.log
+
+# ── Actuator — endpoints de santé ───────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true   # /actuator/health/liveness + /actuator/health/readiness
+  metrics:
+    tags:
+      application: mbemnova
+      env: production

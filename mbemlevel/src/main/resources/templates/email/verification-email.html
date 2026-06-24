@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activation de compte MbemNova</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
+  <p>Bonjour <strong th:text="${prenom}">Apprenant</strong>,</p>
+  <p>Merci pour ton inscription sur MbemNova.</p>
+  <p>Active ton compte en cliquant sur ce lien :</p>
+  <p>
+    <a th:href="${lienVerification}" th:text="${lienVerification}">Activer mon compte</a>
+  </p>
+  <p>Si tu n'es pas à l'origine de cette inscription, ignore cet email.</p>
+</body>
+</html>

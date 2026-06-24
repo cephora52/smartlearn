@@ -1,0 +1,110 @@
+# =============================================================================
+# MbemNova — Profil DEV (développement local)
+# Activé par : SPRING_PROFILES_ACTIVE=dev (défaut)
+#
+# Ce fichier contient UNIQUEMENT les surcharges spécifiques au dev.
+# Toutes les valeurs sensibles utilisent des défauts sécurisés localement.
+# NE JAMAIS commiter de vraies credentials ici.
+# =============================================================================
+
+spring:
+  # ── Base de données PostgreSQL locale ───────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5435/mbemnova_dev
+    username: ${DB_USERNAME:mbemnova}
+    password: ${DB_PASSWORD:mbemnova_dev_123}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: HikariPool-Dev
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ── JPA — visible en dev pour debug ─────────────────────────────────────────
+  jpa:
+    hibernate:
+      # Flyway gère le schéma — JAMAIS create/update/create-drop en prod
+      ddl-auto: create 
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  # ── Redis local ──────────────────────────────────────────────────────────────
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          min-idle: 0
+
+  # ── Email SMTP Gmail ─────────────────────────────────────────────────────────
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:padol5342@gmail.com}
+    password: ${MAIL_PASSWORD:dodt jrfv ccdu ivmo}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.timeout: 10000
+      mail.smtp.connectiontimeout: 10000
+
+  # ── Thymeleaf — rechargement à chaud des templates ─────────────────────────
+  thymeleaf:
+    cache: false
+
+  # ── DevTools ────────────────────────────────────────────────────────────────
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+# ── Actuator — tout exposer en dev ────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0              # 100% des traces en dev
+
+# ── Swagger activé en dev ────────────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+
+# ── JWT — clé de dev (JAMAIS utiliser en prod) ───────────────────────────────
+security:
+  jwt:
+    secret: ${JWT_SECRET:mbemnova-dev-only-secret-key-change-in-production-min-256-bits}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}          # 24h
+    refresh-expiration-ms: ${JWT_REFRESH_MS:2592000000}   # 30j
+
+# ── Logs — DEBUG en dev ───────────────────────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.mbem.mbemlevel: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.flywaydb: DEBUG
+  pattern:
+    # Pattern lisible humain pour le terminal dev
+    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%X{requestId:--})] %logger{36} — %msg%n"

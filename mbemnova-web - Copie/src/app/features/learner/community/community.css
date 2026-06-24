@@ -1,0 +1,236 @@
+/* community.component.css */
+
+/* ══════════════════════════════════════
+   ROOT & LAYOUT
+══════════════════════════════════════ */
+
+.comm-root {
+  min-height: 100vh;
+  background: #f8f9fb;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.comm-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 3.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #f1f5f9;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.comm-inner {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px)  { .comm-inner { padding-inline: 1.5rem; } }
+@media (min-width: 1024px) { .comm-inner { padding-inline: 2rem; } }
+
+/* ── Body: sidebar + feed ── */
+.comm-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  padding-block: 1.25rem;
+  flex: 1;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .comm-body {
+    grid-template-columns: 220px 1fr;
+    gap: 1.5rem;
+    padding-block: 1.5rem;
+  }
+}
+
+/* ── Sidebar ── */
+.comm-sidebar {
+  position: sticky;
+  top: calc(3.5rem + 1.5rem);
+}
+
+/* ── Feed ── */
+.comm-feed {
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════
+   COMPOSER
+══════════════════════════════════════ */
+
+.comm-composer {
+  transition: border-color 0.15s ease;
+}
+
+.comm-composer.focused {
+  border-color: #93c5fd; /* blue-300 */
+}
+
+.comm-textarea {
+  display: block;
+  min-height: 100px;
+}
+
+.comm-composer-bar {
+  background: #fafafa;
+}
+
+.comm-submit-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.comm-submit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.comm-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ══════════════════════════════════════
+   FILTRES SIDEBAR
+══════════════════════════════════════ */
+
+.comm-filter-btn {
+  border-left: 2px solid transparent;
+}
+
+.comm-filter-btn.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+  border-left-color: #2563eb;
+}
+
+.comm-filter-btn.inactive {
+  color: #64748b;
+}
+
+.comm-filter-btn.inactive:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+/* Filtres mobile chips */
+.active-chip {
+  background: #2563eb;
+  color: #fff;
+}
+
+.inactive-chip {
+  background: #fff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.inactive-chip:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+/* ══════════════════════════════════════
+   THREADS
+══════════════════════════════════════ */
+
+.comm-thread {
+  /* border déjà dans le HTML */
+}
+
+.comm-thread:hover {
+  /* subtle lift sans shadow */
+}
+
+.comm-replies {
+  /* bg légèrement plus sombre que le thread */
+}
+
+/* Badge résolu */
+.comm-badge-resolved {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* Réponse inline */
+.comm-reply-send {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.comm-reply-send:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.comm-reply-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── CTA sidebar ── */
+.comm-cta-btn {
+  letter-spacing: -0.01em;
+}
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+
+.fade-in {
+  animation: commFadeUp 0.25s ease-out both;
+}
+
+@keyframes commFadeUp {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════
+   SKELETON
+══════════════════════════════════════ */
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.animate-pulse > * {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* ══════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════ */
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ══════════════════════════════════════
+   MOBILE
+══════════════════════════════════════ */
+
+@media (max-width: 639px) {
+  .comm-inner {
+    padding-inline: 0.875rem;
+  }
+  .comm-body {
+    padding-block: 0.875rem;
+    gap: 0.875rem;
+  }
+  .comm-textarea {
+    min-height: 80px;
+  }
+}

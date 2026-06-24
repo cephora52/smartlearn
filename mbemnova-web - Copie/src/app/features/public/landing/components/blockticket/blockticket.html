@@ -1,0 +1,173 @@
+<!-- blockticket.component.html -->
+
+<div
+  *ngIf="visible"
+  class="ticket-wrapper relative w-full overflow-hidden"
+  role="region"
+  aria-label="Tirage au sort mensuel MbemX"
+>
+
+  <!-- ══ Background layers ══ -->
+  <!-- Deep dark with warm gold undertone -->
+  <div class="absolute inset-0 bg-[#0c0a06]"></div>
+  <!-- Diagonal gold gradient -->
+  <div class="absolute inset-0"
+       style="background:linear-gradient(135deg,rgba(234,179,8,0.12) 0%,rgba(161,98,7,0.06) 40%,transparent 70%)">
+  </div>
+  <!-- Noise texture overlay -->
+  <div class="absolute inset-0 opacity-[0.035] noise-bg pointer-events-none"></div>
+  <!-- Top gold line -->
+  <div class="absolute top-0 left-0 right-0 h-[2px]"
+       style="background:linear-gradient(90deg,transparent 0%,#ca8a04 20%,#fbbf24 50%,#ca8a04 80%,transparent 100%)">
+  </div>
+  <!-- Bottom gold line -->
+  <div class="absolute bottom-0 left-0 right-0 h-[1px]"
+       style="background:linear-gradient(90deg,transparent 0%,#92400e 30%,#d97706 50%,#92400e 70%,transparent 100%)">
+  </div>
+
+  <!-- Animated particles -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+    <div *ngFor="let p of particles"
+         class="particle absolute rounded-full"
+         [style.left]="p.x + '%'"
+         [style.top]="p.y + '%'"
+         [style.width]="p.size + 'px'"
+         [style.height]="p.size + 'px'"
+         [style.animationDelay]="p.delay + 's'"
+         [style.animationDuration]="p.duration + 's'"
+         [style.background]="p.color">
+    </div>
+  </div>
+
+  <!-- ══ Content ══ -->
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-8">
+
+      <!-- ── Left: ticket visual + headline ── -->
+      <div class="flex items-start sm:items-center gap-4 flex-1 min-w-0">
+
+        <!-- Ticket SVG icon -->
+        <div class="ticket-icon-wrap relative flex-shrink-0">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" class="ticket-icon">
+            <!-- Glow -->
+            <circle cx="28" cy="28" r="27" fill="url(#ticketGlow)" opacity="0.15"/>
+            <!-- Ticket body -->
+            <rect x="4" y="14" width="48" height="28" rx="4" fill="url(#ticketGrad)" />
+            <!-- Perforation left -->
+            <circle cx="4" cy="28" r="5" fill="#0c0a06"/>
+            <!-- Perforation right -->
+            <circle cx="52" cy="28" r="5" fill="#0c0a06"/>
+            <!-- Dashed divider -->
+            <line x1="18" y1="14" x2="18" y2="42" stroke="#92400e" stroke-width="1" stroke-dasharray="3 2"/>
+            <!-- Star -->
+            <path d="M33 22l1.5 3.5L38 27l-3.5 1.5L33 32l-1.5-3.5L28 27l3.5-1.5z" fill="#fbbf24"/>
+            <!-- Small star -->
+            <path d="M24 19l.8 1.8L27 21l-2.2.8-.8 2.2-.8-2.2L21 21l2.2-.8z" fill="#fbbf24" opacity="0.6"/>
+            <!-- Number stub -->
+            <rect x="6" y="24" width="8" height="2" rx="1" fill="#fbbf24" opacity="0.4"/>
+            <rect x="6" y="28" width="6" height="2" rx="1" fill="#fbbf24" opacity="0.3"/>
+            <defs>
+              <linearGradient id="ticketGrad" x1="4" y1="14" x2="52" y2="42" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#78350f"/>
+                <stop offset="100%" stop-color="#451a03"/>
+              </linearGradient>
+              <radialGradient id="ticketGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fbbf24"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+            </defs>
+          </svg>
+          <!-- Pulse ring -->
+          <div class="pulse-ring absolute inset-0 rounded-full border border-amber-500/30"></div>
+        </div>
+
+        <!-- Text -->
+        <div class="min-w-0">
+          <!-- Live badge -->
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-amber-400">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400"></span>
+              </span>
+              Tirage mensuel · Places limitées
+            </span>
+          </div>
+
+          <!-- Headline -->
+          <h3 class="text-white font-black text-base sm:text-lg leading-tight">
+            Gagnez&nbsp;
+            <span class="text-amber-400 underline decoration-amber-600/40 decoration-2 underline-offset-2">
+              {{ draw().formationGagnanteTitre }}
+            </span>
+            <span class="text-amber-200/70"> — offerte.</span>
+          </h3>
+
+          <!-- Sub info -->
+          <p class="text-amber-200/50 text-[12px] sm:text-[13px] mt-1 leading-snug">
+            <span class="text-amber-300/80 font-semibold">{{ draw().prixTicketFcfa  }}&nbsp;FCFA</span> le ticket
+            <!-- <span class="text-amber-300/80 font-semibold">{{ draw().prixTicketFcfa | number:'1.0-0' }}&nbsp;FCFA</span> le ticket -->
+            &nbsp;·&nbsp;
+            <span class="text-white/60">{{ draw().nbTicketsVendus }} participants</span>
+            &nbsp;·&nbsp;
+            Tirage le <span class="text-white/80 font-medium">{{ draw().dateDrawFormatee }}</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- ── Center: countdown ── -->
+      <div class="flex items-center gap-3 lg:mx-8 flex-shrink-0">
+        <div *ngFor="let unit of countdown; let last = last" class="flex items-center gap-3">
+          <div class="countdown-block text-center">
+            <div class="countdown-number">{{ unit.value }}</div>
+            <div class="countdown-label">{{ unit.label }}</div>
+          </div>
+          <span *ngIf="!last" class="text-amber-600/60 font-black text-lg pb-3">:</span>
+        </div>
+      </div>
+
+      <!-- ── Right: CTA + dismiss ── -->
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <!-- Participant count mini -->
+        <div class="hidden sm:flex items-center gap-2 mr-1">
+          <div class="flex -space-x-1.5">
+            <div *ngFor="let a of miniAvatars"
+                 class="w-6 h-6 rounded-full border-2 border-[#0c0a06] text-white text-[9px] font-bold flex items-center justify-center"
+                 [style.background]="a.bg">{{ a.i }}</div>
+          </div>
+          <span class="text-amber-200/50 text-[11px]">+{{ draw().nbTicketsVendus }}</span>
+        </div>
+
+        <!-- CTA -->
+        <a
+          routerLink="/auth/inscription"
+          class="ticket-cta relative inline-flex items-center gap-2
+                 px-5 sm:px-6 py-2.5 rounded-full font-black text-sm
+                 text-amber-950 overflow-hidden flex-shrink-0"
+        >
+          <span class="relative z-10 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+            </svg>
+            Prendre mon ticket
+          </span>
+        </a>
+
+        <!-- Dismiss -->
+        <button
+          (click)="dismiss()"
+          class="w-7 h-7 rounded-full flex items-center justify-center
+                 text-amber-600/40 hover:text-amber-400 hover:bg-white/5
+                 transition-all duration-150 flex-shrink-0"
+          aria-label="Fermer"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

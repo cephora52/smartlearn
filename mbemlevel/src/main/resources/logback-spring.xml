@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MbemNova — Configuration Logback
+  - DEV   : logs colorés lisibles sur le terminal
+  - PROD  : logs JSON structurés pour collecte ELK (Logstash)
+  - MDC   : requestId, userId, method, path injectés automatiquement
+            par RequestLoggingFilter dans chaque ligne de log
+-->
+<configuration scan="true" scanPeriod="30 seconds">
+
+  <!-- Variables de configuration -->
+  <springProperty name="APP_NAME" source="spring.application.name" defaultValue="mbemlevel"/>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       APPENDER DEV : Console colorée et lisible
+  ════════════════════════════════════════════════════════════════ -->
+  <springProfile name="dev">
+    <appender name="CONSOLE_DEV" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <!-- Couleurs + MDC requestId + userId -->
+        <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%X{requestId:--})] [%yellow(%X{userId:--})] %logger{36} — %msg%n</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE_DEV"/>
+    </root>
+
+    <logger name="com.mbem.mbemlevel" level="DEBUG" additivity="false">
+      <appender-ref ref="CONSOLE_DEV"/>
+    </logger>
+  </springProfile>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       APPENDER TEST : Minimal, sans couleurs
+  ════════════════════════════════════════════════════════════════ -->
+  <springProfile name="test">
+    <appender name="CONSOLE_TEST" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%d{HH:mm:ss} %-5level [%X{requestId:--}] %logger{36} — %msg%n</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+
+    <root level="WARN">
+      <appender-ref ref="CONSOLE_TEST"/>
+    </root>
+
+    <logger name="com.mbem.mbemlevel" level="INFO" additivity="false">
+      <appender-ref ref="CONSOLE_TEST"/>
+    </logger>
+  </springProfile>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       APPENDER PROD : JSON structuré pour ELK
+       Chaque ligne de log = un objet JSON sur une seule ligne
+       → parsé automatiquement par Logstash
+  ════════════════════════════════════════════════════════════════ -->
+  <springProfile name="prod">
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <!-- Champs fixes dans chaque log JSON -->
+        <customFields>{"app":"${APP_NAME}"}</customFields>
+        <!-- MDC automatiquement inclus (requestId, userId, method, path) -->
+        <includeMdcKeyName>requestId</includeMdcKeyName>
+        <includeMdcKeyName>userId</includeMdcKeyName>
+        <includeMdcKeyName>method</includeMdcKeyName>
+        <includeMdcKeyName>path</includeMdcKeyName>
+        <includeMdcKeyName>ip</includeMdcKeyName>
+        <!-- Masquer les données sensibles dans les logs -->
+        <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+          <maxDepthPerCause>10</maxDepthPerCause>
+          <rootCauseFirst>true</rootCauseFirst>
+        </throwableConverter>
+      </encoder>
+    </appender>
+
+    <root level="WARN">
+      <appender-ref ref="CONSOLE_JSON"/>
+    </root>
+
+    <logger name="com.mbem.mbemlevel" level="INFO" additivity="false">
+      <appender-ref ref="CONSOLE_JSON"/>
+    </logger>
+
+    <!-- Alertes Flyway et sécurité toujours loggées -->
+    <logger name="org.flywaydb" level="INFO"/>
+    <logger name="org.springframework.security" level="WARN"/>
+  </springProfile>
+
+</configuration>

@@ -1,0 +1,122 @@
+# =============================================================================
+# MbemNova — Docker Compose développement local
+#
+# SERVICES :
+#   postgres  — PostgreSQL 16
+#   redis     — Redis 7.2
+#   minio     — Stockage objet S3-compatible
+#   mailhog   — SMTP local (interface web port 8025)
+#   app       — Spring Boot 4 (optionnel, lancer via mvn en dev)
+#
+# USAGE :
+#   docker-compose up -d          # Lancer l'infra
+#   docker-compose up -d app      # Lancer avec l'application
+#   docker-compose logs -f app    # Voir les logs
+#   docker-compose down -v        # Arrêter + supprimer les volumes
+# =============================================================================
+
+services:
+
+  # ── PostgreSQL 16 ────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: mbemnova-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       mbemnova_dev
+      POSTGRES_USER:     mbemnova
+      POSTGRES_PASSWORD: mbemnova_dev_123
+      TZ:                Africa/Douala
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mbemnova -d mbemnova_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis 7.2 ────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: mbemnova-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── MinIO (S3-compatible) ────────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: mbemnova-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER:     minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # API S3
+      - "9001:9001"   # Console web
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── MailHog (SMTP dev + interface web) ──────────────────────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mbemnova-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Interface web (voir les emails envoyés)
+
+  # ── Application Spring Boot 4 (optionnel en dev) ────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SPRING_PROFILE: dev
+    container_name: mbemnova-app
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis:    { condition: service_healthy }
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL:     jdbc:postgresql://postgres:5432/mbemnova_dev
+      DATABASE_USERNAME: mbemnova
+      DATABASE_PASSWORD: mbemnova_dev_123
+      REDIS_HOST:        redis
+      REDIS_PORT:        "6379"
+      MINIO_ENDPOINT:    http://minio:9000
+      MAIL_HOST:         mailhog
+      MAIL_PORT:         "1025"
+      JWT_SECRET:        mbemnova-dev-secret-key-CHANGE-IN-PRODUCTION-min-256-bits
+      SERVER_PORT:       "8080"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 3
+    profiles: ["full"]  # docker-compose --profile full up
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

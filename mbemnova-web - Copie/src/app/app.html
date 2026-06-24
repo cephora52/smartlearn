@@ -1,0 +1,230 @@
+<!-- MbemNova App Shell — Header PUBLIC ≠ Header CONNECTÉ -->
+
+<!-- Barre loading -->
+@if (loading()) {
+  <div class="fixed top-0 left-0 right-0 z-[500] h-0.5 bg-blue-100 overflow-hidden" role="progressbar" aria-label="Chargement">
+    <div class="h-full bg-blue-600" style="animation:loadingBar 1.5s ease-in-out infinite;"></div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  HEADER PUBLIC (non connecté) — logo + liens catalogue    -->
+<!-- ══════════════════════════════════════════════════════════ -->
+@switch (activeHeader()) {
+  @case ('public') {
+    <app-header></app-header>
+  }
+  @case ('learner') {
+    <app-learner-header></app-learner-header>
+  }
+  @case ('instructor') {
+    <app-instructor-header></app-instructor-header>
+  }
+  @case ('admin') {
+    <app-admin-header></app-admin-header>
+  }
+}
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  HEADER CONNECTÉ — navigation adaptée au rôle            -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- @if (isAuth()) { -->
+  <!-- <header class="sticky top-0 z-40 bg-white border-b border-slate-100">
+    <nav class="container flex items-center h-16 gap-2" aria-label="Navigation principale">
+
+      <!-- Logo - 
+      <a routerLink="/" class="flex items-center gap-2 group shrink-0 mr-3" aria-label="MbemNova — Accueil">
+        <svg width="34" height="34" viewBox="0 0 36 36" fill="none" class="group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+          <circle cx="18" cy="18" r="18" fill="#2563eb"/>
+          <path d="M8 26V11l10 8 10-8v15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="28" cy="10" r="3" fill="#f59e0b" class="animate-dot-pulse"/>
+        </svg>
+        <span class="font-bold text-base text-slate-900 hidden sm:block">Mbem<span class="text-blue-600">Nova</span></span>
+      </a>
+
+      <!-- Navigation contextuelle par rôle - 
+      <div class="hidden md:flex items-center gap-0.5 flex-1">
+        @for (link of navLinks(); track link.href) {
+          <a [routerLink]="link.href"
+             routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+             [routerLinkActiveOptions]="{ exact: link.href === '/app' || link.href === '/admin' || link.href === '/instructor' }"
+             class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors duration-150">
+            {{ link.label }}
+          </a>
+        }
+      </div>
+
+      <div class="flex-1 md:flex-none"></div>
+
+      <!-- Actions droite (connecté) - 
+      <div class="flex items-center gap-1.5">
+
+        <!-- Cloche notifications  
+        <a routerLink="/app/notifications"
+           class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+           aria-label="Notifications">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          @if (hasUnread()) {
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" aria-label="Nouvelles notifications"></span>
+          }
+        </a>
+
+        <!-- Menu utilisateur - 
+        <div class="relative">
+          <button (click)="toggleUserMenu()"
+                  class="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                  [attr.aria-expanded]="userMenuOpen()" aria-haspopup="true">
+            <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+              {{ user()?.prenom?.charAt(0)?.toUpperCase() ?? '?' }}
+            </div>
+            <span class="hidden sm:block text-sm font-medium text-slate-700 max-w-20 truncate">{{ user()?.prenom }}</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-slate-400 hidden sm:block" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          @if (userMenuOpen()) {
+            <div class="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-xl border border-slate-200 shadow-lg py-1.5 z-50 animate-slide-down" role="menu">
+              <!-- Rôle badge - 
+              <div class="px-3 py-2 border-b border-slate-100 mb-1">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  {{ role() === 'ADMIN' || role() === 'SUPER_ADMIN' ? 'Administrateur' : role() === 'FORMATEUR' ? 'Formateur' : 'Apprenant' }}
+                </p>
+                <p class="text-sm text-slate-900 font-medium truncate">{{ user()?.email }}</p>
+              </div>
+
+              @if (role() === 'APPRENANT') {
+                <a routerLink="/app/profil" (click)="closeAll()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 w-full" role="menuitem">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Mon profil
+                </a>
+                <a routerLink="/app/paiements" (click)="closeAll()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 w-full" role="menuitem">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Mes paiements
+                </a>
+              }
+
+              <div class="border-t border-slate-100 mt-1 pt-1">
+                <button (click)="logout()" class="flex items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full transition-colors" role="menuitem">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  Se déconnecter
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Burger mobile connecté  
+        <button (click)="toggleMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+                [attr.aria-expanded]="menuOpen()" aria-label="Menu">
+          @if (!menuOpen()) {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          }
+        </button>
+      </div>
+    </nav>
+
+    <!-- Menu mobile connecté - 
+    @if (menuOpen()) {
+      <div class="md:hidden border-t border-slate-100 bg-white animate-slide-down">
+        <div class="container py-3 space-y-0.5">
+          @for (link of navLinks(); track link.href) {
+            <a [routerLink]="link.href" (click)="closeAll()"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
+              {{ link.label }}
+            </a>
+          }
+          <div class="border-t border-slate-100 pt-2 mt-2">
+            <a routerLink="/app/notifications" (click)="closeAll()" class="flex items-center px-3 py-2.5 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
+              Notifications
+            </a>
+            <button (click)="logout()" class="flex items-center px-3 py-2.5 rounded-lg text-sm text-red-600 hover:bg-red-50 w-full text-left">
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </header> -->
+<!-- } -->
+
+<!-- ── CONTENU PRINCIPAL ────────────────────────────── -->
+<main class="min-h-[calc(100vh-64px)]">
+  <router-outlet />
+</main>
+
+<!-- ── FOOTER (pages publiques uniquement) ─────────────── -->
+@if (isPublicRoute()) {
+  <footer class="bg-slate-900 text-slate-400">
+    <div class="container py-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <svg width="30" height="30" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+              <circle cx="18" cy="18" r="18" fill="#3b82f6"/>
+              <path d="M8 26V11l10 8 10-8v15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="28" cy="10" r="3" fill="#f59e0b"/>
+            </svg>
+            <span class="font-bold text-white">Mbem<span class="text-blue-400">Nova</span></span>
+          </div>
+          <p class="text-sm leading-relaxed mb-3">La référence EdTech de l'Afrique Centrale. Formations certifiantes, paiement en tranches.</p>
+          <p class="text-xs">📍 Douala, Cameroun</p>
+          <p class="text-xs mt-1">✉️ contact&#64;mbemnova.com</p>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm mb-3">Formations</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a routerLink="/catalogue" class="hover:text-white transition-colors">Tout le catalogue</a></li>
+            <li><a routerLink="/catalogue" class="hover:text-white transition-colors">Débutants</a></li>
+            <li><a routerLink="/catalogue" class="hover:text-white transition-colors">Intermédiaires</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm mb-3">Plateforme</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a routerLink="/auth/inscription" class="hover:text-white transition-colors">Inscription gratuite</a></li>
+            <li><a routerLink="/auth/connexion" class="hover:text-white transition-colors">Connexion</a></li>
+            <li><a routerLink="/certificat/verifier/demo" class="hover:text-white transition-colors">Vérifier un certificat</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold text-sm mb-3">Légal</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a routerLink="/politique-confidentialite" class="hover:text-white transition-colors">Politique de confidentialité</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+        <p>© 2025 MbemNova. Tous droits réservés.</p>
+        <p>Fait avec ❤️ pour la tech africaine</p>
+      </div>
+    </div>
+  </footer>
+}
+
+<!-- ── TOASTS ───────────────────────────────────────────── -->
+<div class="fixed bottom-4 right-4 z-[400] flex flex-col gap-2 max-w-xs w-full pointer-events-none"
+     role="region" aria-live="polite" aria-label="Notifications">
+  @for (t of toasts(); track t.id) {
+    <div [class]="'flex items-start gap-3 p-3.5 rounded-xl border shadow-lg pointer-events-auto animate-slide-right ' + toastBg(t.type)" role="alert">
+      <div [class]="'w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ' + toastIconBg(t.type)" aria-hidden="true">{{ toastIcon(t.type) }}</div>
+      <div class="flex-1 min-w-0">
+        <p [class]="'text-sm font-semibold leading-tight ' + toastText(t.type)">{{ t.title }}</p>
+        @if (t.message) { <p [class]="'text-xs mt-0.5 opacity-80 ' + toastText(t.type)">{{ t.message }}</p> }
+      </div>
+      <button (click)="toastSvc.dismiss(t.id)" class="opacity-50 hover:opacity-100 transition-opacity shrink-0" [attr.aria-label]="'Fermer ' + t.title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Backdrop pour fermer les dropdowns -->
+@if (menuOpen() || userMenuOpen()) {
+  <div class="fixed inset-0 z-30" (click)="closeAll()" aria-hidden="true"></div>
+}
+
+<!-- MockSwitcher (visible uniquement en mode mock/DEV) -->
+<app-mock-switcher />

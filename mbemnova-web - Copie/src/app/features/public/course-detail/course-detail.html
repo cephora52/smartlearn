@@ -1,0 +1,509 @@
+<!-- course-detail.component.html -->
+<div class="min-h-screen bg-slate-50 ">
+
+  <!-- ══════════════════════════
+       SKELETON (connexion lente)
+  ══════════════════════════ -->
+  @if (loading()) {
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-64 sm:h-72 w-full sk rounded-none sm:rounded-b-3xl mb-8"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-16">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="sk h-6 w-2/3 rounded-xl"></div>
+          <div class="sk h-4 w-full rounded-xl"></div>
+          <div class="sk h-4 w-4/5 rounded-xl"></div>
+          <div class="sk h-40 rounded-2xl mt-2"></div>
+          <div class="sk h-52 rounded-2xl"></div>
+        </div>
+        <div>
+          <div class="sk h-80 rounded-2xl"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════════════════
+       PAGE CONTENT
+  ══════════════════════════ -->
+  @if (!loading() && detail()) {
+
+    <!-- ──────────────────────────────────────────
+         HERO BANNER
+    ────────────────────────────────────────── -->
+    <div class="relative overflow-hidden" [ngClass]="heroBg()">
+
+      <!-- Dot texture -->
+      <div class="absolute inset-0 pointer-events-none opacity-[0.06]"
+           style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:26px 26px"
+           aria-hidden="true"></div>
+
+      <!-- Right ambient glow -->
+      <div class="absolute right-0 top-0 w-1/2 h-full pointer-events-none"
+           style="background:radial-gradient(ellipse at 80% 50%,rgba(255,255,255,0.09) 0%,transparent 70%)"
+           aria-hidden="true"></div>
+
+      <!-- Dynamic illustration (desktop only) -->
+      <div class="absolute right-0 top-0 h-full w-2/5 pointer-events-none
+                  hidden lg:flex items-center justify-end pr-10 xl:pr-16"
+           aria-hidden="true">
+        <div [innerHTML]="domainSvg()" class="opacity-[0.2] w-full max-w-xs xl:max-w-sm"></div>
+      </div>
+
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1.5 text-xs text-white/50 mb-7 flex-wrap" aria-label="Fil d'Ariane">
+          <a routerLink="/" class="hover:text-white/80 transition-colors">Accueil</a>
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6"/></svg>
+          <a routerLink="/catalogue" class="hover:text-white/80 transition-colors">Catalogue</a>
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 18l6-6-6-6"/></svg>
+          <span class="text-white/70 truncate max-w-[160px] sm:max-w-xs">{{ detail()!.titre }}</span>
+        </nav>
+
+        <div class="max-w-xl">
+          <!-- Level badge -->
+          <div class="inline-flex items-center gap-1.5 bg-white/15 border border-white/20
+                      text-white text-[11px] font-bold px-3 py-1 rounded-full mb-4 backdrop-blur-sm">
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="levelDotColor()"></span>
+            Bootcamp {{ levelLabel(detail()!.niveau) }}
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-[1.1] tracking-tight mb-3">
+            {{ detail()!.titre }}
+          </h1>
+
+          <p class="text-white/75 text-[15px] leading-relaxed mb-7 max-w-lg">
+            {{ detail()!.descriptionCourte }}
+          </p>
+
+          <!-- Meta row -->
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/60">
+            @if (detail()!.noteMoyenne) {
+              <span class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <strong class="text-white">{{ detail()!.noteMoyenne }}</strong>
+                <span>({{ detail()!.nbAvis }} avis)</span>
+              </span>
+            }
+            <span class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197"/>
+              </svg>
+              {{ detail()!.nbApprenants }} apprenants
+            </span>
+            <span>{{ detail()!.nbLecons }} leçons · {{ Math.floor(detail()!.dureeTotaleMinutes / 60) }}h</span>
+            <span>{{ detail()!.langue }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ── End Hero ── -->
+
+    <!-- ──────────────────────────────────────────
+         BODY
+    ────────────────────────────────────────── -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12 ">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
+
+        <!-- ══ LEFT / MAIN ══════════════════════════════════════ -->
+        <div class="lg:col-span-2 space-y-6">
+
+          <!-- 1 · Description -->
+          @if (detail()!.descriptionLongue) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-100">
+                <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">À propos</h2>
+              </div>
+              <div class="px-6 py-5 prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed"
+                   [innerHTML]="detail()!.descriptionLongue"></div>
+            </div>
+          }
+
+          <!-- 2 · Débouchés -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Métiers accessibles</h2>
+                <p class="text-[11px] text-slate-400 mt-0.5">Salaires moyens FCFA/mois · Afrique Centrale</p>
+              </div>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div *ngFor="let d of debouches()"
+                   class="relative rounded-xl border border-slate-100 p-4 overflow-hidden
+                          hover:border-indigo-200 hover:bg-indigo-50/20 transition-all duration-150 group">
+                <div class="absolute top-0 left-0 right-0 h-[2px]" [ngClass]="demandBar(d.demande)"></div>
+                <p class="text-sm font-bold text-slate-900 leading-tight mb-1">{{ d.titre }}</p>
+                <p class="text-[11px] text-slate-400 mb-2.5">
+                  Demande :
+                  <span class="font-semibold" [ngClass]="demandColor(d.demande)">{{ d.demande }}</span>
+                </p>
+                <div class="flex items-baseline gap-1">
+                  <span class="text-[15px] font-black text-indigo-700 tabular-nums">{{ d.salaireMin | number:'1.0-0' }}</span>
+                  <span class="text-slate-300 text-xs">–</span>
+                  <span class="text-[15px] font-black text-indigo-700 tabular-nums">{{ d.salaireMax | number:'1.0-0' }}</span>
+                  <span class="text-[11px] text-slate-400 ml-1">FCFA/mois</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 · Programme -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+              <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Programme</h2>
+              <span class="text-[11px] text-slate-400">
+                {{ detail()!.nbModules }} modules · {{ detail()!.nbLecons }} leçons ·
+                {{ Math.floor(detail()!.dureeTotaleMinutes / 60) }}h{{ detail()!.dureeTotaleMinutes % 60 ? (detail()!.dureeTotaleMinutes % 60) + 'min' : '' }}
+              </span>
+            </div>
+            <div class="divide-y divide-slate-50">
+              @for (mod of detail()!.modules; track mod.id; let i = $index) {
+                <details class="group" [attr.open]="i === 0 ? true : null">
+                  <summary class="flex items-center gap-3 px-5 py-3.5 cursor-pointer
+                                  hover:bg-slate-50/70 transition-colors list-none select-none">
+                    <div class="w-6 h-6 rounded-md bg-indigo-50 flex items-center justify-center
+                                text-[10px] font-black text-indigo-600 flex-shrink-0">{{ i + 1 }}</div>
+                    <span class="font-semibold text-slate-800 text-sm flex-1 leading-snug">{{ mod.titre }}</span>
+                    <span class="text-[11px] text-slate-400 flex-shrink-0">{{ mod.lecons.length }} leçons</span>
+                    <svg class="w-4 h-4 text-slate-300 flex-shrink-0 group-open:rotate-180 transition-transform duration-200"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </summary>
+                  <div class="border-t border-slate-100 bg-slate-50/30">
+                    @for (l of mod.lecons; track l.id) {
+                      <div class="flex items-center gap-3 px-5 py-2.5 border-b border-slate-100/40 last:border-0">
+                        @if (l.typeContenu === 'VIDEO') {
+                          <svg class="w-3.5 h-3.5 text-slate-300 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        } @else if (l.typeContenu === 'QCM') {
+                          <svg class="w-3.5 h-3.5 text-slate-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>
+                        } @else {
+                          <svg class="w-3.5 h-3.5 text-slate-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        }
+                        <span class="text-sm text-slate-600 flex-1 leading-snug">{{ l.titre }}</span>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                          @if (!l.estVerrouille) {
+                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Gratuit</span>
+                          } @else {
+                            <svg class="w-3 h-3 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                          }
+                          <span class="text-[11px] text-slate-400 tabular-nums">{{ l.dureeMinutes }}min</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </details>
+              }
+            </div>
+          </div>
+
+          <!-- 4 · Formules — Autonome vs Avec formateur -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100">
+              <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Choisir votre formule</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Le contenu est identique — ce qui diffère, c'est l'accompagnement</p>
+            </div>
+            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <!-- Autonome -->
+              <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Autonome</p>
+                <p class="text-2xl font-black text-slate-900 tabular-nums mb-1">
+                  {{ detail()!.prixFcfa | number:'1.0-0' }}
+                  <span class="text-sm font-semibold text-slate-400">FCFA</span>
+                </p>
+                <p class="text-[11px] text-slate-400 mb-4">Paiement en plusieurs fois disponible</p>
+                <div class="space-y-2.5 text-xs text-slate-600">
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Accès illimité au contenu
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Un mentor est attribué — <strong class="text-slate-700">1 séance par semaine</strong> pour répondre à vos questions</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Certificat officiel MbemX
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="text-slate-400">Pas de cours en direct avec le formateur</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avec formateur -->
+              <div class="rounded-xl border-2 border-indigo-200 bg-indigo-50/30 p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0">
+                  <span class="bg-indigo-600 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl block">
+                    MEILLEUR RÉSULTAT
+                  </span>
+                </div>
+                <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3">Avec Formateur</p>
+                <p class="text-2xl font-black text-indigo-700 tabular-nums mb-1">
+                  {{ prixAvecFormateur() | number:'1.0-0' }}
+                  <span class="text-sm font-semibold text-indigo-400">FCFA</span>
+                </p>
+                <p class="text-[11px] text-indigo-400 mb-4">Paiement en plusieurs fois disponible</p>
+                <div class="space-y-2.5 text-xs text-slate-700">
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Tout ce qui est inclus en Autonome
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Le <strong>formateur anime des cours en direct</strong> aux dates planifiées</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span><strong>Plusieurs séances</strong>/semaine : mentor + formateur</span>
+                  </div>
+                  <div class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Corrections personnalisées sur vos projets
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 5 · Sessions avec formateur -->
+          @if (sessions().length > 0) {
+            <div id="sessions" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-100">
+                <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Sessions avec formateur</h2>
+                <p class="text-[11px] text-slate-400 mt-0.5">Cours en direct — formule Avec Formateur</p>
+              </div>
+              <div class="p-4 space-y-3">
+                @for (s of sessions(); track s.id) {
+                  <div class="border rounded-xl p-4 transition-all duration-150"
+                       [class]="s.placesRestantes === 0
+                         ? 'border-slate-200 bg-slate-50/50 opacity-70'
+                         : 'border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/20'">
+                    <div class="flex items-start justify-between gap-4 flex-wrap">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-2 flex-wrap">
+                          <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border"
+                                [ngClass]="modaliteStyle(s.modalite)">
+                            {{ modaliteLabel(s.modalite) }}
+                            @if (s.modalite !== 'MEET' && s.lieu) {
+                              <span class="opacity-60">· {{ s.lieu }}</span>
+                            }
+                          </span>
+                          @if (s.placesRestantes === 0) {
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-200">Complet</span>
+                          } @else if (s.placesRestantes <= 3) {
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-200">
+                              {{ s.placesRestantes }} place{{ s.placesRestantes > 1 ? 's' : '' }} restante{{ s.placesRestantes > 1 ? 's' : '' }}
+                            </span>
+                          }
+                        </div>
+                        <p class="font-semibold text-slate-900 text-sm">{{ s.titre }}</p>
+                        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
+                          <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          Du {{ formatDate(s.dateDebut) }} au {{ formatDate(s.dateFin) }}
+                        </p>
+                      </div>
+                      <div class="flex-shrink-0 text-right">
+                        <p class="text-[11px] text-slate-400 mb-1.5 tabular-nums">{{ s.nbInscrits }}/{{ s.capaciteMax }}</p>
+                        <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden ml-auto">
+                          <div class="h-full rounded-full transition-all duration-500"
+                               [class]="s.placesRestantes === 0 ? 'bg-red-400' : s.placesRestantes <= 3 ? 'bg-amber-400' : 'bg-indigo-400'"
+                               [style.width.%]="(s.nbInscrits / s.capaciteMax) * 100"></div>
+                        </div>
+                        @if (s.placesRestantes === 0 && isAuth()) {
+                          <button (click)="rejoindreListeAttente(detail()!.id, s.id)"
+                                  class="text-[11px] text-indigo-600 font-semibold mt-2 block hover:text-indigo-800 transition-colors">
+                            Liste d'attente
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- 6 · Avis -->
+          @if (avis().length > 0) {
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                <h2 class="text-xs font-black text-slate-900 uppercase tracking-widest">Avis vérifiés</h2>
+                @if (detail()!.noteMoyenne) {
+                  <div class="flex items-center gap-1.5">
+                    <div class="flex">
+                      @for (s of starsArray(detail()!.noteMoyenne ?? 0); track $index) {
+                        <svg class="w-4 h-4" [class]="s === 1 ? 'text-amber-400' : 'text-slate-200'" fill="currentColor" viewBox="0 0 24 24">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                      }
+                    </div>
+                    <span class="font-black text-slate-900 text-sm">{{ detail()!.noteMoyenne }}</span>
+                    <span class="text-xs text-slate-400">({{ detail()!.nbAvis }})</span>
+                  </div>
+                }
+              </div>
+              <div class="divide-y divide-slate-50">
+                @for (a of avis().slice(0, 5); track a.id) {
+                  <div class="flex gap-3 px-6 py-4">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center
+                                text-indigo-700 font-black text-xs flex-shrink-0">
+                      {{ (a.prenomApprenant ?? '?').charAt(0) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="text-sm font-semibold text-slate-900">{{ a.prenomApprenant }}</span>
+                        <div class="flex">
+                          @for (s of starsArray(a.note); track $index) {
+                            <svg class="w-3 h-3" [class]="s === 1 ? 'text-amber-400' : 'text-slate-200'" fill="currentColor" viewBox="0 0 24 24">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                          }
+                        </div>
+                        <span class="text-[11px] text-slate-400 ml-auto">{{ timeAgo(a.createdAt) }}</span>
+                      </div>
+                      @if (a.commentaire) {
+                        <p class="text-sm text-slate-600 leading-relaxed">{{ a.commentaire }}</p>
+                      }
+                      <span class="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold mt-1.5">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        Avis vérifié
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+        <!-- ══ END LEFT ══ -->
+
+        <!-- ══ STICKY SIDEBAR ══════════════════════════════════ -->
+        <aside class="lg:col-span-1 self-start">
+        <div class="sticky top-24">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+               <!-- Freemium bar -->
+            <div class="h-[3px] w-full bg-slate-100">
+              <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700"
+                   [style.width.%]="detail()!.seuilPaiement * 100"></div>
+            </div>
+
+            <div class="p-5">
+
+              <!-- Price block -->
+              <div class="mb-5">
+                <div class="flex items-baseline gap-2 mb-1">
+                  <span class="text-[26px] font-black text-slate-900 tabular-nums leading-none">
+                    {{ detail()!.prixFcfa | number:'1.0-0' }}
+                  </span>
+                  <span class="text-sm font-semibold text-slate-400">FCFA</span>
+                </div>
+                <p class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mb-0.5">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {{ (detail()!.seuilPaiement * 100).toFixed(0) }}% du contenu gratuit pour commencer
+                </p>
+                <p class="text-[11px] text-slate-400">Paiement en plusieurs fois · Mobile Money accepté</p>
+              </div>
+
+              <!-- CTA primary -->
+              @if (isAuth()) {
+                <a [routerLink]="['/app/cours', detail()!.slug]"
+                   class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl
+                          font-bold text-sm text-white mb-3
+                          bg-gradient-to-r from-indigo-600 to-[#312e81]
+                          shadow-md shadow-indigo-200/40 hover:scale-[1.02] transition-all duration-200
+                          select-none">
+                  Commencer maintenant
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              } @else {
+                <a routerLink="/auth/inscription"
+                   class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl
+                          font-bold text-sm text-white mb-3
+                          bg-gradient-to-r from-indigo-600 to-[#312e81]
+                          shadow-md shadow-indigo-200/40 hover:scale-[1.02] transition-all duration-200
+                          select-none">
+                  Commencer gratuitement
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+                <a routerLink="/auth/connexion"
+                   class="flex items-center justify-center w-full px-4 py-2.5 rounded-xl
+                          text-sm font-semibold text-slate-500 border border-slate-200
+                          hover:bg-slate-50 transition-colors mb-4 select-none">
+                  Déjà inscrit ? Se connecter
+                </a>
+              }
+
+              <!-- Inclus -->
+              <div class="pt-4 border-t border-slate-100 space-y-2.5">
+                @for (av of avantages; track av) {
+                  <div class="flex items-start gap-2 text-xs text-slate-600">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ av }}
+                  </div>
+                }
+              </div>
+
+              <!-- Teaser formateur -->
+              @if (sessions().length > 0) {
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                  <div class="rounded-xl border border-indigo-200/60 bg-indigo-50/40 p-4">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Avec Formateur</p>
+                      <span class="text-[10px] bg-indigo-100 text-indigo-600 font-black px-1.5 py-0.5 rounded">
+                        +{{ prixFormateurPct() }}%
+                      </span>
+                    </div>
+                    <p class="text-xl font-black text-indigo-700 tabular-nums mb-1 leading-none">
+                      {{ prixAvecFormateur() | number:'1.0-0' }}
+                      <span class="text-xs font-semibold text-indigo-400">FCFA</span>
+                    </p>
+                    <p class="text-[11px] text-indigo-500 mb-2">
+                      Prochain cours :
+                      <strong class="text-indigo-700">{{ formatDate(sessions()[0].dateDebut) }}</strong>
+                    </p>
+                    <a href="#sessions"
+                       class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+                      Voir les sessions disponibles
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              }
+
+            </div>
+         </div>
+          </div>
+        </aside>
+        <!-- ══ END SIDEBAR ══ -->
+
+      </div>
+    </div>
+
+  }
+</div>

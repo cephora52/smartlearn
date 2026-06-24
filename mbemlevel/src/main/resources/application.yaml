@@ -1,0 +1,123 @@
+# =============================================================================
+# MbemNova — Configuration commune à tous les environnements
+#
+# RÈGLE STRICTE : Ce fichier ne contient QUE les valeurs identiques
+# en dev, test et prod. Les valeurs spécifiques à un environnement
+# sont dans application-{profil}.yaml.
+#
+# JAMAIS de secrets ici (mots de passe, clés API, JWT secret).
+# =============================================================================
+
+spring:
+  application:
+    name: mbemlevel
+
+  # Activation du profil via variable d'environnement SPRING_PROFILES_ACTIVE
+  # Valeur par défaut : dev (surchargée en CI par -Dspring.profiles.active=test)
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # ── Sérialisation JSON ──────────────────────────────────────────────────────
+  jackson:
+    # Timezone Afrique Centrale (Cameroun = UTC+1)
+    time-zone: Africa/Douala
+    default-property-inclusion: NON_NULL # Pas de champs null dans les réponses JSON
+
+  # ── JPA — Paramètres communs ─────────────────────────────────────────────────
+  jpa:
+    # CRITIQUE : désactiver open-in-view pour éviter les transactions long-running
+    # et les problèmes de lazy loading hors transaction
+    open-in-view: false
+    properties:
+      hibernate:
+        # Batch inserts/updates : réduit les aller-retours BDD (perf x5 en bulk)
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+        # Détecte les pagination sur collections (problème N+1 classique)
+        query:
+          fail_on_pagination_over_collection_fetch: true
+        # Format UTC en BDD, conversion application selon la timezone configurée
+        jdbc.time_zone: UTC
+
+  # ── Flyway ───────────────────────────────────────────────────────────────────
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true           # Crée la baseline si la BDD existe déjà
+    out-of-order: false                  # Migrations dans l'ordre strict
+    validate-on-migrate: true            # Vérifie les checksums à chaque démarrage
+
+  # ── Cache ────────────────────────────────────────────────────────────────────
+  cache:
+    type: redis
+
+  # ── Upload de fichiers ───────────────────────────────────────────────────────
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 55MB
+
+  # ── Thymeleaf (templates emails) ─────────────────────────────────────────────
+  thymeleaf:
+    prefix: classpath:/templates/email/
+    suffix: .html
+    encoding: UTF-8
+
+# ── Serveur HTTP ───────────────────────────────────────────────────────────────
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/plain
+    min-response-size: 1024
+  http2:
+    enabled: true
+  # Ne JAMAIS exposer les détails d'erreur internes au client
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
+    include-binding-errors: never
+
+# ── Actuator ──────────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+  endpoint:
+    health:
+      # Détails réservés aux utilisateurs authentifiés (ADMIN)
+      show-details: when-authorized
+  metrics:
+    tags:
+      # Ces tags apparaissent sur TOUTES les métriques Prometheus
+      application: ${spring.application.name}
+
+# ── SpringDoc / Swagger UI ────────────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    try-it-out-enabled: true
+
+# ── Configuration métier MbemNova ─────────────────────────────────────────────
+mbemnova:
+  cours:
+    seuil-paiement-defaut: 0.30     # 30% du cours = seuil de conversion
+    xp-par-lecon: 25
+    xp-bonus-module: 100
+    score-min-qcm: 70               # Score minimum pour valider un QCM (%)
+  security:
+    refresh-token-ttl-jours: 30
+    reset-token-ttl-minutes: 60
+    max-tentatives-connexion: 5
+    blocage-connexion-minutes: 30
+  gamification:
+    tirage-jour: 1                  # 1er du mois (CRON)
+    tirage-heure: 8                 # 08h00 Africa/Douala

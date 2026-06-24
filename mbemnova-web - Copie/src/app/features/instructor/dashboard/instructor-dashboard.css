@@ -1,0 +1,163 @@
+/* instructor-dashboard.component.css */
+
+/* ── Layout ── */
+.dash-root {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dash-container {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .dash-container { padding-inline: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .dash-container { padding-inline: 2rem; }
+}
+
+/* ── Header ── */
+.dash-header {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.95);
+}
+
+/* ── KPI cards ── */
+.kpi-card {
+  transition: border-color 0.15s ease;
+}
+.kpi-card:hover {
+  border-color: #e2e8f0;
+}
+
+.kpi-icon {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.delta-badge.positive {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.delta-badge.negative {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+/* ── Statut badge ── */
+.statut-badge.published {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.statut-badge.draft {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+/* ── Chart ── */
+.chart-wrap {
+  padding-bottom: 0;
+}
+
+.chart-col {
+  position: relative;
+}
+
+.chart-col:hover .chart-tooltip {
+  opacity: 1 !important;
+}
+
+.chart-col:hover .chart-bar {
+  opacity: 0.85;
+}
+
+.chart-bar {
+  transition: opacity 0.15s ease;
+  /* hauteur définie via [style.height.%] */
+  min-height: 4px;
+}
+
+.chart-bar-fill {
+  /* L'animation de remplissage se fait via scaleY */
+  animation: barGrow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ── Progress bar ── */
+.progress-bar {
+  animation: progressGrow 0.7s ease-out both;
+  transform-origin: left;
+}
+
+@keyframes progressGrow {
+  from { width: 0 !important; }
+}
+
+/* ── Fade-in staggeré ── */
+.fade-in {
+  animation: fadeUp 0.3s ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Rows hover ── */
+.cours-row,
+.rendu-item {
+  cursor: default;
+}
+
+/* ── Responsive: mobile compact ── */
+@media (max-width: 639px) {
+  .dash-root main {
+    padding-block: 1rem;
+  }
+
+  .kpi-card {
+    padding: 0.875rem;
+  }
+}
+
+/* ── Scrollbar discrète ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* ── Pulse skeleton override ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+.animate-pulse {
+  animation: pulse 1.5s cubic-bezier(0.4,0,0.6,1) infinite;
+}
