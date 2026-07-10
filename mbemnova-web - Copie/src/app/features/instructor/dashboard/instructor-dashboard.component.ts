@@ -5,6 +5,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CourseService }     from '../../../core/services/course.service';
+import { AdminService }      from '../../../core/services/admin.service';
 import { SessionService }    from '../../../core/services/session.service';
 import { AuthService }       from '../../../core/services/auth.service';
 import type { CoursResponse, SessionResponse } from '../../../core/models';
@@ -57,12 +58,13 @@ const PROGRESSION_DATA = [
 export class InstructorDashboardComponent implements OnInit, OnDestroy {
   readonly #auth       = inject(AuthService);
   readonly #courseSvc  = inject(CourseService);
+  readonly #adminSvc   = inject(AdminService);
   readonly #sessionSvc = inject(SessionService);
   readonly #platformId = inject(PLATFORM_ID);
 
   // ── State ──
-  readonly cours    = signal<CoursResponse[]>(MOCK_COURS.slice(0, 3));
-  readonly sessions = signal<SessionResponse[]>(MOCK_SESSIONS);
+  readonly cours    = signal<CoursResponse[]>([]);
+  readonly sessions = signal<SessionResponse[]>([]);
   readonly isLoading = signal(true);
 
   readonly prenom = computed(() => this.#auth.currentUser()?.prenom ?? 'Formateur');
@@ -91,8 +93,8 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
       this.isLoading.set(false);
     }
 
-    this.#courseSvc.getAll({ size: 6 }).subscribe({
-      next: r => { if (r.success && r.data?.content?.length) this.cours.set(r.data.content); },
+    this.#adminSvc.getMesCours().subscribe({
+      next: r => { if (r.success && r.data) this.cours.set(r.data); },
     });
     this.#sessionSvc.getByCours('c-001').subscribe({
       next: r => { if (r.success && r.data?.content?.length) this.sessions.set(r.data.content); },

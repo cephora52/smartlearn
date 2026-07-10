@@ -1,8 +1,7 @@
 package com.mbem.mbemlevel.api.controller;
 
 import com.mbem.mbemlevel.api.dto.response.*;
-import com.mbem.mbemlevel.infrastructure.persistence.entity.*;
-import com.mbem.mbemlevel.infrastructure.persistence.repository.*;
+import com.mbem.mbemlevel.application.usecase.session.GetTableauBordDevoirsUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,29 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DevoirListingController {
 
-    private final DevoirJpaRepository devoirRepo;
-    private final RenduJpaRepository  renduRepo;
-
-    /** S11 — L'apprenant voit tous ses devoirs en cours */
-// @GetMapping("/mes-devoirs")
-// @PreAuthorize("hasRole('APPRENANT')")
-// @Operation(summary = "Mes devoirs en cours (S11)")
-// public ResponseEntity<ApiResponse<List<DevoirResponse>>> mesDevoirs(
-//         @AuthenticationPrincipal String userId) {
-    
-//     UUID apprenantId = UUID.fromString(userId);
-    
-//     List<DevoirResponse> devoirs = renduRepo
-//         .findByApprenantId(apprenantId)
-//         .stream()
-//         .map(RenduJpaEntity::getDevoirId)
-//         .map(devoirRepo::findById)
-//         .flatMap(Optional::stream)
-//         .map(DevoirResponse::from)
-//         .toList();
-    
-//     return ResponseEntity.ok(ApiResponse.ok(devoirs));
-// }
+    private final GetTableauBordDevoirsUseCase getTableauBordDevoirsUC;
 
     /**
      * S22 — Le formateur suit qui a rendu son devoir.
@@ -59,19 +36,7 @@ public class DevoirListingController {
     @Operation(summary = "Tableau de bord des rendus pour une session (S22)")
     public ResponseEntity<ApiResponse<List<DevoirSuiviResponse>>> tableauBord(
             @PathVariable UUID sessionId) {
-        List<DevoirSuiviResponse> suivi = devoirRepo
-            .findBySessionId(sessionId)
-            .stream()
-            .map(d -> {
-                List<RenduJpaEntity> rendus = renduRepo.findByDevoirId(d.getId());
-                return new DevoirSuiviResponse(
-                    d.getId(), d.getTitre(), d.getDateRemise(),
-                    rendus.size(),
-                    (int) rendus.stream().filter(r -> !r.isEnRetard()).count(),
-                    (int) rendus.stream().filter(RenduJpaEntity::isEnRetard).count()
-                );
-            })
-            .toList();
+        List<DevoirSuiviResponse> suivi = getTableauBordDevoirsUC.executer(sessionId);
         return ResponseEntity.ok(ApiResponse.ok(suivi));
     }
 }

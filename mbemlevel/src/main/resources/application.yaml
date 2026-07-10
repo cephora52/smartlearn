@@ -12,6 +12,13 @@ spring:
   application:
     name: mbemlevel
 
+  # Configuration par défaut (fallbacks pour exécution directe sans profil actif)
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5435/mbemnova_dev?sslmode=disable
+    username: mbemnova
+    password: mbemnova_dev_123
+    driver-class-name: org.postgresql.Driver
+
   # Activation du profil via variable d'environnement SPRING_PROFILES_ACTIVE
   # Valeur par défaut : dev (surchargée en CI par -Dspring.profiles.active=test)
   profiles:
@@ -25,11 +32,13 @@ spring:
 
   # ── JPA — Paramètres communs ─────────────────────────────────────────────────
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     # CRITIQUE : désactiver open-in-view pour éviter les transactions long-running
     # et les problèmes de lazy loading hors transaction
     open-in-view: false
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         # Batch inserts/updates : réduit les aller-retours BDD (perf x5 en bulk)
         jdbc:
           batch_size: 25

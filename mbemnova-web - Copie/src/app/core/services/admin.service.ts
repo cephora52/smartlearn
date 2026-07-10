@@ -9,6 +9,7 @@ import type {
   InscriptionManuelleRequest,
   AssignerRoleRequest,
   DrawResponse,
+  CoursResponse,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -28,14 +29,11 @@ export class AdminService {
   assignerRole(req: AssignerRoleRequest): Observable<ApiResponse<null>> {
     return this.#api.post<null>('/admin/utilisateurs/role', req);
   }
-  creerCours(req: {
-    titre: string;
-    description: string;
-    niveau: string;
-    prixFcfa: number;
-    seuilPaiement: number;
-  }): Observable<ApiResponse<{ id: string }>> {
+  creerCours(req: any): Observable<ApiResponse<{ id: string }>> {
     return this.#api.post<{ id: string }>('/admin/cours', req);
+  }
+  getMesCours(): Observable<ApiResponse<CoursResponse[]>> {
+    return this.#api.get<CoursResponse[]>('/admin/cours');
   }
   publierCours(id: string): Observable<ApiResponse<null>> {
     return this.#api.post<null>(`/admin/cours/${id}/publier`, {});

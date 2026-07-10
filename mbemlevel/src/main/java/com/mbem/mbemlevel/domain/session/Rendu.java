@@ -18,6 +18,7 @@ public class Rendu extends AggregateRoot {
     private String commentaire;
     private LocalDateTime dateSoumission;
     private LocalDateTime dateCorrection;
+    private boolean enRetard;
 
     public static Rendu soumettre(UUID devoirId, UUID apprenantId,
             String contenu, String lienFichier) {
@@ -37,6 +38,7 @@ public class Rendu extends AggregateRoot {
     public Rendu(UUID id, UUID devoirId, UUID apprenantId, String contenu,
             String lienFichier, Integer note, String commentaire,
             LocalDateTime soumission, LocalDateTime correction,
+            boolean enRetard,
             LocalDateTime ca, LocalDateTime ua) {
         super(id, ca, ua);
         this.devoirId = devoirId;
@@ -47,6 +49,7 @@ public class Rendu extends AggregateRoot {
         this.commentaire = commentaire;
         this.dateSoumission = soumission;
         this.dateCorrection = correction;
+        this.enRetard = enRetard;
     }
 
     /** Le formateur corrige le rendu — publie RenduCorrigeEvent. */
@@ -95,5 +98,13 @@ public class Rendu extends AggregateRoot {
 
     public LocalDateTime getDateCorrection() {
         return dateCorrection;
+    }
+
+    public boolean isEnRetard() {
+        return enRetard;
+    }
+
+    public void setEnRetard(boolean enRetard) {
+        this.enRetard = enRetard;
     }
 }

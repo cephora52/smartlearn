@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CourseBuilderDraftService, LessonBlock, LessonDraft } from './course-builder-draft.service';
+import { AdminService } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-lesson-content-editor',
@@ -15,7 +17,12 @@ import { CourseBuilderDraftService, LessonBlock, LessonDraft } from './course-bu
         <h1 class="text-base font-black text-slate-900">Editeur de contenu lecon</h1>
         <p class="text-xs text-slate-500">{{ courseTitle() }} · {{ moduleTitle() }} · {{ lessonTitle() }}</p>
       </div>
-      <a [routerLink]="['/instructor/cours', courseId(), 'modules']" class="px-3 py-2 text-xs rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Retour modules</a>
+      <div class="flex items-center gap-2">
+        <a [routerLink]="['/instructor/cours', courseId(), 'modules']" class="px-3 py-2 text-xs rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Retour modules</a>
+        <button (click)="validerCours()" [disabled]="saving()" class="px-3 py-2 text-xs font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60">
+          {{ saving() ? 'Enregistrement...' : 'Valider & Enregistrer le cours' }}
+        </button>
+      </div>
     </div>
   </header>
 
@@ -112,6 +119,31 @@ import { CourseBuilderDraftService, LessonBlock, LessonDraft } from './course-bu
         }
       </div>
     </section>
+
+    <!-- Barre de validation et navigation en bas de page -->
+    <div class="col-span-1 xl:col-span-2 bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <a [routerLink]="['/instructor/cours', courseId(), 'modules']" class="w-full sm:w-auto text-center px-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
+          ← Retour aux modules
+        </a>
+        @if (prevLesson()) {
+          <a [routerLink]="['/instructor/cours', courseId(), 'lecons', prevLesson()!.id, 'contenu']" class="w-full sm:w-auto text-center px-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
+            Leçon précédente
+          </a>
+        }
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+        @if (nextLesson()) {
+          <a [routerLink]="['/instructor/cours', courseId(), 'lecons', nextLesson()!.id, 'contenu']" class="w-full sm:w-auto text-center px-4 py-2.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors">
+            Leçon suivante →
+          </a>
+        }
+        <button (click)="validerCours()" [disabled]="saving()" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 shadow-sm transition-colors">
+          {{ saving() ? 'Enregistrement...' : 'Valider & Enregistrer le cours' }}
+        </button>
+      </div>
+    </div>
   </main>
 </div>
   `,
@@ -120,9 +152,12 @@ export class LessonContentEditorComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #draftSvc = inject(CourseBuilderDraftService);
+  readonly #adminSvc = inject(AdminService);
+  readonly #toast = inject(ToastService);
 
   readonly courseId = signal('');
   readonly lessonId = signal('');
+  readonly saving = signal(false);
   readonly openBlocks = signal<Record<string, boolean>>({});
   readonly course = computed(() => this.#draftSvc.get(this.courseId()));
   readonly courseTitle = computed(() => this.course()?.title ?? 'Formation');
@@ -142,6 +177,29 @@ export class LessonContentEditorComponent implements OnInit {
   });
   readonly lessonTitle = computed(() => this.lesson()?.title ?? 'Lecon');
   readonly blocks = computed(() => this.lesson()?.blocks ?? []);
+
+  readonly allLessons = computed(() => {
+    const c = this.course();
+    if (!c) return [];
+    return c.modules.flatMap(m => m.lessons);
+  });
+
+  readonly lessonIndexInCourse = computed(() => {
+    const lid = this.lessonId();
+    return this.allLessons().findIndex(l => l.id === lid);
+  });
+
+  readonly prevLesson = computed(() => {
+    const idx = this.lessonIndexInCourse();
+    return idx > 0 ? this.allLessons()[idx - 1] : null;
+  });
+
+  readonly nextLesson = computed(() => {
+    const idx = this.lessonIndexInCourse();
+    const list = this.allLessons();
+    return idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
+  });
+
   #dragBlockIndex: number | null = null;
 
   ngOnInit(): void {
@@ -218,4 +276,110 @@ export class LessonContentEditorComponent implements OnInit {
   }
 
   uid(prefix: string): string { return `${prefix}-${Math.random().toString(36).slice(2, 9)}`; }
+
+  validerCours(): void {
+    const c = this.course();
+    if (!c) {
+      this.#toast.error('Erreur', 'Cours introuvable.');
+      return;
+    }
+    
+    if (!c.title.trim() || c.title.length < 5) {
+      this.#toast.error('Formulaire invalide', 'Le titre du cours doit faire au moins 5 caractères.');
+      return;
+    }
+    if (!c.description.trim() || c.description.length < 10) {
+      this.#toast.error('Formulaire invalide', 'La description courte doit faire au moins 10 caractères.');
+      return;
+    }
+    if (c.modules.length === 0) {
+      this.#toast.error('Formulaire invalide', 'Le cours doit contenir au moins un module.');
+      return;
+    }
+    const hasLessons = c.modules.some(m => m.lessons && m.lessons.length > 0);
+    if (!hasLessons) {
+      this.#toast.error('Formulaire invalide', 'Le cours doit contenir au moins une leçon.');
+      return;
+    }
+
+    this.saving.set(true);
+
+    const req = {
+      titre: c.title,
+      descriptionCourte: c.description,
+      descriptionLongue: c.about || c.description,
+      niveau: c.level || 'DEBUTANT',
+      categorieId: c.category || null,
+      dureeTotaleMinutes: c.modules.reduce((acc, m) => acc + m.lessons.reduce((accL, l) => accL + (l.durationMinutes || 0), 0), 0),
+      imageCouverture: c.bannerUrl || '',
+      seuilPaiement: c.kind === 'COURS' ? 1.0 : (c.freePercent / 100),
+      prixFcfa: c.kind === 'COURS' ? 0 : c.priceFcfa,
+      objectifsApprentissage: c.whatYouLearn ? c.whatYouLearn.split('\n').filter((l: string) => l.trim()) : ['Apprendre ' + c.title],
+      prerequis: c.prerequis || 'Aucun prérequis',
+      publicCible: c.publicCible || 'Tout public',
+      modules: c.modules.map((m, mIdx) => ({
+        titre: m.title,
+        description: m.description || '',
+        ordre: mIdx + 1,
+        xpBonus: 100,
+        estGratuit: m.estGratuit ?? false,
+        lecons: m.lessons.map((l, lIdx) => ({
+          titre: l.title,
+          descriptionCourte: l.shortDescription || '',
+          ordre: lIdx + 1,
+          dureeMinutes: l.durationMinutes || 10,
+          xpValeur: 25,
+          estPreview: l.estPreview ?? false,
+          blocs: l.blocks && l.blocks.length > 0 ? l.blocks.map((b, bIdx) => ({
+            typeBloc: this.#mapTypeBloc(b.type),
+            ordre: bIdx + 1,
+            contenuHtml: b.type === 'TEXT' ? b.content : null,
+            urlImage: b.type === 'IMAGE' ? b.content : null,
+            altImage: b.type === 'IMAGE' ? b.title : null,
+            legendeImage: null,
+            urlVideo: b.type === 'VIDEO' ? b.content : null,
+            dureeVideoSec: null,
+            urlPdf: b.type === 'FILE' ? b.content : null,
+            nomPdf: b.type === 'FILE' ? b.fileName : null,
+            langageCode: b.type === 'CODE' ? (b.language || 'javascript') : null,
+            codeSource: b.type === 'CODE' ? b.content : null,
+            typeCallout: b.type === 'TIP' ? (b.tipColor || 'INFO').toUpperCase() : null,
+            texteCallout: b.type === 'TIP' ? b.content : null
+          })) : [{
+            typeBloc: 'TEXTE_HTML',
+            ordre: 1,
+            contenuHtml: 'Introduction de la leçon'
+          }],
+          qcm: null
+        }))
+      }))
+    };
+
+    this.#adminSvc.creerCours(req).subscribe({
+      next: r => {
+        this.saving.set(true);
+        this.#toast.success('Félicitations !', 'Le cours complet a été enregistré avec succès en base de données.');
+        setTimeout(() => {
+          this.saving.set(false);
+          this.#router.navigate(['/instructor']);
+        }, 1500);
+      },
+      error: err => {
+        this.saving.set(false);
+        this.#toast.error('Erreur', 'Une erreur est survenue lors de la sauvegarde sur le serveur.');
+      }
+    });
+  }
+
+  #mapTypeBloc(type: string): string {
+    switch (type) {
+      case 'TEXT': return 'TEXTE_HTML';
+      case 'CODE': return 'CODE';
+      case 'IMAGE': return 'IMAGE';
+      case 'VIDEO': return 'VIDEO';
+      case 'FILE': return 'PDF_EMBED';
+      case 'TIP': return 'CALLOUT';
+      default: return 'TEXTE_HTML';
+    }
+  }
 }

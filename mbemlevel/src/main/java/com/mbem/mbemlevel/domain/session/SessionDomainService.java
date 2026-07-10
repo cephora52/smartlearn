@@ -1,9 +1,7 @@
 package com.mbem.mbemlevel.domain.session;
 import java.util.List;
 /** Règles métier sessions — détection conflits horaires. */
-import org.springframework.stereotype.Service;
 
-@Service
 public class SessionDomainService {
     /**
      * Vérifie si deux créneaux se chevauchent (même jour, heures qui se recoupent).

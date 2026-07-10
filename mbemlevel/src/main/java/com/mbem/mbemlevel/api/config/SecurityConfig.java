@@ -54,7 +54,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 .requestMatchers(PUBLIC).permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/cours/**").permitAll()
-                .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+                .requestMatchers("/api/v1/admin/cours", "/api/admin/cours", "/api/v1/admin/cours/**", "/api/admin/cours/**")
+                    .hasAnyRole("FORMATEUR", "ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/api/v1/admin/**", "/api/admin/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+                .requestMatchers("/api/v1/formateur/**", "/api/formateur/**").hasRole("FORMATEUR")
+                .requestMatchers("/api/v1/apprenant/**", "/api/apprenant/**").hasRole("APPRENANT")
                 .requestMatchers(HttpMethod.POST, "/api/v1/cours/**")
                     .hasAnyRole("FORMATEUR","ADMIN","SUPER_ADMIN")
                 .anyRequest().authenticated())
@@ -99,14 +103,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsSource() {
         var cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of(
-            "http://localhost:3000","http://localhost:5173",
+            "http://localhost:4200", "http://localhost:4000",
+            "http://localhost:3000", "http://localhost:5173",
             "https://mbemnova.com","https://www.mbemnova.com","https://app.mbemnova.com"));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of("Authorization","Content-Type","Accept","X-Request-ID"));
         cfg.setAllowCredentials(true);
         cfg.setMaxAge(3600L);
         var src = new UrlBasedCorsConfigurationSource();
-        src.registerCorsConfiguration("/api/**", cfg);
+        src.registerCorsConfiguration("/**", cfg);
         return src;
     }
 }

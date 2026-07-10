@@ -36,7 +36,7 @@ public class GetCatalogueUseCase {
      */
     @Cacheable(
         value   = "catalogue",
-        key     = "T(String).valueOf(#niveau) + '-' + T(String).valueOf(#categorieId) + '-' + #page + '-' + #size",
+        key     = "(#niveau ?: 'null') + '-' + (#categorieId ?: 'null') + '-' + #page + '-' + #size",
         unless  = "#result == null"
     )
     @Transactional(readOnly = true)

@@ -4,6 +4,9 @@ import { roleGuard } from './core/guards/role.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
+  { path: 'apprenant/dashboard', redirectTo: 'app', pathMatch: 'full' },
+  { path: 'formateur/dashboard', redirectTo: 'instructor', pathMatch: 'full' },
+  { path: 'admin/dashboard', redirectTo: 'admin', pathMatch: 'full' },
 
   // ── PAGES PUBLIQUES ───────────────────────────────────────
   // S01 · Landing

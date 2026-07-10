@@ -26,7 +26,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       const status: number = err.status ?? 0;
       // Préférer le message de l'API (ErrorResponse.message) si disponible
-      const msg = err.error?.message || HTTP_MESSAGES[status] || 'Une erreur est survenue.';
+      let msg = err.error?.message || HTTP_MESSAGES[status] || 'Une erreur est survenue.';
+      const details = err.error?.error?.details;
+      if (details && Array.isArray(details) && details.length > 0) {
+        msg += ' : ' + details.join(' | ');
+      }
 
       // Erreurs réseau (status 0 = timeout, connexion refusée)
       if (status === 0) {

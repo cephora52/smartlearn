@@ -81,7 +81,14 @@ public class InscrireApprenantUseCase {
         String hashBcrypt = passwordEncoder.encode(cmd.motDePasse());
 
         // ── 3. Créer l'agrégat domaine ──────────────────────────────────────
-        Utilisateur user = Utilisateur.creer(cmd.prenom(), cmd.email(), hashBcrypt);
+        Utilisateur user = Utilisateur.creer(
+            cmd.prenom(),
+            cmd.nom(),
+            cmd.email(),
+            hashBcrypt,
+            com.mbem.mbemlevel.domain.shared.enums.Role.valueOf(cmd.role()),
+            cmd.telephone()
+        );
         String tokenVerification = UUID.randomUUID().toString();
         // Token expire dans 24h pour sécurité
         LocalDateTime expireAt = LocalDateTime.now().plusHours(24);
@@ -99,8 +106,11 @@ public class InscrireApprenantUseCase {
             appUrl + "/api/v1/auth/confirm-email?token=" + tokenVerification
         );
 
-        // ── 6. Ne pas générer de tokens avant validation de l'email ─────────
-        // L'utilisateur doit confirmer son adresse email avant d'obtenir un JWT.
+        // ── 6. Générer les tokens (emailVerifie = true par défaut en dev) ────
+        String accessToken  = jwtFacade.genererToken(
+            saved.getId().toString(), saved.getEmail(), saved.getRole().name());
+        String refreshToken = jwtFacade.genererRefreshToken(
+            saved.getId(), refreshTtlJours, cmd.ipAdresse(), cmd.userAgent());
 
         // ── 7. Audit ─────────────────────────────────────────────────────────
         auditRepo.enregistrer(saved.getId(), saved.getEmail(), "REGISTER",
@@ -110,9 +120,9 @@ public class InscrireApprenantUseCase {
         log.info("[AUTH] Inscription: {} ({})", saved.getPrenom(), saved.getEmail());
 
         return new AuthResultDto(
-            saved.getId(), saved.getPrenom(), saved.getEmail(),
-            saved.getRole().name(), null, null,
-            null, false
+            saved.getId(), saved.getNom(), saved.getPrenom(), saved.getEmail(),
+            saved.getRole().name(), accessToken, refreshToken,
+            LocalDateTime.now().plusHours(24), false
         );
     }
 }

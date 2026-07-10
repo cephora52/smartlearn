@@ -47,18 +47,44 @@ import { CourseBuilderDraftService } from './course-builder-draft.service';
 
       <div>
         <label class="text-xs font-semibold text-slate-600">Titre</label>
-        <input formControlName="title" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="Titre">
+        <input formControlName="title"
+               maxlength="200"
+               [class.border-red-500]="form.controls.title.invalid && form.controls.title.touched"
+               class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="Titre">
+        @if (form.controls.title.invalid && (form.controls.title.dirty || form.controls.title.touched)) {
+          <p class="text-[11px] text-red-500 mt-1">
+            @if (form.controls.title.errors?.['required']) { Le titre est requis. }
+            @if (form.controls.title.errors?.['minlength']) { Le titre doit faire au moins 5 caractères. }
+          </p>
+        }
       </div>
 
       <div>
         <label class="text-xs font-semibold text-slate-600">Description</label>
-        <textarea rows="4" formControlName="description" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="Description"></textarea>
+        <textarea rows="4" formControlName="description"
+                  maxlength="500"
+                  [class.border-red-500]="form.controls.description.invalid && form.controls.description.touched"
+                  class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="Description"></textarea>
+        @if (form.controls.description.invalid && (form.controls.description.dirty || form.controls.description.touched)) {
+          <p class="text-[11px] text-red-500 mt-1">
+            @if (form.controls.description.errors?.['required']) { La description est requise. }
+            @if (form.controls.description.errors?.['minlength']) { La description doit faire au moins 10 caractères. }
+          </p>
+        }
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="text-xs font-semibold text-slate-600">Prix (FCFA)</label>
-          <input type="number" min="0" formControlName="priceFcfa" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
+          <input type="number" min="0" formControlName="priceFcfa"
+                 [class.border-red-500]="form.controls.priceFcfa.invalid && form.controls.priceFcfa.touched"
+                 class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
+          @if (form.controls.priceFcfa.invalid && (form.controls.priceFcfa.dirty || form.controls.priceFcfa.touched)) {
+            <p class="text-[11px] text-red-500 mt-1">
+              @if (form.controls.priceFcfa.errors?.['required']) { Le prix est requis. }
+              @if (form.controls.priceFcfa.errors?.['min']) { Le prix ne peut pas être négatif. }
+            </p>
+          }
         </div>
         @if (form.value.kind === 'FORMATION') {
           <div>
@@ -86,9 +112,16 @@ import { CourseBuilderDraftService } from './course-builder-draft.service';
 
       <div class="flex items-center justify-between pt-2">
         <span class="text-xs text-slate-500">Brouillon persistant (reprise apres fermeture)</span>
-        <button type="button" (click)="createRemote()" [disabled]="creating()" class="px-3 py-2 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60">
-          {{ creating() ? 'Creation...' : 'Creer brouillon API' }}
-        </button>
+        <div class="flex gap-2">
+          <button type="button" (click)="createRemote()" [disabled]="creating()" class="px-3 py-2 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60">
+            {{ creating() ? 'Creation...' : hasRemoteId() ? 'Mettre a jour sur l\'API' : 'Creer brouillon API' }}
+          </button>
+          @if (hasRemoteId()) {
+            <button type="button" (click)="continueModules()" class="px-3 py-2 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+              Continuer (Etape 2)
+            </button>
+          }
+        </div>
       </div>
     </form>
 
@@ -130,6 +163,8 @@ export class CourseSetupComponent implements OnInit {
   readonly creating = signal(false);
   readonly courseId = signal('');
   readonly bannerPreview = computed(() => this.form.value.bannerUrl || '/hero.png');
+  readonly draft = computed(() => this.#draftSvc.courses()[this.courseId()]);
+  readonly hasRemoteId = computed(() => !!this.draft()?.remoteId);
 
   readonly form = this.#fb.nonNullable.group({
     kind: ['FORMATION' as 'FORMATION' | 'COURS', Validators.required],
@@ -150,10 +185,24 @@ export class CourseSetupComponent implements OnInit {
       kind: draft.kind, title: draft.title, description: draft.description, level: draft.level,
       priceFcfa: draft.priceFcfa, freePercent: draft.freePercent, bannerUrl: draft.bannerUrl, bannerFileName: draft.bannerFileName,
     });
+    if (draft.kind === 'COURS') {
+      this.form.controls.priceFcfa.disable();
+      this.form.controls.freePercent.disable();
+    } else {
+      this.form.controls.priceFcfa.enable();
+      this.form.controls.freePercent.enable();
+    }
   }
 
   onKindChanged(): void {
-    if (this.form.value.kind === 'COURS') this.form.patchValue({ freePercent: 100 });
+    if (this.form.value.kind === 'COURS') {
+      this.form.patchValue({ priceFcfa: 0, freePercent: 100 });
+      this.form.controls.priceFcfa.disable();
+      this.form.controls.freePercent.disable();
+    } else {
+      this.form.controls.priceFcfa.enable();
+      this.form.controls.freePercent.enable();
+    }
   }
 
   onBannerUpload(event: Event): void {
@@ -173,13 +222,19 @@ export class CourseSetupComponent implements OnInit {
   }
 
   continueModules(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.#toast.error('Formulaire invalide', 'Veuillez remplir correctement les champs requis avant de continuer.');
+      return;
+    }
     this.saveDraft(false);
     this.#router.navigate(['/instructor/cours', this.courseId(), 'modules']);
   }
 
   createRemote(): void {
     if (this.form.invalid) {
-      this.#toast.error('Formulaire invalide', 'Completer les champs requis.');
+      this.form.markAllAsTouched();
+      this.#toast.error('Formulaire invalide', 'Veuillez remplir correctement les champs requis.');
       return;
     }
     this.creating.set(true);
@@ -193,8 +248,12 @@ export class CourseSetupComponent implements OnInit {
     }).subscribe({
       next: r => {
         this.creating.set(false);
-        if (r.data?.id) this.#draftSvc.patch(this.courseId(), { remoteId: r.data.id });
-        this.#toast.success('Brouillon API cree', 'Tu peux continuer.');
+        const remoteId = typeof r.data === 'string' ? r.data : r.data?.id;
+        if (remoteId) {
+          this.#draftSvc.patch(this.courseId(), { remoteId });
+          this.#toast.success('Brouillon API cree', 'Redirection vers l\'etape 2...');
+          this.#router.navigate(['/instructor/cours', this.courseId(), 'modules']);
+        }
       },
       error: () => this.creating.set(false),
     });

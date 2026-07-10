@@ -294,11 +294,11 @@ export class CatalogComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly Math = Math;
 
-  readonly cours = signal<CoursResponse[]>(MOCK_COURS);
+  readonly cours = signal<CoursResponse[]>([]);
   readonly loading = signal(true);
-  readonly total = signal(6);
+  readonly total = signal(0);
   readonly page = signal(0);
-  readonly totalPages = signal(1);
+  readonly totalPages = signal(0);
 
   search = '';
   selectedNiveau: NiveauCours | '' = '';
@@ -337,7 +337,9 @@ export class CatalogComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.cours.set(MOCK_COURS);
+        this.cours.set([]);
+        this.total.set(0);
+        this.totalPages.set(0);
         this.loading.set(false);
       },
     });

@@ -62,7 +62,7 @@ public class RefreshTokenUseCase {
         log.debug("[AUTH] Refresh token roté pour: {}", user.getEmail());
 
         return new AuthResultDto(
-            user.getId(), user.getPrenom(), user.getEmail(),
+            user.getId(), user.getNom(), user.getPrenom(), user.getEmail(),
             user.getRole().name(), newAccessToken, newRefreshToken,
             LocalDateTime.now().plusHours(24),
             !user.peutAccederAuxCours()

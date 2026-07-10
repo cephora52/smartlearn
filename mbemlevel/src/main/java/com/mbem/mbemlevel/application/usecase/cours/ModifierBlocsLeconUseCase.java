@@ -2,7 +2,11 @@ package com.mbem.mbemlevel.application.usecase.cours;
 
 import com.mbem.mbemlevel.api.dto.request.BlocContenuRequest;
 import com.mbem.mbemlevel.infrastructure.persistence.entity.BlocContenuJpaEntity;
+import com.mbem.mbemlevel.infrastructure.persistence.entity.LeconJpaEntity;
+import com.mbem.mbemlevel.infrastructure.persistence.entity.ModuleJpaEntity;
+import com.mbem.mbemlevel.infrastructure.persistence.entity.CoursJpaEntity;
 import com.mbem.mbemlevel.infrastructure.persistence.repository.*;
+import com.mbem.mbemlevel.domain.shared.enums.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,12 +26,32 @@ public class ModifierBlocsLeconUseCase {
 
     private final BlocContenuJpaRepository blocRepo;
     private final LeconJpaRepository       leconRepo;
+    private final ModuleJpaRepository      moduleRepo;
+    private final CoursJpaRepository       coursRepo;
+    private final UtilisateurJpaRepository utilisateurRepo;
 
     @Transactional
     public void executer(UUID leconId, List<BlocContenuRequest> nouveauxBlocs, UUID formateurId) {
         // Vérifier que la leçon existe
-        leconRepo.findById(leconId)
+        LeconJpaEntity lecon = leconRepo.findById(leconId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:LECON:" + leconId));
+
+        // Trouver le module
+        ModuleJpaEntity module = moduleRepo.findById(lecon.getModuleId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:MODULE:" + lecon.getModuleId()));
+
+        // Trouver le cours
+        CoursJpaEntity cours = coursRepo.findById(module.getCoursId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + module.getCoursId()));
+
+        // Vérifier la propriété (le formateur du cours doit être formateurId, sauf si admin/super_admin)
+        boolean isAdmin = utilisateurRepo.findById(formateurId)
+            .map(u -> u.getRole() == Role.ADMIN || u.getRole() == Role.SUPER_ADMIN)
+            .orElse(false);
+
+        if (!cours.getFormateurId().equals(formateurId) && !isAdmin) {
+            throw new RuntimeException("ACCESS_DENIED: Le cours ne vous appartient pas.");
+        }
 
         // Supprimer tous les blocs existants
         blocRepo.deleteByLeconId(leconId);

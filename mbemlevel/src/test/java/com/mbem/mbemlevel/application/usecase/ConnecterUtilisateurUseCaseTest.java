@@ -61,6 +61,7 @@ class ConnecterUtilisateurUseCaseTest {
     @DisplayName("Connexion réussie → tokens retournés")
     void connexionReussie_retourneTokens() {
         Utilisateur u = Utilisateur.creer("Bob", "bob@test.com", "$2a$12$hash");
+        u.verifierEmail();
         when(utilisateurRepo.findByEmail("bob@test.com")).thenReturn(Optional.of(u));
         when(passwordEncoder.matches("motdepasse", "$2a$12$hash")).thenReturn(true);
         when(utilisateurRepo.save(any())).thenReturn(u);

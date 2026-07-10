@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,19 +28,19 @@ class AuthControllerIT {
     @Test
     @DisplayName("POST /register → 201 + accessToken présent")
     void register_retourne201AvecToken() throws Exception {
-        var req = new InscriptionRequest("Alice", "alice_it@mbemnova.com", "Password1!");
+        var req = new InscriptionRequest("Test", "Alice", "alice_it@mbemnova.com", "0606060606", "Password1!", "Password1!", "APPRENANT");
         mvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(req)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.data.accessToken").isNotEmpty());
+            .andExpect(jsonPath("$.data.id").isNotEmpty());
     }
 
     @Test
     @DisplayName("POST /register email invalide → 422 + détails validation")
     void register_emailInvalide_retourne422() throws Exception {
-        var req = new InscriptionRequest("Bob", "pas-un-email", "Password1!");
+        var req = new InscriptionRequest("Test", "Bob", "pas-un-email", "0606060606", "Password1!", "Password1!", "APPRENANT");
         mvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(req)))
@@ -51,7 +52,7 @@ class AuthControllerIT {
     @Test
     @DisplayName("POST /register email déjà utilisé → 409")
     void register_emailDuplique_retourne409() throws Exception {
-        var req = new InscriptionRequest("Carol", "carol_dup@mbemnova.com", "Password1!");
+        var req = new InscriptionRequest("Test", "Carol", "carol_dup@mbemnova.com", "0606060606", "Password1!", "Password1!", "APPRENANT");
         mvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(req)))

@@ -30,7 +30,8 @@ class InscrireApprenantUseCaseTest {
     @Mock private PasswordEncoder          passwordEncoder;
     @Mock private JwtFacade                jwtFacade;
     @Mock private AuditLogRepository       auditRepo;
-    @Mock private ApplicationEventPublisher publisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private EmailPort                emailPort;
 
     @InjectMocks
     private InscrireApprenantUseCase useCase;
@@ -41,22 +42,21 @@ class InscrireApprenantUseCaseTest {
         // Arrange
         when(utilisateurRepo.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("$2a$12$hashed");
-        Utilisateur savedUser = Utilisateur.creer("Alice", "alice@test.com", "$2a$12$hashed");
+        Utilisateur savedUser = Utilisateur.creer("Alice", "Test", "alice@test.com", "$2a$12$hashed", com.mbem.mbemlevel.domain.shared.enums.Role.APPRENANT, "0606060606");
         when(utilisateurRepo.save(any())).thenReturn(savedUser);
-        when(jwtFacade.genererToken(anyString(), anyString(), anyString())).thenReturn("jwt.token");
-        when(jwtFacade.genererRefreshToken(any(), anyInt(), any(), any())).thenReturn("refresh.token");
+        when(jwtFacade.genererToken(anyString(), anyString(), anyString())).thenReturn("mock.accessToken");
+        when(jwtFacade.genererRefreshToken(any(), anyInt(), anyString(), anyString())).thenReturn("mock.refreshToken");
 
         // Act
         AuthResultDto result = useCase.executer(
-            new InscriptionCommand("Alice", "alice@test.com", "Password1!", "127.0.0.1", "Test"),
-            "127.0.0.1", "TestAgent");
+            new InscriptionCommand("Test", "Alice", "alice@test.com", "0606060606", "Password1!", "APPRENANT", "127.0.0.1", "Test"));
 
         // Assert
-        assertThat(result.accessToken()).isEqualTo("jwt.token");
-        assertThat(result.refreshToken()).isEqualTo("refresh.token");
+        assertThat(result.accessToken()).isEqualTo("mock.accessToken");
+        assertThat(result.refreshToken()).isEqualTo("mock.refreshToken");
         assertThat(result.prenom()).isEqualTo("Alice");
         verify(utilisateurRepo).save(any(Utilisateur.class));
-        verify(publisher, atLeastOnce()).publishEvent(any());
+        verify(eventPublisher, atLeastOnce()).publishEvent(any(Object.class));
     }
 
     @Test
@@ -65,8 +65,7 @@ class InscrireApprenantUseCaseTest {
         when(utilisateurRepo.existsByEmail("alice@test.com")).thenReturn(true);
         assertThatThrownBy(() ->
             useCase.executer(
-                new InscriptionCommand("Alice", "alice@test.com", "Password1!", "127.0.0.1", ""),
-                "127.0.0.1", ""))
+                new InscriptionCommand("Test", "Alice", "alice@test.com", "0606060606", "Password1!", "APPRENANT", "127.0.0.1", "")))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("EMAIL_ALREADY_EXISTS");
         verify(utilisateurRepo, never()).save(any());
@@ -77,14 +76,11 @@ class InscrireApprenantUseCaseTest {
     void executer_hacheLeMotDePasse() {
         when(utilisateurRepo.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode("Password1!")).thenReturn("$2a$12$hashed");
-        Utilisateur u = Utilisateur.creer("Alice", "alice@test.com", "$2a$12$hashed");
+        Utilisateur u = Utilisateur.creer("Alice", "Test", "alice@test.com", "$2a$12$hashed", com.mbem.mbemlevel.domain.shared.enums.Role.APPRENANT, "0606060606");
         when(utilisateurRepo.save(any())).thenReturn(u);
-        when(jwtFacade.genererToken(any(),any(),any())).thenReturn("t");
-        when(jwtFacade.genererRefreshToken(any(),anyInt(),any(),any())).thenReturn("r");
 
         useCase.executer(
-            new InscriptionCommand("Alice", "alice@test.com", "Password1!", "127.0.0.1", ""),
-            "127.0.0.1", "");
+            new InscriptionCommand("Test", "Alice", "alice@test.com", "0606060606", "Password1!", "APPRENANT", "127.0.0.1", ""));
 
         // Vérifier que le mot de passe encodé a été utilisé
         verify(passwordEncoder).encode("Password1!");

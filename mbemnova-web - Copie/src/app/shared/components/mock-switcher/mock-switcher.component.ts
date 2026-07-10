@@ -106,7 +106,7 @@ export class MockSwitcherComponent implements OnInit {
     if (!isPlatformBrowser(this.#platform)) return;
     // Visible seulement si useMock est actif
     import('../../../../environments/environment').then(env => {
-      this.visible.set(env.environment.useMock === true);
+      this.visible.set(!!env.environment.useMock);
     }).catch(() => {});
   }
 
@@ -115,15 +115,22 @@ export class MockSwitcherComponent implements OnInit {
     const authData = MOCK_PROFILES[role];
     // Forcer la mise à jour du signal currentUser
     (this.#auth as any).currentUser.set({
-      userId: authData.userId, prenom: authData.prenom,
-      email: authData.email, role: authData.role,
-      photoUrl: null, statut: 'ACTIF',
+      id: authData.userId,
+      userId: authData.userId,
+      nom: authData.nom,
+      prenom: authData.prenom,
+      email: authData.email,
+      role: authData.role,
+      photoUrl: null,
+      statut: 'ACTIF',
     });
     this.open.set(false);
     // Redirection vers le dashboard du rôle
     const routes: Record<UserRole, string> = {
-      APPRENANT: '/app', FORMATEUR: '/instructor',
-      ADMIN: '/admin', SUPER_ADMIN: '/admin',
+      APPRENANT: '/apprenant/dashboard',
+      FORMATEUR: '/formateur/dashboard',
+      ADMIN: '/admin/dashboard',
+      SUPER_ADMIN: '/admin/dashboard',
     };
     this.#router.navigateByUrl(routes[role]);
   }

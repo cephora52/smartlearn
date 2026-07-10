@@ -125,7 +125,7 @@ public class ConnecterUtilisateurUseCase {
         log.info("[AUTH] Connexion réussie: {}", user.getEmail());
 
         return new AuthResultDto(
-            user.getId(), user.getPrenom(), user.getEmail(),
+            user.getId(), user.getNom(), user.getPrenom(), user.getEmail(),
             user.getRole().name(), accessToken, refreshToken,
             LocalDateTime.now().plusHours(24),
             !user.peutAccederAuxCours()  // estSuspendu

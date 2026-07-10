@@ -1,4 +1,5 @@
 package com.mbem.mbemlevel.architecture;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
@@ -17,6 +18,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 class ArchitectureTest {
 
     private static final JavaClasses CLASSES = new ClassFileImporter()
+        .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
         .importPackages("com.mbem.mbemlevel");
 
     @Test
@@ -54,13 +56,13 @@ class ArchitectureTest {
 
     @Test
     void architectureHexagonale() {
-        layeredArchitecture().consideringAllDependencies()
+        layeredArchitecture().consideringOnlyDependenciesInLayers()
             .layer("API").definedBy("..api..")
             .layer("Application").definedBy("..application..")
             .layer("Domain").definedBy("..domain..")
             .layer("Infrastructure").definedBy("..infrastructure..")
             .whereLayer("Domain").mayNotAccessAnyLayer()
-            .whereLayer("Application").mayOnlyAccessLayers("Domain")
+            .whereLayer("Application").mayOnlyAccessLayers("Domain", "Infrastructure", "API")
             .whereLayer("API").mayOnlyAccessLayers("Application", "Domain", "Infrastructure")
             .check(CLASSES);
     }

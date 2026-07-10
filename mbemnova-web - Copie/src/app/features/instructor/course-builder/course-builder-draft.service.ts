@@ -15,6 +15,7 @@ export interface LessonBlock {
   optionC?: string;
   optionD?: string;
   answer?: string;
+  language?: string;
 }
 
 export interface LessonDraft {
@@ -24,6 +25,7 @@ export interface LessonDraft {
   shortDescription: string;
   sortOrder: number;
   blocks: LessonBlock[];
+  estPreview?: boolean;
 }
 
 export interface ModuleDraft {
@@ -31,6 +33,8 @@ export interface ModuleDraft {
   title: string;
   sortOrder: number;
   lessons: LessonDraft[];
+  description?: string;
+  estGratuit?: boolean;
 }
 
 export interface CourseDraft {
@@ -47,6 +51,11 @@ export interface CourseDraft {
   status: 'BROUILLON';
   modules: ModuleDraft[];
   updatedAt: string;
+  about?: string;
+  whatYouLearn?: string;
+  category?: string;
+  prerequis?: string;
+  publicCible?: string;
 }
 
 @Injectable({ providedIn: 'root' })

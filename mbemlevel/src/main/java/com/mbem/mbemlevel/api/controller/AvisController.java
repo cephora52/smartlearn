@@ -3,8 +3,6 @@ package com.mbem.mbemlevel.api.controller;
 import com.mbem.mbemlevel.api.dto.request.LaissserAvisRequest;
 import com.mbem.mbemlevel.api.dto.response.*;
 import com.mbem.mbemlevel.application.usecase.cours.*;
-import com.mbem.mbemlevel.infrastructure.persistence.entity.AvisCoursJpaEntity;
-import com.mbem.mbemlevel.infrastructure.persistence.repository.AvisCoursJpaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,21 +29,14 @@ public class AvisController {
 
     private final LaissserAvisUseCase         laissserAvisUC;
     private final SInscrireListeAttenteUseCase listeAttenteUC;
-    private final AvisCoursJpaRepository       avisRepo;
+    private final ListerAvisUseCase            listerAvisUC;
 
     /** S4 — Lire les avis vérifiés d'un cours */
     @GetMapping("/{coursId}/avis")
     @Operation(summary = "Avis vérifiés d'un cours (S4)")
     public ResponseEntity<ApiResponse<List<AvisCoursResponse>>> lister(
             @PathVariable UUID coursId) {
-        List<AvisCoursResponse> avis = avisRepo.findByCoursId(coursId)
-            .stream()
-            .filter(AvisCoursJpaEntity::isEstVerifie)
-            .map(a -> new AvisCoursResponse(
-                a.getId(), a.getApprenantId(), a.getNote(),
-                a.getCommentaire(), a.getCreatedAt()
-            ))
-            .toList();
+        List<AvisCoursResponse> avis = listerAvisUC.executer(coursId);
         return ResponseEntity.ok(ApiResponse.ok(avis));
     }
 

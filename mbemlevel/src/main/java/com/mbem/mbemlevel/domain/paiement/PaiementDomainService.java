@@ -5,10 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.springframework.stereotype.Service;
-
-@Service
 /** Règles métier plan de paiement et calcul des tranches. */
 public class PaiementDomainService {
     /** Génère un plan de tranches mensuelles. */

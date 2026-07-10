@@ -66,6 +66,9 @@ public class GlobalExceptionHandler {
         if ("EMAIL_ALREADY_EXISTS".equals(e.getMessage())) {
             return ResponseEntity.status(409).body(ApiResponse.err("Email déjà utilisé.", "EMAIL_ALREADY_EXISTS"));
         }
+        if ("PASSWORDS_DO_NOT_MATCH".equals(e.getMessage())) {
+            return ResponseEntity.status(400).body(ApiResponse.err("Les mots de passe ne correspondent pas.", "PASSWORDS_DO_NOT_MATCH"));
+        }
         log.warn("[EX] IllegalState: {}", e.getMessage());
         return ResponseEntity.badRequest().body(ApiResponse.err("Opération impossible.", "BAD_REQUEST"));
     }

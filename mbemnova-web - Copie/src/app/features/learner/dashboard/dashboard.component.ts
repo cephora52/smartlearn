@@ -27,11 +27,11 @@ export class DashboardComponent implements OnInit {
   readonly #talentSvc   = inject(TalentService);
 
   // ── Signaux de données ──────────────────────────────────────────────────
-  readonly profil        = signal<ProfilTalentResponse | null>(MOCK_PROFIL);
-  readonly progressions  = signal<ProgressionResponse[]>([MOCK_PROGRESSION]);
-  readonly tousLesCours  = signal<CoursResponse[]>(MOCK_COURS);
-  readonly notifications = signal<NotificationResponse[]>(MOCK_NOTIFICATIONS);
-  readonly draw          = signal(MOCK_DRAW);
+  readonly profil        = signal<ProfilTalentResponse | null>(null);
+  readonly progressions  = signal<ProgressionResponse[]>([]);
+  readonly tousLesCours  = signal<CoursResponse[]>([]);
+  readonly notifications = signal<NotificationResponse[]>([]);
+  readonly draw          = signal<DrawResponse | null>(null);
 
   // XP des 7 derniers jours (sera alimenté depuis le service si dispo,
   // sinon calculé depuis les progressions comme fallback)

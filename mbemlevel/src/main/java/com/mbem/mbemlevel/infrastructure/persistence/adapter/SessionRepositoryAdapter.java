@@ -122,7 +122,7 @@ private SessionJpaEntity toSessionEntity(Session s) {
     private Rendu toRenduDomain(RenduJpaEntity e) {
         return new Rendu(e.getId(), e.getDevoirId(), e.getApprenantId(), e.getContenu(),
                 e.getLienFichier(), e.getNote(), e.getCommentaire(), e.getDateSoumission(),
-                e.getDateCorrection(), e.getCreatedAt(), e.getUpdatedAt());
+                e.getDateCorrection(), e.isEnRetard(), e.getCreatedAt(), e.getUpdatedAt());
     }
 
     private RenduJpaEntity toRenduEntity(Rendu r) {

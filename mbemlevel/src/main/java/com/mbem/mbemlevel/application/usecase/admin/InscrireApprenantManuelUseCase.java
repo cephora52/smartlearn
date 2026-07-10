@@ -37,8 +37,17 @@ public class InscrireApprenantManuelUseCase {
         }
         // Cas B : nouveau compte
         AuthResultDto result = inscrireUC.executer(
-            new InscriptionCommand(cmd.prenom(), cmd.email(),
-                cmd.motDePasse(), cmd.ipAdmin(), "AdminBackoffice"));
+            new InscriptionCommand(
+                "Apprenant",
+                cmd.prenom(),
+                cmd.email(),
+                "",
+                cmd.motDePasse(),
+                "APPRENANT",
+                cmd.ipAdmin(),
+                "AdminBackoffice"
+            )
+        );
         Utilisateur u = utilisateurRepo.findById(result.utilisateurId())
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
         auditRepo.enregistrer(cmd.adminId(), null, "MANUAL_REGISTRATION_NEW",

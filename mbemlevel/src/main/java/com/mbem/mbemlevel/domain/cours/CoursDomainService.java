@@ -4,9 +4,7 @@ import java.util.List;
  * Règles métier liées aux cours qui dépassent un seul agrégat.
  * Stateless — injectable en Spring si besoin.
  */
-import org.springframework.stereotype.Service;
 
-@Service
 public class CoursDomainService {
     /**
      * Calcule le % de progression d'un cours en fonction des leçons terminées.

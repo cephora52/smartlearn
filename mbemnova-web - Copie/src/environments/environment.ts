@@ -16,7 +16,7 @@ export const environment = {
   wsUrl:        'ws://localhost:8080/ws',
 
   // ← CHANGER ICI : true = mock | false = API Spring Boot
-  useMock:      true,
+  useMock:      false,
 
   // Auto-fallback : si l'API retourne [] en dev, bascule sur mock
   autoFallback: true,

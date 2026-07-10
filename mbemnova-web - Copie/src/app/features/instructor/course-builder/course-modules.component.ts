@@ -16,8 +16,13 @@ import { CourseBuilderDraftService, LessonDraft, ModuleDraft } from './course-bu
         <p class="text-xs text-slate-500">Etape 2/3 · structure + apercu global</p>
       </div>
       <div class="flex items-center gap-2">
-        <a [routerLink]="['/instructor/cours', courseId(), 'editer']" class="px-3 py-2 text-xs rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Infos</a>
-        <button (click)="addModule()" class="px-3 py-2 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700">+ Module</button>
+        <a [routerLink]="['/instructor/cours', courseId(), 'editer']" class="px-3 py-2 text-xs rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50">Infos (Etape 1)</a>
+        <button (click)="addModule()" class="px-3 py-2 text-xs rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200">+ Module</button>
+        @if (firstLessonId()) {
+          <a [routerLink]="['/instructor/cours', courseId(), 'lecons', firstLessonId(), 'contenu']" class="px-3 py-2 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold">Continuer (Etape 3)</a>
+        } @else {
+          <button disabled class="px-3 py-2 text-xs rounded-lg bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200" title="Ajoutez au moins une leçon pour continuer">Continuer (Etape 3)</button>
+        }
       </div>
     </div>
   </header>
@@ -75,6 +80,23 @@ import { CourseBuilderDraftService, LessonDraft, ModuleDraft } from './course-bu
           </section>
         }
       </div>
+
+      <!-- Etape 3 CTA -->
+      <div class="mt-6 flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl p-4">
+        <div>
+          <h4 class="text-xs font-bold text-slate-900">Structure prete ?</h4>
+          <p class="text-[11px] text-slate-600">Passez a la redaction du contenu de vos lecons.</p>
+        </div>
+        @if (firstLessonId()) {
+          <a [routerLink]="['/instructor/cours', courseId(), 'lecons', firstLessonId(), 'contenu']" class="px-3 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm">
+            Passer a l'etape 3 : Remplir le contenu
+          </a>
+        } @else {
+          <span class="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-1.5 rounded-lg border border-amber-200">
+            Ajoutez au moins une lecon pour commencer a rediger
+          </span>
+        }
+      </div>
     </section>
 
     <section class="bg-white border border-slate-100 rounded-xl p-5">
@@ -106,6 +128,15 @@ export class CourseModulesComponent implements OnInit {
   readonly courseId = signal('');
   readonly course = computed(() => this.#draftSvc.get(this.courseId()));
   readonly modules = computed(() => this.course()?.modules ?? []);
+  readonly firstLessonId = computed(() => {
+    const mods = this.modules();
+    for (const m of mods) {
+      if (m.lessons && m.lessons.length > 0) {
+        return m.lessons[0].id;
+      }
+    }
+    return null;
+  });
   readonly courseTitle = computed(() => this.course()?.title ?? '');
   readonly openModules = signal<Record<string, boolean>>({});
   readonly openLessons = signal<Record<string, boolean>>({});

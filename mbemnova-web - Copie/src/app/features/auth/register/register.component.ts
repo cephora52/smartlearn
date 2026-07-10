@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 const pwdMatch = (c: AbstractControl) => {
@@ -59,30 +59,69 @@ const pwdMatch = (c: AbstractControl) => {
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="space-y-4">
-        <div>
-          <label for="prenom" class="label">Prénom <span class="text-red-500">*</span></label>
-          <input id="prenom" type="text" formControlName="prenom" autocomplete="given-name" placeholder="Jean-Paul"
-                 [class]="'input ' + (s && form.get('prenom')?.invalid ? 'input-error' : '')">
-          @if (s && form.get('prenom')?.invalid) { <p class="field-error" role="alert">Prénom requis (2 car. min)</p> }
+        <!-- Nom / Prénom en ligne -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="nom" class="label">Nom <span class="text-red-500">*</span></label>
+            <input id="nom" type="text" formControlName="nom" autocomplete="family-name" placeholder="Mbemba"
+                   [class]="'input ' + (s && form.get('nom')?.invalid ? 'input-error' : '')">
+            @if (s && form.get('nom')?.invalid) { <p class="field-error" role="alert">Nom requis</p> }
+          </div>
+          <div>
+            <label for="prenom" class="label">Prénom <span class="text-red-500">*</span></label>
+            <input id="prenom" type="text" formControlName="prenom" autocomplete="given-name" placeholder="Jean-Paul"
+                   [class]="'input ' + (s && form.get('prenom')?.invalid ? 'input-error' : '')">
+            @if (s && form.get('prenom')?.invalid) { <p class="field-error" role="alert">Prénom requis</p> }
+          </div>
         </div>
+
+        <!-- Choix du Rôle -->
+        <div>
+          <label class="label font-semibold text-slate-600">Vous êtes <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3 mt-1.5">
+            <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 cursor-pointer bg-white hover:bg-slate-50"
+                   [class.border-blue-400]="form.get('role')?.value === 'APPRENANT'"
+                   [class.bg-blue-50/10]="form.get('role')?.value === 'APPRENANT'">
+              <input type="radio" formControlName="role" value="APPRENANT" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+              <span class="text-sm font-semibold text-slate-700">Apprenant</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 cursor-pointer bg-white hover:bg-slate-50"
+                   [class.border-blue-400]="form.get('role')?.value === 'FORMATEUR'"
+                   [class.bg-blue-50/10]="form.get('role')?.value === 'FORMATEUR'">
+              <input type="radio" formControlName="role" value="FORMATEUR" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+              <span class="text-sm font-semibold text-slate-700">Formateur</span>
+            </label>
+          </div>
+        </div>
+
         <div>
           <label for="reg-email" class="label">Email <span class="text-red-500">*</span></label>
           <input id="reg-email" type="email" formControlName="email" autocomplete="email" placeholder="vous@example.com"
                  [class]="'input ' + (s && form.get('email')?.invalid ? 'input-error' : '')">
           @if (s && form.get('email')?.invalid) { <p class="field-error" role="alert">Email valide requis</p> }
         </div>
+
+        <div>
+          <label for="telephone" class="label">Téléphone <span class="text-red-500">*</span></label>
+          <input id="telephone" type="tel" formControlName="telephone" autocomplete="tel" placeholder="+242 06 600 0000"
+                 [class]="'input ' + (s && form.get('telephone')?.invalid ? 'input-error' : '')">
+          @if (s && form.get('telephone')?.invalid) { <p class="field-error" role="alert">Téléphone requis</p> }
+        </div>
+
         <div>
           <label for="reg-pwd" class="label">Mot de passe <span class="text-red-500">*</span></label>
           <input id="reg-pwd" type="password" formControlName="motDePasse" autocomplete="new-password" placeholder="8 caractères minimum"
                  [class]="'input ' + (s && form.get('motDePasse')?.invalid ? 'input-error' : '')">
           @if (s && form.get('motDePasse')?.hasError('minlength')) { <p class="field-error" role="alert">8 caractères minimum</p> }
         </div>
+
         <div>
           <label for="reg-conf" class="label">Confirmation <span class="text-red-500">*</span></label>
           <input id="reg-conf" type="password" formControlName="confirmation" autocomplete="new-password" placeholder="Retapez le mot de passe"
                  [class]="'input ' + (s && form.hasError('mismatch') ? 'input-error' : '')">
           @if (s && form.hasError('mismatch')) { <p class="field-error" role="alert">Les mots de passe ne correspondent pas</p> }
         </div>
+
         <label class="flex items-start gap-2.5 cursor-pointer">
           <input type="checkbox" formControlName="consent" class="w-4 h-4 rounded mt-0.5 text-blue-600 border-slate-300 focus:ring-blue-500 shrink-0">
           <span class="text-sm text-slate-600 leading-relaxed">
@@ -108,21 +147,24 @@ const pwdMatch = (c: AbstractControl) => {
   `,
 })
 export class RegisterComponent implements OnInit {
-  readonly #auth  = inject(AuthService);
-  readonly #route = inject(ActivatedRoute);
-  readonly #fb    = inject(FormBuilder);
+  readonly #auth   = inject(AuthService);
+  readonly #route  = inject(ActivatedRoute);
+  readonly #fb     = inject(FormBuilder);
 
-  readonly loading     = signal(false);
-  readonly referralCode= signal('');
+  readonly loading      = signal(false);
+  readonly referralCode = signal('');
   s = false;
 
   readonly avantages = ['Accès partiel gratuit dès l\'inscription', 'Paiement en tranches adapté', 'Certificat officiel vérifiable', 'Communauté d\'apprenants active'];
 
   readonly form = this.#fb.nonNullable.group({
+    nom:          ['', [Validators.required, Validators.minLength(2)]],
     prenom:       ['', [Validators.required, Validators.minLength(2)]],
     email:        ['', [Validators.required, Validators.email]],
+    telephone:    ['', [Validators.required]],
     motDePasse:   ['', [Validators.required, Validators.minLength(8)]],
     confirmation: ['', Validators.required],
+    role:         ['APPRENANT', [Validators.required]],
     consent:      [false, Validators.requiredTrue],
   }, { validators: pwdMatch });
 
@@ -135,9 +177,18 @@ export class RegisterComponent implements OnInit {
     this.s = true;
     if (this.form.invalid) return;
     this.loading.set(true);
-    const { prenom, email, motDePasse } = this.form.getRawValue();
+    const { nom, prenom, email, telephone, motDePasse, confirmation, role } = this.form.getRawValue();
     const code = this.referralCode();
-    this.#auth.register({ prenom, email, motDePasse, ...(code ? { referralCode: code } : {}) }).subscribe({
+    this.#auth.register({
+      nom,
+      prenom,
+      email,
+      telephone,
+      motDePasse,
+      confirmationMotDePasse: confirmation,
+      role,
+      ...(code ? { referralCode: code } : {})
+    }).subscribe({
       next: () => { this.loading.set(false); this.#auth.redirectToDashboard(); },
       error: () => { this.loading.set(false); },
     });

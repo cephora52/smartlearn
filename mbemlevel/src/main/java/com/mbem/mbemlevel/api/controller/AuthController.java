@@ -36,10 +36,22 @@ public class AuthController {
     @Operation(summary = "Créer un compte apprenant")
     public ResponseEntity<ApiResponse<AuthResponse>> register(
             @Valid @RequestBody InscriptionRequest req, HttpServletRequest httpReq) {
+        if (!req.motDePasse().equals(req.confirmationMotDePasse())) {
+            throw new IllegalStateException("PASSWORDS_DO_NOT_MATCH");
+        }
         AuthResultDto result = inscrireUC.executer(
-            new InscriptionCommand(req.prenom(), req.email(), req.motDePasse(),
-                getIp(httpReq), httpReq.getHeader("User-Agent")));
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(toAuthResponse(result), "Compte créé ! Vérifiez votre email pour activer votre accès."));
+            new InscriptionCommand(
+                req.nom(),
+                req.prenom(),
+                req.email(),
+                req.telephone(),
+                req.motDePasse(),
+                req.role(),
+                getIp(httpReq),
+                httpReq.getHeader("User-Agent")
+            )
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(toAuthResponse(result), "Compte créé !"));
     }
 
     /** POST /api/v1/auth/login — Scénario 03 */
@@ -126,7 +138,7 @@ public class AuthController {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     private AuthResponse toAuthResponse(AuthResultDto d) {
-        return new AuthResponse(d.utilisateurId(), d.prenom(), d.email(), d.role(),
+        return new AuthResponse(d.utilisateurId(), d.utilisateurId(), d.nom(), d.prenom(), d.email(), d.role(),
             d.accessToken(), d.refreshToken(), d.expiresAt(), d.estSuspendu());
     }
 

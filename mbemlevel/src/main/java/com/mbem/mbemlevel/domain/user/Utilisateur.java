@@ -91,17 +91,26 @@ public class Utilisateur extends AggregateRoot {
      * @param motDePasseHache Hash BCrypt — JAMAIS le mot de passe en clair
      */
     public static Utilisateur creer(String prenom, String email, String motDePasseHache) {
+        Utilisateur u = creer(prenom, null, email, motDePasseHache, Role.APPRENANT, null);
+        u.emailVerifie = false;
+        return u;
+    }
+
+    public static Utilisateur creer(String prenom, String nom, String email, String motDePasseHache, Role role, String telephone) {
         validatePrenom(prenom);
         validateEmail(email);
         Objects.requireNonNull(motDePasseHache, "Le hash du mot de passe est obligatoire");
+        Objects.requireNonNull(role, "Le rôle est obligatoire");
 
         Utilisateur u = new Utilisateur(email.trim().toLowerCase());
         u.prenom             = prenom.trim();
+        u.nom                = nom != null ? nom.trim() : null;
         u.motDePasseHache    = motDePasseHache;
-        u.role               = Role.APPRENANT;
+        u.role               = role;
         u.statut             = StatutApprenant.INSCRIT;
-        u.emailVerifie       = false;
+        u.emailVerifie       = true; // Activé directement en dev pour connexion immédiate
         u.tentativesEchouees = 0;
+        u.telephone          = telephone != null ? telephone.trim() : null;
 
         // Event publié après persistance → déclenche email bienvenue
         u.registerEvent(new ApprenantInscritEvent(u.getId(), u.prenom, u.email));

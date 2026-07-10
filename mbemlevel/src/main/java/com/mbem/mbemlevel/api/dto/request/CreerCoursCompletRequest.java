@@ -28,8 +28,12 @@ public record CreerCoursCompletRequest(
     String titre,
 
     /** Description courte pour les cartes du catalogue (max 500 chars) */
-    @NotBlank @Size(max = 500)
+    @Size(max = 500)
     String descriptionCourte,
+
+    /** Description fournie par le frontend */
+    @Size(max = 500)
+    String description,
 
     /** Description longue pour la page détail — HTML autorisé (sanitisé) */
     @Size(max = 10000)
@@ -80,7 +84,6 @@ public record CreerCoursCompletRequest(
      * Minimum 1 module, maximum 20.
      * Chaque module contient ses leçons avec leur contenu complet.
      */
-    @NotEmpty @Size(min = 1, max = 20)
     @Valid
     List<CreerModuleRequest> modules
 

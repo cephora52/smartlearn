@@ -1,4 +1,3 @@
-// MbemNova — application/dto/response/AuthResultDto.java
 package com.mbem.mbemlevel.application.dto.response;
 
 import java.time.LocalDateTime;
@@ -9,6 +8,7 @@ import java.util.UUID;
  * Contient le JWT (access token) + le refresh token brut.
  *
  * @param utilisateurId UUID de l'utilisateur
+ * @param nom           Nom de l'utilisateur
  * @param prenom        Prénom pour la personnalisation UI
  * @param email         Email de l'utilisateur
  * @param role          Rôle pour le routage frontend
@@ -19,6 +19,7 @@ import java.util.UUID;
  */
 public record AuthResultDto(
     UUID          utilisateurId,
+    String        nom,
     String        prenom,
     String        email,
     String        role,

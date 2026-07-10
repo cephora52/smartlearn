@@ -18,6 +18,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest req,
             @NonNull HttpServletResponse res, @NonNull FilterChain chain)
             throws ServletException, IOException {
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
+            chain.doFilter(req, res);
+            return;
+        }
         String ip   = getClientIp(req);
         String path = req.getRequestURI();
         int cap; Duration dur;

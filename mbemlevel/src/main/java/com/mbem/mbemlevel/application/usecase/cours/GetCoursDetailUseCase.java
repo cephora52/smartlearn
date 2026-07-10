@@ -38,6 +38,7 @@ public class GetCoursDetailUseCase {
     private final SessionJpaRepository      sessionRepo;
     private final AvisCoursJpaRepository    avisRepo;
     private final ProgressionJpaRepository  progressionRepo;
+    private final UtilisateurJpaRepository  utilisateurRepo;
     private final ObjectMapper              objectMapper;
 
     @Transactional(readOnly = true)
@@ -45,6 +46,19 @@ public class GetCoursDetailUseCase {
         // ── 1. Récupérer le cours ─────────────────────────────────────────────
         CoursJpaEntity cours = coursRepo.findById(coursId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + coursId));
+
+        if (!"PUBLIE".equals(cours.getStatut())) {
+            boolean isFormateur = apprenantId != null && apprenantId.equals(cours.getFormateurId());
+            boolean isAdmin = false;
+            if (apprenantId != null) {
+                isAdmin = utilisateurRepo.findById(apprenantId)
+                    .map(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.ADMIN || u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.SUPER_ADMIN)
+                    .orElse(false);
+            }
+            if (!isFormateur && !isAdmin) {
+                throw new RuntimeException("ACCESS_DENIED: Ce cours n'est pas accessible.");
+            }
+        }
 
         // ── 2. Progression de l'apprenant ────────────────────────────────────
         ProgressionJpaEntity progression = null;

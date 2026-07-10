@@ -13,10 +13,10 @@ import type {
 } from '../models';
 
 const DASHBOARDS: Record<UserRole, string> = {
-  APPRENANT:   '/app',
-  FORMATEUR:   '/instructor',
-  ADMIN:       '/admin',
-  SUPER_ADMIN: '/admin',
+  APPRENANT:   '/apprenant/dashboard',
+  FORMATEUR:   '/formateur/dashboard',
+  ADMIN:       '/admin/dashboard',
+  SUPER_ADMIN: '/admin/dashboard',
 };
 
 /**
@@ -98,8 +98,14 @@ export class AuthService {
   #onSuccess(a: AuthResponse): void {
     this.#token.set(a.accessToken);
     const u: UserProfile = {
-      userId: a.userId, prenom: a.prenom, email: a.email,
-      role: a.role, photoUrl: null, statut: 'ACTIF',
+      id: a.id,
+      userId: a.userId,
+      nom: a.nom,
+      prenom: a.prenom,
+      email: a.email,
+      role: a.role,
+      photoUrl: null,
+      statut: 'ACTIF',
     };
     this.currentUser.set(u);
     if (isPlatformBrowser(this.#plat)) {

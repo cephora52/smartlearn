@@ -46,7 +46,9 @@ export type StatutTirage = 'OUVERT' | 'CLOTURE' | 'GAGNANT_SELECTIONNE';
 
 // ── Auth (s07) ─────────────────────────────────────────────
 export interface AuthResponse {
+  id: string;
   userId: string;
+  nom: string;
   prenom: string;
   email: string;
   role: UserRole;
@@ -56,7 +58,9 @@ export interface AuthResponse {
   suspended: boolean;
 }
 export interface UserProfile {
+  id: string;
   userId: string;
+  nom: string;
   prenom: string;
   email: string;
   role: UserRole;
@@ -69,9 +73,13 @@ export interface ConnexionRequest {
   rememberMe: boolean;
 }
 export interface InscriptionRequest {
+  nom: string;
   prenom: string;
   email: string;
+  telephone: string;
   motDePasse: string;
+  confirmationMotDePasse: string;
+  role: string;
   referralCode?: string;
 }
 export interface ResetPasswordRequest {

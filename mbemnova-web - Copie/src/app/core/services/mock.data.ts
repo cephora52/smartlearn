@@ -13,22 +13,22 @@ import type {
 // ── 4 profils disponibles ──────────────────────────────────
 export const MOCK_PROFILES: Record<string, AuthResponse> = {
   APPRENANT: {
-    userId: 'u-001', prenom: 'Jean-Paul', email: 'jeanpaul.mbemba@gmail.com',
+    id: 'u-001', userId: 'u-001', nom: 'Mbemba', prenom: 'Jean-Paul', email: 'jeanpaul.mbemba@gmail.com',
     role: 'APPRENANT', accessToken: 'mock.apprenant', refreshToken: 'mock.refresh',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(), suspended: false,
   },
   FORMATEUR: {
-    userId: 'u-fmt', prenom: 'Alice', email: 'alice.fouda@mbemnova.com',
+    id: 'u-fmt', userId: 'u-fmt', nom: 'Fouda', prenom: 'Alice', email: 'alice.fouda@mbemnova.com',
     role: 'FORMATEUR', accessToken: 'mock.formateur', refreshToken: 'mock.refresh',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(), suspended: false,
   },
   ADMIN: {
-    userId: 'u-adm', prenom: 'Serge', email: 'serge.admin@mbemnova.com',
+    id: 'u-adm', userId: 'u-adm', nom: 'Serge', prenom: 'Serge', email: 'serge.admin@mbemnova.com',
     role: 'ADMIN', accessToken: 'mock.admin', refreshToken: 'mock.refresh',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(), suspended: false,
   },
   SUPER_ADMIN: {
-    userId: 'u-sad', prenom: 'MbemNova', email: 'root@mbemnova.com',
+    id: 'u-sad', userId: 'u-sad', nom: 'Nova', prenom: 'MbemNova', email: 'root@mbemnova.com',
     role: 'SUPER_ADMIN', accessToken: 'mock.super', refreshToken: 'mock.refresh',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(), suspended: false,
   },
@@ -38,9 +38,14 @@ export const MOCK_PROFILES: Record<string, AuthResponse> = {
 export let MOCK_AUTH: AuthResponse = MOCK_PROFILES['APPRENANT'];
 
 export const MOCK_USER: UserProfile = {
-  userId: MOCK_AUTH.userId, prenom: MOCK_AUTH.prenom,
-  email: MOCK_AUTH.email, role: MOCK_AUTH.role,
-  photoUrl: null, statut: 'ACTIF',
+  id: MOCK_AUTH.userId,
+  userId: MOCK_AUTH.userId,
+  nom: MOCK_AUTH.nom,
+  prenom: MOCK_AUTH.prenom,
+  email: MOCK_AUTH.email,
+  role: MOCK_AUTH.role,
+  photoUrl: null,
+  statut: 'ACTIF',
 };
 
 // Fonction pour changer de profil (appelée par MockSwitcher)

@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Query;
 
-import com.mbem.mbemlevel.domain.cours.infrastructure.persistence.entity.UtilisateurJpaEntity;
 import com.mbem.mbemlevel.domain.user.Utilisateur;
 
 import io.lettuce.core.dynamic.annotation.Param;

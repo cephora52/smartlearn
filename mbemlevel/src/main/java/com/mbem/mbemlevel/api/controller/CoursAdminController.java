@@ -38,6 +38,7 @@ public class CoursAdminController {
     private final PublierCoursUseCase       publierUC;
     private final GetCoursEnAttenteUseCase  enAttenteUC;
     private final ModifierBlocsLeconUseCase modifierBlocsUC;
+    private final GetCoursFormateurUseCase  getCoursFormateurUC;
 
     /**
      * S19 — Créer un cours complet avec modules, leçons, blocs, QCM.
@@ -92,5 +93,16 @@ public class CoursAdminController {
     @Operation(summary = "Cours en attente de publication (S19)")
     public ResponseEntity<ApiResponse<List<CoursResponse>>> enAttente() {
         return ResponseEntity.ok(ApiResponse.ok(enAttenteUC.executer()));
+    }
+
+    /**
+     * Lister les cours créés par le formateur connecté (publiés + brouillons).
+     */
+    @GetMapping
+    @Operation(summary = "Lister les cours du formateur connecté")
+    public ResponseEntity<ApiResponse<List<CoursResponse>>> mesCours(
+            @AuthenticationPrincipal String userId) {
+        List<CoursResponse> responses = getCoursFormateurUC.executer(UUID.fromString(userId));
+        return ResponseEntity.ok(ApiResponse.ok(responses));
     }
 }
