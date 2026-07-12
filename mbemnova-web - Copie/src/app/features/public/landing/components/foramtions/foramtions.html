@@ -131,32 +131,35 @@
           [attr.aria-label]="'Formation ' + c.titre"
         >
 
-          <!-- ── Banner SVG ── -->
+          <!-- ── Banner Image or SVG ── -->
           <div class="relative h-48 overflow-hidden flex-shrink-0" [ngClass]="levelBg(c.niveau)">
-
-            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 192"
-                 preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient [id]="'grad-' + c.id" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" [attr.stop-color]="levelColor1(c.niveau)"/>
-                  <stop offset="100%" [attr.stop-color]="levelColor2(c.niveau)"/>
-                </linearGradient>
-                <pattern [id]="'dots-' + c.id" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <circle cx="12" cy="12" r="1" fill="white" opacity="0.12"/>
-                </pattern>
-              </defs>
-              <rect width="400" height="192" [attr.fill]="'url(#grad-' + c.id + ')'"/>
-              <rect width="400" height="192" [attr.fill]="'url(#dots-' + c.id + ')'"/>
-              <circle cx="340" cy="40"  r="80" fill="white" opacity="0.05"/>
-              <circle cx="360" cy="160" r="50" fill="white" opacity="0.04"/>
-              <circle cx="30"  cy="160" r="60" fill="white" opacity="0.04"/>
-              <line x1="0" y1="145" x2="400" y2="115" stroke="white" stroke-opacity="0.06" stroke-width="1"/>
-              <line x1="0" y1="165" x2="400" y2="135" stroke="white" stroke-opacity="0.04" stroke-width="1"/>
-              <text x="200" y="115" text-anchor="middle" font-family="'Segoe UI',sans-serif"
-                    font-size="68" font-weight="900" fill="white" opacity="0.07" letter-spacing="-2">
-                {{ c.titre.slice(0, 2).toUpperCase() }}
-              </text>
-            </svg>
+            @if (c.imageCouvertureThumbnail || c.imageCouverture) {
+              <img [src]="c.imageCouvertureThumbnail || c.imageCouverture" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" alt="couverture">
+            } @else {
+              <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 192"
+                   preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient [id]="'grad-' + c.id" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" [attr.stop-color]="levelColor1(c.niveau)"/>
+                    <stop offset="100%" [attr.stop-color]="levelColor2(c.niveau)"/>
+                  </linearGradient>
+                  <pattern [id]="'dots-' + c.id" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="12" cy="12" r="1" fill="white" opacity="0.12"/>
+                  </pattern>
+                </defs>
+                <rect width="400" height="192" [attr.fill]="'url(#grad-' + c.id + ')'"/>
+                <rect width="400" height="192" [attr.fill]="'url(#dots-' + c.id + ')'"/>
+                <circle cx="340" cy="40"  r="80" fill="white" opacity="0.05"/>
+                <circle cx="360" cy="160" r="50" fill="white" opacity="0.04"/>
+                <circle cx="30"  cy="160" r="60" fill="white" opacity="0.04"/>
+                <line x1="0" y1="145" x2="400" y2="115" stroke="white" stroke-opacity="0.06" stroke-width="1"/>
+                <line x1="0" y1="165" x2="400" y2="135" stroke="white" stroke-opacity="0.04" stroke-width="1"/>
+                <text x="200" y="115" text-anchor="middle" font-family="'Segoe UI',sans-serif"
+                      font-size="68" font-weight="900" fill="white" opacity="0.07" letter-spacing="-2">
+                  {{ c.titre.slice(0, 2).toUpperCase() }}
+                </text>
+              </svg>
+            }
 
             <!-- Level badge -->
             <div class="absolute top-3 left-3 z-10">
@@ -198,6 +201,15 @@
 
           <!-- ── Card body ── -->
           <div class="flex flex-col flex-1 p-5">
+            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+              @if (c.formateurNom) {
+                <span class="text-[11px] font-semibold text-slate-600">Par {{ c.formateurNom }}</span>
+              }
+              @if (c.categorieNom) {
+                @if (c.formateurNom) { <span class="text-[10px] text-slate-400">·</span> }
+                <span class="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full font-bold">{{ c.categorieNom }}</span>
+              }
+            </div>
 
             <h3 class="text-slate-900 font-bold text-[15px] leading-snug mb-1.5
                        group-hover:text-indigo-700 transition-colors duration-200 line-clamp-2">
@@ -236,7 +248,7 @@
                   {{ (c.seuilPaiement * 100).toFixed(0) }}% gratuit
                 </span>
                 <span class="text-slate-900 font-bold text-sm">
-                  {{ c.prixFcfa.toLocaleString('fr-FR') }} FCFA
+                  {{ c.prixFcfa === 0 ? 'Gratuit' : c.prixFcfa.toLocaleString('fr-FR') + ' FCFA' }}
                 </span>
               </div>
               <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">

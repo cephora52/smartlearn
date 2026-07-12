@@ -17,5 +17,7 @@ public record LeconSommaireResponse(
     boolean estPreview,
     boolean aQCM,
     /** État de complétion pour l'apprenant connecté */
-    Boolean estTerminee
+    Boolean estTerminee,
+    boolean estVerrouille,
+    String  typeContenu
 ) {}

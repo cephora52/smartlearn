@@ -38,9 +38,9 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (m === 'GET'  && p === '/auth/me')                   return r(ok({ userId: MOCK_AUTH.userId, prenom: MOCK_AUTH.prenom, email: MOCK_AUTH.email, role: MOCK_AUTH.role, photoUrl: null, statut: 'ACTIF' }));
 
   // ── Cours ──────────────────────────────────────────────────
-  if (m === 'GET' && (p === '/cours' || p.startsWith('/cours?')))         return r(page(MOCK_COURS, 6));
-  if (m === 'GET' && p.startsWith('/cours/slug/'))                        return r(ok(MOCK_COURS_DETAIL));
-  if (m === 'GET' && p.match(/^\/cours\/[^/]+$/) && !p.includes('/avis') && !p.includes('/liste')) return r(ok(MOCK_COURS_DETAIL));
+  // if (m === 'GET' && (p === '/cours' || p.startsWith('/cours?')))         return r(page(MOCK_COURS, 6));
+  // if (m === 'GET' && p.startsWith('/cours/slug/'))                        return r(ok(MOCK_COURS_DETAIL));
+  // if (m === 'GET' && p.match(/^\/cours\/[^/]+$/) && !p.includes('/avis') && !p.includes('/liste')) return r(ok(MOCK_COURS_DETAIL));
   if (m === 'GET' && p.includes('/avis'))                                 return r(ok(MOCK_AVIS));
   if (m === 'POST' && p.includes('/avis'))                                return r(ok('av-new', 'Merci pour ton avis !'));
   if (m === 'POST' && p.includes('/liste-attente'))                       return r(ok(null, 'Tu es sur la liste d\'attente.'));

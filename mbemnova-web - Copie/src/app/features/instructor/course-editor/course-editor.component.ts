@@ -56,7 +56,6 @@ interface ModuleItem {
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Statut: Brouillon</span>
         <button (click)="saveCourse()" [disabled]="saving()" class="px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-60">
           {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
         </button>
@@ -240,8 +239,8 @@ export class CourseEditorComponent implements OnInit {
   readonly isEditMode = computed(() => !!this.id() || !!this.#route.snapshot.paramMap.get('id'));
 
   readonly courseForm = this.#fb.nonNullable.group({
-    title: ['', [Validators.required, Validators.minLength(5)]],
-    description: ['', [Validators.required, Validators.minLength(10)]],
+    title: ['', Validators.required],
+    description: ['', Validators.required],
     level: ['DEBUTANT' as NiveauCours, Validators.required],
     price: [25000, [Validators.required, Validators.min(0)]],
   });

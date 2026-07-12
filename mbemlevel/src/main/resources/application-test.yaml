@@ -68,3 +68,7 @@ logging:
     root: WARN
     com.mbem.mbemlevel: INFO
     org.flywaydb: WARN
+
+mbemnova:
+  security:
+    bcrypt-cost: 4

@@ -9,6 +9,7 @@ public enum TypeBloc {
     IMAGE,         // Image avec alt text et légende optionnelle
     VIDEO_YOUTUBE, // Embed YouTube via lien
     VIDEO_VIMEO,   // Embed Vimeo via lien
+    VIDEO,         // Vidéo hébergée en direct (MinIO)
     PDF_EMBED,     // PDF affiché inline dans la page (stocké MinIO)
     CODE,          // Bloc de code avec coloration syntaxique
     CALLOUT        // Encadré informatif : INFO, ASTUCE, ATTENTION, IMPORTANT

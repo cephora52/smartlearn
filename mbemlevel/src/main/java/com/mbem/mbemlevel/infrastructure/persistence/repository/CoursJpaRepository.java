@@ -30,6 +30,7 @@ public interface CoursJpaRepository extends JpaRepository<CoursJpaEntity, UUID> 
     Optional<CoursJpaEntity> findBySlug(String slug);
     boolean existsBySlug(String slug);
     boolean existsByTitreAndFormateurId(String titre, UUID formateurId);
+    List<CoursJpaEntity> findByFormateurIdAndTitre(UUID formateurId, String titre);
 
     /** S19 — Cours en attente de publication (admin) */
     List<CoursJpaEntity> findByStatutIn(List<String> statuts);
@@ -43,8 +44,13 @@ public interface CoursJpaRepository extends JpaRepository<CoursJpaEntity, UUID> 
        "c.imageCouvertureThumbnail as imageCouvertureThumbnail, " +
        "c.nbApprenants as nbApprenants, c.noteMoyenne as noteMoyenne, " +
        "c.nbLecons as nbLecons, c.dureeTotaleMinutes as dureeTotaleMinutes, " +
-       "c.prixFcfa as prixFcfa, c.seuilPaiement as seuilPaiement " +
-       "FROM CoursJpaEntity c WHERE c.statut = 'PUBLIE' " +
+       "c.prixFcfa as prixFcfa, c.seuilPaiement as seuilPaiement, c.slug as slug, " +
+       "u.prenom as formateurPrenom, u.nom as formateurNom, " +
+       "cat.nom as categorieNom " +
+       "FROM CoursJpaEntity c " +
+       "LEFT JOIN UtilisateurJpaEntity u ON c.formateurId = u.id " +
+       "LEFT JOIN CategorieJpaEntity cat ON c.categorieId = cat.id " +
+       "WHERE c.statut = 'PUBLIE' " +
        "AND (:niveau IS NULL OR c.niveau = :niveau) " +
        "AND (:categorieId IS NULL OR c.categorieId = :categorieId)")
 Page<CoursCatalogueProjection> findCatalogueProjection(

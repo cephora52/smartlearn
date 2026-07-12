@@ -10,6 +10,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.time.LocalDateTime;
 
 @Component @RequiredArgsConstructor
 public class CoursRepositoryAdapter implements CoursRepository {
@@ -30,6 +31,22 @@ public class CoursRepositoryAdapter implements CoursRepository {
     @Override @Transactional(readOnly=true)
     public boolean existsBySlug(String slug) { return repo.existsBySlug(slug); }
 
+    private String resolveUniqueSlug(String baseSlug, UUID id) {
+        if (baseSlug == null || baseSlug.isEmpty()) {
+            return UUID.randomUUID().toString();
+        }
+        String slug = baseSlug;
+        int count = 1;
+        while (true) {
+            Optional<CoursJpaEntity> existing = repo.findBySlug(slug);
+            if (existing.isEmpty() || existing.get().getId().equals(id)) {
+                return slug;
+            }
+            slug = baseSlug + "-" + count;
+            count++;
+        }
+    }
+
     @Override @Transactional
     public Cours save(Cours c) {
         return toDomain(repo.save(repo.findById(c.getId())
@@ -37,12 +54,58 @@ public class CoursRepositoryAdapter implements CoursRepository {
             .orElseGet(() -> toEntity(c))));
     }
 
+    private String toJson(List<String> list) {
+        if (list == null) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append("\"").append(list.get(i).replace("\"", "\\\"")).append("\"");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<String> fromJson(String json) {
+        if (json == null || json.isEmpty() || "[]".equals(json)) return new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        String content = json.trim();
+        if (content.startsWith("[") && content.endsWith("]")) {
+            content = content.substring(1, content.length() - 1);
+            if (!content.isEmpty()) {
+                String[] items = content.split("\",\"");
+                for (String item : items) {
+                    list.add(item.replace("\"", ""));
+                }
+            }
+        }
+        return list;
+    }
+
     private CoursJpaEntity update(Cours c, CoursJpaEntity e) {
         e.setTitre(c.getTitre());
-        e.setDescriptionCourte(c.getDescriptionCourte()); // ← corrigé
+        e.setDescriptionCourte(c.getDescriptionCourte());
+        e.setDescriptionLongue(c.getDescriptionLongue());
         e.setNiveau(c.getNiveau());
+        e.setCategorieId(c.getCategorieId());
+        e.setFormateurId(c.getFormateurId());
+        e.setSeuilPaiement(c.getSeuilPaiement());
+        e.setPrixFcfa(c.getPrixFcfa());
         e.setEstActif(c.isEstActif());
+        e.setSlug(resolveUniqueSlug(c.getSlug(), c.getId()));
+        e.setImageCouverture(c.getImageCouverture());
+        e.setImageCouvertureThumbnail(c.getImageCouvertureThumbnail());
+        e.setStatut(c.getStatut());
         e.setNbApprenants(c.getNbApprenants());
+        e.setNbModules(c.getNbModules());
+        e.setNbLecons(c.getNbLecons());
+        e.setDureeTotaleMinutes(c.getDureeTotaleMinutes());
+        e.setNbAvis(c.getNbAvis());
+        e.setNoteMoyenne(c.getNoteMoyenne());
+        e.setObjectifsApprentissageJson(toJson(c.getObjectifsApprentissage()));
+        e.setPrerequis(c.getPrerequis());
+        e.setPublicCible(c.getPublicCible());
+        e.setDebouchesJson(c.getDebouchesJson());
+        e.setUpdatedAt(c.getUpdatedAt() != null ? c.getUpdatedAt() : LocalDateTime.now());
         return e;
     }
 
@@ -50,15 +113,15 @@ public class CoursRepositoryAdapter implements CoursRepository {
         return CoursJpaEntity.builder()
             .id(c.getId())
             .titre(c.getTitre())
-            .descriptionCourte(c.getDescriptionCourte())       // ← corrigé
+            .descriptionCourte(c.getDescriptionCourte())
             .descriptionLongue(c.getDescriptionLongue())
             .niveau(c.getNiveau())
             .categorieId(c.getCategorieId())
             .formateurId(c.getFormateurId())
-            .seuilPaiement(c.getSeuilPaiement())               // ← corrigé : déjà BigDecimal
-            .prixFcfa(c.getPrixFcfa())                         // ← corrigé : getPrixFcfa()
+            .seuilPaiement(c.getSeuilPaiement())
+            .prixFcfa(c.getPrixFcfa())
             .estActif(c.isEstActif())
-            .slug(c.getSlug())
+            .slug(resolveUniqueSlug(c.getSlug(), c.getId()))
             .imageCouverture(c.getImageCouverture())
             .imageCouvertureThumbnail(c.getImageCouvertureThumbnail())
             .langue(c.getLangue() != null ? c.getLangue() : "fr")
@@ -69,21 +132,31 @@ public class CoursRepositoryAdapter implements CoursRepository {
             .dureeTotaleMinutes(c.getDureeTotaleMinutes())
             .nbAvis(c.getNbAvis())
             .noteMoyenne(c.getNoteMoyenne())
+            .objectifsApprentissageJson(toJson(c.getObjectifsApprentissage()))
+            .prerequis(c.getPrerequis())
+            .publicCible(c.getPublicCible())
+            .debouchesJson(c.getDebouchesJson())
+            .createdAt(c.getCreatedAt() != null ? c.getCreatedAt() : LocalDateTime.now())
+            .updatedAt(c.getUpdatedAt() != null ? c.getUpdatedAt() : LocalDateTime.now())
             .build();
     }
 
     private Cours toDomain(CoursJpaEntity e) {
-        return new Cours(
+        Cours c = new Cours(
             e.getId(), e.getTitre(),
-            e.getDescriptionCourte(),                          // ← corrigé
+            e.getDescriptionCourte(),
             e.getDescriptionLongue(),
             e.getNiveau(), e.getCategorieId(), e.getFormateurId(),
             e.getSlug(), e.getImageCouverture(), e.getImageCouvertureThumbnail(),
             e.getLangue(),
             e.getNbModules(), e.getNbLecons(), e.getDureeTotaleMinutes(),
             e.getNbApprenants(), e.getNoteMoyenne(), e.getNbAvis(),
-            e.getSeuilPaiement(), e.getPrixFcfa(),             // ← corrigé
+            e.getSeuilPaiement(), e.getPrixFcfa(),
             e.getStatut(), e.isEstActif(),
             e.getCreatedAt(), e.getUpdatedAt());
+        c.setObjectifsApprentissage(fromJson(e.getObjectifsApprentissageJson()));
+        c.setPrerequisEtPublicCible(e.getPrerequis(), e.getPublicCible());
+        c.setDebouchesJson(e.getDebouchesJson());
+        return c;
     }
 }

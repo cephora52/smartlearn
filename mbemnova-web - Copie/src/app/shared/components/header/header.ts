@@ -78,8 +78,24 @@ export class Header implements OnInit, OnDestroy {
     { id: 'dev',         label: 'Développement Web et Mobile', count: '3' },
     { id: 'marketing',   label: 'Marketing et Communication', count: '4' },
     { id: 'reseaux',     label: 'Réseaux Système et Sécurité', count: '2' },
-    { id: 'soft',        label: 'Soft Skills',                count: '0' },
   ];
+
+  getCategoryId(catId: string): string {
+    const ids: Record<string, string> = {
+      'bureautique': '11111111-1111-1111-1111-111111111111',
+      'data': '22222222-2222-2222-2222-222222222222',
+      'design': '33333333-3333-3333-3333-333333333333',
+      'dev': '44444444-4444-4444-4444-444444444444',
+      'marketing': '55555555-5555-5555-5555-555555555555',
+      'reseaux': '66666666-6666-6666-6666-666666666666',
+    };
+    return ids[catId] ?? '';
+  }
+
+  forceClose(): void {
+    this.activeDropdown = null;
+    this.mobileOpen = false;
+  }
  
   readonly bootcamps: Bootcamp[] = [
     // Marketing

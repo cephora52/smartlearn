@@ -8,6 +8,7 @@ import com.mbem.mbemlevel.infrastructure.persistence.entity.*;
 import com.mbem.mbemlevel.infrastructure.persistence.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -30,13 +31,26 @@ import java.util.*;
 public class CreerCoursCompletUseCase {
 
     private final CoursRepository            coursRepo;
+    private final CoursJpaRepository         coursJpaRepo;
     private final ModuleJpaRepository        moduleRepo;
     private final LeconJpaRepository         leconRepo;
     private final BlocContenuJpaRepository   blocRepo;
     private final QCMJpaRepository           qcmRepo;
 
     @Transactional
+    @CacheEvict(value = "catalogue", allEntries = true)
     public UUID executer(CreerCoursCompletRequest req, UUID formateurId) {
+        // Supprimer tout brouillon vide existant (sans modules) pour le même formateur avec le même titre
+        List<CoursJpaEntity> duplicates = coursJpaRepo.findByFormateurIdAndTitre(formateurId, req.titre());
+        if (duplicates != null && !duplicates.isEmpty()) {
+            for (CoursJpaEntity dup : duplicates) {
+                if (dup.getNbModules() == 0) {
+                    coursJpaRepo.delete(dup);
+                    log.info("[COURS] Brouillon vide doublon supprimé: {}", dup.getId());
+                }
+            }
+        }
+
         // 1. Créer le cours
         String descCourte = req.descriptionCourte() != null ? req.descriptionCourte() : (req.description() != null ? req.description() : "");
         Cours cours = Cours.creer(
@@ -46,8 +60,17 @@ public class CreerCoursCompletUseCase {
         );
         cours.setDescriptionLongue(req.descriptionLongue());
         cours.setImageCouverture(req.imageCouverture());
+        if (req.imageCouverture() != null && req.imageCouverture().contains("/banniere/original/")) {
+            cours.setImageCouvertureThumbnail(req.imageCouverture().replace("/banniere/original/", "/banniere/thumbnail/"));
+        } else {
+            cours.setImageCouvertureThumbnail(req.imageCouverture());
+        }
         cours.setObjectifsApprentissage(req.objectifsApprentissage());
         cours.setPrerequisEtPublicCible(req.prerequis(), req.publicCible());
+        
+        // Auto-publier dès la création pour garantir la visibilité côté apprenant
+        cours.publier();
+        
         coursRepo.save(cours);
         log.info("[COURS] Cours créé en brouillon: {} par formateur: {}", cours.getId(), formateurId);
 
@@ -118,10 +141,11 @@ public class CreerCoursCompletUseCase {
         cours.setDureeTotaleMinutes(
             req.dureeTotaleMinutes() != null ? req.dureeTotaleMinutes() : totalDuree
         );
+
         coursRepo.save(cours);
 
-        log.info("[COURS] Cours complet persisté: {} modules, {} minutes",
-            nbModules, totalDuree);
+        log.info("[COURS] Cours complet persisté: {} modules, {} minutes, statut: {}",
+            nbModules, totalDuree, cours.getStatut());
         return cours.getId();
     }
 

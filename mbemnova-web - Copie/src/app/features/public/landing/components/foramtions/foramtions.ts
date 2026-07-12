@@ -47,6 +47,7 @@ export class Foramtions implements OnInit {
     const domain = this.activeDomaine();
     const list = domain
       ? all.filter(c =>
+          c.categorieNom?.toLowerCase().includes(domain.toLowerCase()) ||
           c.domaine?.toLowerCase().includes(domain.toLowerCase()) ||
           c.titre?.toLowerCase().includes(domain.toLowerCase())
         )
@@ -57,12 +58,12 @@ export class Foramtions implements OnInit {
   // ── Static data ──────────────────────────────────────────────────────────
  
   readonly domaines: DomainFilter[] = [
-    { label: 'Développement Web' },
-    { label: 'Data & IA' },
-    { label: 'Design Graphique' },
-    { label: 'Marketing Digital' },
-    { label: 'Réseaux & Sécurité' },
-    { label: 'No-Code & SaaS' },
+    { label: 'Bureautique & Productivité' },
+    { label: 'Data et IA' },
+    { label: 'Design Graphique et UI/UX' },
+    { label: 'Développement Web et Mobile' },
+    { label: 'Marketing et Communication' },
+    { label: 'Réseaux Système et Sécurité' },
   ];
  
   readonly trustItems: TrustItem[] = [
@@ -91,31 +92,20 @@ export class Foramtions implements OnInit {
   // ── Lifecycle ────────────────────────────────────────────────────────────
  
   ngOnInit(): void {
-    // Optimistic: show mock data instantly, then replace with API response
-    this.cours.set(MOCK_COURS);
- 
-    // Simulate skeleton for 800ms even with mock data for smooth UX
-    // In production remove this timeout — the skeleton disappears when API responds
-    setTimeout(() => {
-      this.isLoading.set(false);
-      this.#cdr.markForCheck();
-    }, 800);
- 
-    // Real API call — uncomment in production:
-    // this.#courseSvc.getAll({ size: 6 }).subscribe({
-    //   next: r => {
-    //     if (r.success && r.data?.content?.length) {
-    //       this.cours.set(r.data.content);
-    //     }
-    //     this.isLoading.set(false);
-    //     this.#cdr.markForCheck();
-    //   },
-    //   error: () => {
-    //     // Fallback: keep mock data, stop loading
-    //     this.isLoading.set(false);
-    //     this.#cdr.markForCheck();
-    //   }
-    // });
+    this.isLoading.set(true);
+    this.#courseSvc.getAll({ size: 6 }).subscribe({
+      next: r => {
+        if (r.success && r.data?.content) {
+          this.cours.set(r.data.content);
+        }
+        this.isLoading.set(false);
+        this.#cdr.markForCheck();
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.#cdr.markForCheck();
+      }
+    });
   }
  
   // ── Actions ──────────────────────────────────────────────────────────────

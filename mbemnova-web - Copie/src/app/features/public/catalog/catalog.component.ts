@@ -10,7 +10,6 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../../core/services/course.service';
 import type { CoursResponse, NiveauCours } from '../../../core/models';
-import { MOCK_COURS } from '../../../core/services/mock.data';
 
 @Component({
   selector: 'app-catalog',
@@ -65,6 +64,33 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
             <div class="card p-5 sticky top-20">
               <h2 class="font-semibold text-slate-900 mb-4">Filtres</h2>
 
+              <!-- Domaine -->
+              <div class="mb-5">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">
+                  Domaine
+                </p>
+                <div class="space-y-2">
+                  @for (dom of domains; track dom.value) {
+                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="domaine"
+                        [value]="dom.value"
+                        [(ngModel)]="selectedCategory"
+                        (change)="load()"
+                        class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                      />
+                      <span
+                        class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                      >
+                        <span aria-hidden="true">{{ dom.icon }}</span>
+                        {{ dom.label }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
               <!-- Niveau -->
               <div class="mb-5">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">
@@ -84,8 +110,8 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
                       <span
                         class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-1.5"
                       >
-                        <span aria-hidden="true">{{ n.icon }}</span
-                        >{{ n.label }}
+                        <span aria-hidden="true">{{ n.icon }}</span>
+                        {{ n.label }}
                       </span>
                     </label>
                   }
@@ -121,6 +147,13 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
 
           <!-- Grille -->
           <div class="flex-1 min-w-0">
+            @if (errorMessage()) {
+              <div class="bg-red-50 text-red-800 p-4 rounded-xl mb-6 border border-red-200 text-sm flex items-center justify-between animate-fade-in">
+                <span class="font-medium">⚠️ {{ errorMessage() }}</span>
+                <button (click)="errorMessage.set(null)" class="text-red-500 hover:text-red-700 font-bold text-lg select-none px-2">×</button>
+              </div>
+            }
+
             <div class="flex items-center justify-between mb-6">
               @if (!loading()) {
                 <p class="text-sm text-slate-500">
@@ -172,7 +205,12 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
                     [style]="'animation-delay:' + i * 40 + 'ms'"
                     [attr.aria-label]="c.titre"
                   >
-                    <div [class]="'h-36 relative overflow-hidden ' + levelGradient(c.niveau)">
+                    <div class="h-36 relative overflow-hidden bg-slate-100">
+                      @if (c.imageCouvertureThumbnail) {
+                        <img [src]="c.imageCouvertureThumbnail" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" alt="couverture">
+                      } @else {
+                        <div [class]="'absolute inset-0 ' + levelGradient(c.niveau)"></div>
+                      }
                       <div
                         class="absolute inset-0 opacity-10"
                         style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:20px 20px"
@@ -206,6 +244,15 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
                     </div>
 
                     <div class="flex-1 flex flex-col p-4">
+                      <div class="flex items-center gap-2 mb-1.5">
+                        @if (c.formateurNom) {
+                          <span class="text-[11px] font-semibold text-slate-600">Par {{ c.formateurNom }}</span>
+                        }
+                        @if (c.categorieNom) {
+                          @if (c.formateurNom) { <span class="text-[10px] text-slate-400">·</span> }
+                          <span class="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-bold">{{ c.categorieNom }}</span>
+                        }
+                      </div>
                       <h3
                         class="font-bold text-slate-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors"
                       >
@@ -220,7 +267,7 @@ import { MOCK_COURS } from '../../../core/services/mock.data';
                         <span>·</span>
                         <span>{{ Math.floor(c.dureeTotaleMinutes / 60) }}h</span>
                         <span class="ml-auto font-bold text-slate-700">
-                          {{ c.prixFcfa   }} FCFA
+                          {{ c.prixFcfa === 0 ? 'Gratuit' : c.prixFcfa + ' FCFA' }}
                         </span>
                           <!-- {{ c.prixFcfa | number: '1.0-0' }} FCFA</span> -->
                       </div>
@@ -299,12 +346,24 @@ export class CatalogComponent implements OnInit {
   readonly total = signal(0);
   readonly page = signal(0);
   readonly totalPages = signal(0);
+  readonly errorMessage = signal<string | null>(null);
 
   search = '';
   selectedNiveau: NiveauCours | '' = '';
   onlyFree = false;
+  selectedCategory = '';
 
-  readonly hasFilter = computed(() => !!this.search || !!this.selectedNiveau || this.onlyFree);
+  readonly domains = [
+    { value: '', label: 'Tous', icon: '📁' },
+    { value: '11111111-1111-1111-1111-111111111111', label: 'Bureautique & Productivité', icon: '💻' },
+    { value: '22222222-2222-2222-2222-222222222222', label: 'Data et IA', icon: '🧠' },
+    { value: '33333333-3333-3333-3333-333333333333', label: 'Design Graphique et UI/UX', icon: '🎨' },
+    { value: '44444444-4444-4444-4444-444444444444', label: 'Développement Web et Mobile', icon: '🚀' },
+    { value: '55555555-5555-5555-5555-555555555555', label: 'Marketing et Communication', icon: '📢' },
+    { value: '66666666-6666-6666-6666-666666666666', label: 'Réseaux Système et Sécurité', icon: '🛡️' }
+  ];
+
+  readonly hasFilter = computed(() => !!this.search || !!this.selectedNiveau || this.onlyFree || !!this.selectedCategory);
 
   readonly niveaux = [
     { value: '' as NiveauCours | '', label: 'Tous', icon: '🎯' },
@@ -316,17 +375,29 @@ export class CatalogComponent implements OnInit {
   ngOnInit(): void {
     this.#route.queryParams.subscribe((p) => {
       if (p['niveau']) this.selectedNiveau = p['niveau'] as NiveauCours;
-      if (p['q']) this.search = p['q'];
+      if (p['categoryId']) {
+        this.selectedCategory = p['categoryId'];
+      } else if (p['q']) {
+        const found = this.domains.find(d => d.label.toLowerCase() === p['q'].toLowerCase());
+        if (found) {
+          this.selectedCategory = found.value;
+          this.search = '';
+        } else {
+          this.search = p['q'];
+        }
+      }
       this.load();
     });
   }
 
   load(): void {
     this.loading.set(true);
+    this.errorMessage.set(null);
     const params: Record<string, string | number> = { page: this.page(), size: 9 };
     if (this.search) params['q'] = this.search;
     if (this.selectedNiveau) params['niveau'] = this.selectedNiveau;
     if (this.onlyFree) params['gratuit'] = 'true';
+    if (this.selectedCategory) params['categorieId'] = this.selectedCategory;
     this.#svc.getAll(params).subscribe({
       next: (r) => {
         if (r.success && r.data) {
@@ -337,9 +408,7 @@ export class CatalogComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.cours.set([]);
-        this.total.set(0);
-        this.totalPages.set(0);
+        this.errorMessage.set("Une erreur réseau ou serveur est survenue lors de la mise à jour du catalogue. Les formations affichées peuvent ne pas être à jour.");
         this.loading.set(false);
       },
     });
@@ -365,6 +434,7 @@ export class CatalogComponent implements OnInit {
     this.search = '';
     this.selectedNiveau = '';
     this.onlyFree = false;
+    this.selectedCategory = '';
     this.page.set(0);
     this.load();
   }

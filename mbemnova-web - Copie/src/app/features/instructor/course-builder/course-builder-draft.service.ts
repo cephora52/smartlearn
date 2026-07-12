@@ -6,7 +6,7 @@ export type BlockType = 'TEXT' | 'CODE' | 'IMAGE' | 'VIDEO' | 'QUIZ' | 'FILE' | 
 export interface LessonBlock {
   id: string;
   type: BlockType;
-  title: string;
+  title?: string;
   content: string;
   tipColor?: 'blue' | 'green' | 'amber' | 'red' | 'slate';
   fileName?: string;
@@ -26,6 +26,8 @@ export interface LessonDraft {
   sortOrder: number;
   blocks: LessonBlock[];
   estPreview?: boolean;
+  typeContenu?: 'TEXTE' | 'VIDEO' | 'PDF';
+  xpReward?: number;
 }
 
 export interface ModuleDraft {
@@ -97,6 +99,15 @@ export class CourseBuilderDraftService {
     const next = { ...base, ...patch, updatedAt: new Date().toISOString() };
     this.#set(next);
     return next;
+  }
+
+  remove(id: string): void {
+    this.courses.update(c => {
+      const next = { ...c };
+      delete next[id];
+      return next;
+    });
+    this.#persist();
   }
 
   toApiPayload(id: string): Record<string, unknown> | null {

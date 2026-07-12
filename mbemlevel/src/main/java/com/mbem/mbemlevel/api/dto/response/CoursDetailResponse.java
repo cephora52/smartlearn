@@ -30,6 +30,8 @@ public record CoursDetailResponse(
     String      imageCouverture,
     String      imageCouvertureThumbnail,
     String      slug,
+    String      formateurNom,
+    String      categorieNom,
 
     // ── Stats ─────────────────────────────────────────────────────────────────
     int          nbModules,

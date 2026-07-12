@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { CourseService }     from '../../../core/services/course.service';
 import { AdminService }      from '../../../core/services/admin.service';
 import { SessionService }    from '../../../core/services/session.service';
@@ -94,10 +95,22 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.#adminSvc.getMesCours().subscribe({
-      next: r => { if (r.success && r.data) this.cours.set(r.data); },
-    });
-    this.#sessionSvc.getByCours('c-001').subscribe({
-      next: r => { if (r.success && r.data?.content?.length) this.sessions.set(r.data.content); },
+      next: r => {
+        if (r.success && r.data) {
+          this.cours.set(r.data);
+          if (r.data.length > 0) {
+            const courseIds = r.data.map(c => c.id);
+            forkJoin(courseIds.map(id => this.#sessionSvc.getByCours(id))).subscribe({
+              next: results => {
+                const allSessions = results
+                  .filter(res => res.success && res.data)
+                  .flatMap(res => res.data!);
+                this.sessions.set(allSessions);
+              }
+            });
+          }
+        }
+      },
     });
   }
 

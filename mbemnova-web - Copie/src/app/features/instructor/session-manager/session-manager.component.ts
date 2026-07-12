@@ -6,10 +6,12 @@ import {
   ReactiveFormsModule, FormBuilder, Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { SessionService } from '../../../core/services/session.service';
+import { AdminService }   from '../../../core/services/admin.service';
 import { ToastService }   from '../../../core/services/toast.service';
-import type { SessionResponse, Modalite } from '../../../core/models';
-import { MOCK_SESSIONS, MOCK_COURS } from '../../../core/services/mock.data';
+import type { SessionResponse, Modalite, CoursResponse } from '../../../core/models';
+import { MOCK_SESSIONS } from '../../../core/services/mock.data';
 
 @Component({
   selector: 'app-session-manager',
@@ -127,7 +129,7 @@ import { MOCK_SESSIONS, MOCK_COURS } from '../../../core/services/mock.data';
               <label for="coursId" class="label">Cours associé <span class="text-red-500">*</span></label>
               <select id="coursId" formControlName="coursId" class="input">
                 <option value="">Sélectionnez un cours</option>
-                @for (c of cours; track c.id) {
+                @for (c of cours(); track c.id) {
                   <option [value]="c.id">{{ c.titre }}</option>
                 }
               </select>
@@ -212,15 +214,16 @@ import { MOCK_SESSIONS, MOCK_COURS } from '../../../core/services/mock.data';
 })
 export class SessionManagerComponent implements OnInit {
   readonly #sessionSvc = inject(SessionService);
+  readonly #adminSvc   = inject(AdminService);
   readonly #toast      = inject(ToastService);
   readonly #fb         = inject(FormBuilder);
 
-  readonly sessions   = signal<SessionResponse[]>(MOCK_SESSIONS);
+  readonly sessions   = signal<SessionResponse[]>([]);
   readonly loading    = signal(true);
   readonly showCreate = signal(false);
   readonly creating   = signal(false);
 
-  readonly cours = MOCK_COURS.slice(0, 4);
+  readonly cours = signal<CoursResponse[]>([]);
 
   readonly modalites = [
     { value: 'MEET',       label: 'En ligne', icon: '💻' },
@@ -240,8 +243,30 @@ export class SessionManagerComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.#sessionSvc.getByCours('c-001').subscribe({
-      next: r => { if (r.success && r.data?.content?.length) this.sessions.set(r.data.content); this.loading.set(false); },
+    this.#adminSvc.getMesCours().subscribe({
+      next: r => {
+        if (r.success && r.data) {
+          this.cours.set(r.data);
+          if (r.data.length > 0) {
+            const courseIds = r.data.map(c => c.id);
+            forkJoin(courseIds.map(id => this.#sessionSvc.getByCours(id))).subscribe({
+              next: results => {
+                const allSessions = results
+                  .filter(res => res.success && res.data)
+                  .flatMap(res => res.data!);
+                this.sessions.set(allSessions);
+                this.loading.set(false);
+              },
+              error: () => { this.loading.set(false); },
+            });
+          } else {
+            this.sessions.set([]);
+            this.loading.set(false);
+          }
+        } else {
+          this.loading.set(false);
+        }
+      },
       error: () => { this.loading.set(false); },
     });
   }

@@ -39,13 +39,25 @@ public class GetCoursDetailUseCase {
     private final AvisCoursJpaRepository    avisRepo;
     private final ProgressionJpaRepository  progressionRepo;
     private final UtilisateurJpaRepository  utilisateurRepo;
+    private final CategorieJpaRepository    categorieRepo;
     private final ObjectMapper              objectMapper;
 
     @Transactional(readOnly = true)
     public CoursDetailResponse executer(UUID coursId, UUID apprenantId) {
-        // ── 1. Récupérer le cours ─────────────────────────────────────────────
         CoursJpaEntity cours = coursRepo.findById(coursId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + coursId));
+        return executerPourCours(cours, apprenantId);
+    }
+
+    @Transactional(readOnly = true)
+    public CoursDetailResponse executerParSlug(String slug, UUID apprenantId) {
+        CoursJpaEntity cours = coursRepo.findBySlug(slug)
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:SLUG:" + slug));
+        return executerPourCours(cours, apprenantId);
+    }
+
+    private CoursDetailResponse executerPourCours(CoursJpaEntity cours, UUID apprenantId) {
+        UUID coursId = cours.getId();
 
         if (!"PUBLIE".equals(cours.getStatut())) {
             boolean isFormateur = apprenantId != null && apprenantId.equals(cours.getFormateurId());
@@ -68,7 +80,6 @@ public class GetCoursDetailUseCase {
                 .orElse(null);
         }
         final boolean estPaye = progression != null && progression.isEstPaye();
-        final double pct = progression != null ? progression.getPourcentage() : 0.0;
 
         // ── 3. Modules et leçons ─────────────────────────────────────────────
         List<ModuleJpaEntity> modules = moduleRepo.findByCoursIdOrderByOrdreAsc(coursId);
@@ -90,11 +101,24 @@ public class GetCoursDetailUseCase {
                 // - ou la leçon est marquée preview
                 // - ou l'apprenant a payé
                 boolean accessible = m.isEstGratuit() || l.isEstPreview() || estPaye;
+                boolean estVerrouille = !accessible;
+
+                String typeContenu = "TEXTE";
+                if (l.isAQCM()) {
+                    typeContenu = "QCM";
+                } else if (l.getLienVideo() != null && !l.getLienVideo().isBlank()) {
+                    typeContenu = "VIDEO";
+                } else if (l.getLienPdf() != null && !l.getLienPdf().isBlank()) {
+                    typeContenu = "PDF";
+                }
+
                 return new LeconSommaireResponse(
                     l.getId(), l.getTitre(), l.getOrdre(),
                     l.getDureeMinutes(), l.getXpValeur(),
                     l.isEstPreview(), l.isAQCM(),
-                    apprenantId != null ? leconsTerminees.contains(l.getId()) : null
+                    apprenantId != null ? leconsTerminees.contains(l.getId()) : null,
+                    estVerrouille,
+                    typeContenu
                 );
             }).toList();
 
@@ -141,10 +165,25 @@ public class GetCoursDetailUseCase {
             progResp = new CoursDetailResponse.ProgressionApprenanteResponse(
                 progression.getPourcentage(),
                 progression.isEstPaye(),
-                progression.getPourcentage() >= cours.getSeuilPaiement().doubleValue() * 100,
+                cours.getSeuilPaiement().doubleValue() < 1.0 && (progression.getPourcentage() >= cours.getSeuilPaiement().doubleValue() * 100),
                 progression.getXpGagne(),
                 null // derniereLeconTitre — à enrichir si besoin
             );
+        }
+
+        // ── 8. Formateur et Catégorie / Domaine ──────────────────────────────
+        String formateurNom = "Formateur Inconnu";
+        if (cours.getFormateurId() != null) {
+            formateurNom = utilisateurRepo.findById(cours.getFormateurId())
+                .map(u -> (u.getPrenom() != null ? u.getPrenom() : "") + " " + (u.getNom() != null ? u.getNom() : ""))
+                .orElse("Formateur Inconnu");
+        }
+
+        String categorieNom = "Non spécifié";
+        if (cours.getCategorieId() != null) {
+            categorieNom = categorieRepo.findById(cours.getCategorieId())
+                .map(CategorieJpaEntity::getNom)
+                .orElse("Non spécifié");
         }
 
         return new CoursDetailResponse(
@@ -153,6 +192,7 @@ public class GetCoursDetailUseCase {
             cours.getNiveau(), cours.getLangue(),
             cours.getImageCouverture(), cours.getImageCouvertureThumbnail(),
             cours.getSlug(),
+            formateurNom, categorieNom,
             cours.getNbModules(), cours.getNbLecons(), cours.getDureeTotaleMinutes(),
             cours.getNbApprenants(), cours.getNoteMoyenne(), cours.getNbAvis(),
             cours.getPrixFcfa(), cours.getSeuilPaiement().doubleValue(),

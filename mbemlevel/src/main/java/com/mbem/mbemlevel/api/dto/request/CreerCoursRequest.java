@@ -7,6 +7,6 @@ public record CreerCoursRequest(
     @Size(max=5000)           String description,
     @NotNull                  NiveauCours niveau,
     UUID                      categorieId,
-    @DecimalMin("0.01") @DecimalMax("1.0") double seuilPaiement,
+    @DecimalMin("0.0") @DecimalMax("1.0") double seuilPaiement,
     @Min(0)             long  prixFcfa
 ) {}

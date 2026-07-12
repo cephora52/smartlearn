@@ -91,9 +91,7 @@ public class ImageCompressionService {
 
     Thumbnails.Builder<BufferedImage> builder;  // ← AJOUTER CETTE LIGNE
 
-    if (height == -1) {
-            throw new ImageValidationException("Image invalide");
-        } // Thumbnailator → JPEG
+    // Thumbnailator → JPEG
           // Note : la conversion WebP réelle nécessiterait libwebp ou cwebp.
           // En fallback, on utilise JPEG haute qualité qui est bien supporté partout.
           // Pour WebP natif en prod : ajouter la dépendance

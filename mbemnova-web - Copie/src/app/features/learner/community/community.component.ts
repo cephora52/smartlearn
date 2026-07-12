@@ -31,7 +31,7 @@ const AVATAR_PALETTE = [
   styleUrl: './community.css',
 })
 export class CommunityComponent implements OnInit {
-  readonly coursId = input<string>('c-001');
+  readonly coursId = input<string>('');
 
   readonly #svc        = inject(CommunityService);
   readonly #toast      = inject(ToastService);
@@ -101,6 +101,10 @@ export class CommunityComponent implements OnInit {
 
   // ── Lifecycle ──
   ngOnInit(): void {
+    if (!this.coursId()) {
+      this.loading.set(false);
+      return;
+    }
     this.#svc.getQuestions(this.coursId()).subscribe({
       next: r => {
         if (r.success && r.data?.content?.length) this.messages.set(r.data.content);
@@ -129,7 +133,7 @@ export class CommunityComponent implements OnInit {
 
   submitQuestion(): void {
     this.qSubmitted = true;
-    if (this.questionForm.invalid) return;
+    if (this.questionForm.invalid || !this.coursId()) return;
     this.qLoading.set(true);
     this.#svc.publier(this.coursId(), {
       coursId: this.coursId(),

@@ -30,4 +30,8 @@ public interface CoursCatalogueProjection {
     int         getDureeTotaleMinutes();
     long        getPrixFcfa();
     BigDecimal  getSeuilPaiement();
+    String      getSlug();
+    String      getFormateurPrenom();
+    String      getFormateurNom();
+    String      getCategorieNom();
 }

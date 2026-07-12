@@ -3,7 +3,9 @@ import {
   signal, computed, OnInit,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { SessionService } from '../../../core/services/session.service';
+import { ProgressionService } from '../../../core/services/progression.service';
 import { ToastService }   from '../../../core/services/toast.service';
 import type { SessionResponse, CreneauResponse } from '../../../core/models';
 import { MOCK_SESSIONS } from '../../../core/services/mock.data';
@@ -239,10 +241,11 @@ import { MOCK_SESSIONS } from '../../../core/services/mock.data';
   `,
 })
 export class SessionsComponent implements OnInit {
-  readonly #sessionSvc = inject(SessionService);
-  readonly #toast      = inject(ToastService);
+  readonly #sessionSvc     = inject(SessionService);
+  readonly #progressSvc    = inject(ProgressionService);
+  readonly #toast          = inject(ToastService);
 
-  readonly sessions       = signal<SessionResponse[]>(MOCK_SESSIONS);
+  readonly sessions       = signal<SessionResponse[]>([]);
   readonly creneaux       = signal<CreneauResponse[]>([]);
   readonly loading        = signal(true);
   readonly creneauxLoading= signal(false);
@@ -251,12 +254,26 @@ export class SessionsComponent implements OnInit {
   readonly selectedCreneau= signal<CreneauResponse | null>(null);
 
   ngOnInit(): void {
-    this.#sessionSvc.getByCours('c-001').subscribe({
-      next: r => {
-        if (r.success && r.data?.content?.length) this.sessions.set(r.data.content);
-        this.loading.set(false);
+    this.#progressSvc.getAll().subscribe({
+      next: pr => {
+        if (pr.success && pr.data?.content?.length) {
+          const courseIds = pr.data.content.map(p => p.coursId);
+          forkJoin(courseIds.map(id => this.#sessionSvc.getByCours(id))).subscribe({
+            next: results => {
+              const allSessions = results
+                .filter(res => res.success && res.data)
+                .flatMap(res => res.data!);
+              this.sessions.set(allSessions);
+              this.loading.set(false);
+            },
+            error: () => { this.loading.set(false); }
+          });
+        } else {
+          this.sessions.set([]);
+          this.loading.set(false);
+        }
       },
-      error: () => { this.loading.set(false); },
+      error: () => { this.loading.set(false); }
     });
   }
 

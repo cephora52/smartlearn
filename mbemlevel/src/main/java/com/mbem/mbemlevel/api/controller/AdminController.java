@@ -77,8 +77,9 @@ public class AdminController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary="Effectuer le tirage au sort (S24)")
     public ResponseEntity<ApiResponse<Void>> tirage(
-            @RequestParam(defaultValue="Réduction 50% sur le prochain cours") String prix) {
-        tirageUC.executer(prix);
+            @RequestParam(defaultValue="Réduction 50% sur le prochain cours") String prix,
+            @AuthenticationPrincipal String adminId) {
+        tirageUC.executer(prix, UUID.fromString(adminId));
         return ResponseEntity.ok(ApiResponse.ok("Tirage effectué."));
     }
 }

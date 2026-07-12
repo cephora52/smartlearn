@@ -102,6 +102,7 @@ export interface CoursResponse {
   niveau: NiveauCours;
   langue: string;
   imageCouvertureThumbnail: string | null; // 400px pour les cartes
+  imageCouverture?: string | null;
   nbApprenants: number;
   noteMoyenne: number | null;
   nbAvis: number;
@@ -111,6 +112,8 @@ export interface CoursResponse {
   seuilPaiement: number;
   statut: string;
   slug: string;
+  formateurNom?: string;
+  categorieNom?: string;
 }
 
 // ── CoursDetailResponse (s21 — arbre complet) ──────────────
@@ -138,6 +141,8 @@ export interface CoursDetailResponse {
   modules: ModuleDetail[];
   sessionsDisponibles: SessionSommaireResponse[];
   progressionApprenant: ProgressionApprenanteResponse | null;
+  formateurNom?: string;
+  categorieNom?: string;
 }
 export interface ModuleDetail {
   id: string;
@@ -159,6 +164,7 @@ export interface LeconDetail {
   xpReward: number;
   estTerminee: boolean;
   estVerrouille: boolean;
+  qcm?: any;
 }
 export interface SessionSommaireResponse {
   id: string;

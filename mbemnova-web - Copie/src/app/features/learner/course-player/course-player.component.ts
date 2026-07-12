@@ -581,11 +581,11 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
 
   readonly dark = this.themeSvc.isDark;
 
-  readonly detail      = signal<CoursDetailResponse | null>(MOCK_COURS_DETAIL);
-  readonly progression = signal<{ pourcentage: number; xpGagne: number } | null>({ pourcentage: 37, xpGagne: 120 });
+  readonly detail      = signal<CoursDetailResponse | null>(null);
+  readonly progression = signal<{ pourcentage: number; xpGagne: number } | null>(null);
   readonly activeLecon = signal<LeconDetail | null>(null);
   readonly sidebarOpen = signal(false);
-  readonly openModules = signal<Set<string>>(new Set(['mod-01']));
+  readonly openModules = signal<Set<string>>(new Set());
   readonly showPaywall = signal(false);
   readonly completing  = signal(false);
   readonly showXP      = signal(false);
@@ -614,12 +614,18 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     return this.#sanitizer.bypassSecurityTrustResourceUrl(this.activeLecon()?.videoUrl ?? '');
   });
   readonly currentQCM = computed(() => {
-    const id = this.activeLecon()?.id;
-    return id ? MOCK_QCM[id] ?? null : null;
+    return (this.activeLecon() as any)?.qcm ?? null;
   });
   readonly qcmOptions = computed(() => {
     const q = this.currentQCM();
-    return q ? Object.entries(q.options).map(([key, value]) => ({ key, value })) : [];
+    if (!q) return [];
+    if (Array.isArray(q.options)) {
+      return q.options.map((opt: any) => ({
+        key: opt.id || opt.key,
+        value: opt.texte || opt.value
+      }));
+    }
+    return Object.entries(q.options || {}).map(([key, value]) => ({ key, value }));
   });
   readonly activeModuleTitle = computed(() => {
     const l = this.activeLecon();
@@ -642,13 +648,24 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     const s = this.slug();
     if (s) {
       this.#courseSvc.getBySlug(s).subscribe({
-        next: r => { if (r.success && r.data) this.detail.set(r.data); },
-      });
-      this.#progressSvc.commencer(this.detail()?.id ?? 'c-001').subscribe({
         next: r => {
           if (r.success && r.data) {
-            this.progression.set({ pourcentage: r.data.pourcentage, xpGagne: r.data.xpGagne });
-            if (r.data.seuilAtteint && !r.data.estPaye) this.showPaywall.set(true);
+            this.detail.set(r.data);
+            if (r.data.modules && r.data.modules[0]) {
+              this.openModules.update(set => {
+                set.add(r.data!.modules[0].id);
+                return set;
+              });
+            }
+            this.startFirstLecon();
+            this.#progressSvc.commencer(r.data.id).subscribe({
+              next: pr => {
+                if (pr.success && pr.data) {
+                  this.progression.set({ pourcentage: pr.data.pourcentage, xpGagne: pr.data.xpGagne });
+                  if (pr.data.seuilAtteint && !pr.data.estPaye) this.showPaywall.set(true);
+                }
+              },
+            });
           }
         },
       });
@@ -660,7 +677,45 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   }
 
   selectLecon(l: LeconDetail): void {
-    this.activeLecon.set(l);
+    const moduleId = l.moduleId;
+    const coursId = this.detail()?.id;
+    if (coursId && moduleId) {
+      this.#courseSvc.getLecon(coursId, moduleId, l.id).subscribe({
+        next: r => {
+          if (r.success && r.data) {
+            const fullLecon = r.data;
+            const textBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'TEXTE_HTML');
+            const videoBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'VIDEO' || b.typeBloc === 'VIDEO_YOUTUBE' || b.typeBloc === 'VIDEO_VIMEO');
+            const pdfBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'PDF_EMBED');
+            
+            const mappedLecon: any = {
+              id: fullLecon.id,
+              moduleId: fullLecon.moduleId,
+              titre: fullLecon.titre,
+              typeContenu: videoBloc ? 'VIDEO' : (pdfBloc ? 'PDF' : 'TEXTE'),
+              contenu: textBloc ? textBloc.contenuHtml : null,
+              videoUrl: videoBloc ? (videoBloc.urlVideo || videoBloc.urlVideo) : null,
+              pdfUrl: pdfBloc ? pdfBloc.urlPdf : null,
+              dureeMinutes: fullLecon.dureeMinutes,
+              sortOrder: fullLecon.ordre,
+              aQuiz: fullLecon.aQCM,
+              xpReward: fullLecon.xpValeur,
+              estTerminee: !!l.estTerminee,
+              estVerrouille: !!l.estVerrouille,
+              qcm: fullLecon.qcm
+            };
+            this.activeLecon.set(mappedLecon);
+          } else {
+            this.activeLecon.set(l);
+          }
+        },
+        error: () => {
+          this.activeLecon.set(l);
+        }
+      });
+    } else {
+      this.activeLecon.set(l);
+    }
     this.sidebarOpen.set(false);
     this.selectedAnswer.set(null);
     this.qcmResult.set(null);
@@ -714,7 +769,9 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     const mods  = this.detail()?.modules ?? [];
     const total = mods.reduce((s, m) => s + m.lecons.length, 0);
     const done  = mods.reduce((s, m) => s + m.lecons.filter(l => l.estTerminee).length, 0);
-    this.#progressSvc.terminerLecon(this.detail()?.id ?? 'c-001', {
+    const coursId = this.detail()?.id;
+    if (!coursId) return;
+    this.#progressSvc.terminerLecon(coursId, {
       leconId: lecon.id, nbLeconsTotales: total,
       nbLeconsTerminees: done + 1, xpLecon: lecon.xpReward,
     }).subscribe({

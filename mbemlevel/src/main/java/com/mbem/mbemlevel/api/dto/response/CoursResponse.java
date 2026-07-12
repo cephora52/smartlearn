@@ -30,7 +30,9 @@ public record CoursResponse(
     long        prixFcfa,
     BigDecimal  seuilPaiement,
     String      statut,
-    String      slug
+    String      slug,
+    String      formateurNom,
+    String      categorieNom
 ) {
     /**
      * Depuis le domain Cours — utilisé dans la plupart des use cases.
@@ -43,7 +45,8 @@ public record CoursResponse(
             c.getNbApprenants(), c.getNoteMoyenne(),
             c.getNbLecons(), c.getDureeTotaleMinutes(),
             c.getPrixFcfa(), c.getSeuilPaiement(),
-            c.getStatut(), c.getSlug()
+            c.getStatut(), c.getSlug(),
+            null, null
         );
     }
 
@@ -59,7 +62,8 @@ public record CoursResponse(
             e.getNbApprenants(), e.getNoteMoyenne(),
             e.getNbLecons(), e.getDureeTotaleMinutes(),
             e.getPrixFcfa(), e.getSeuilPaiement(),
-            e.getStatut(), e.getSlug()
+            e.getStatut(), e.getSlug(),
+            null, null
         );
     }
 }

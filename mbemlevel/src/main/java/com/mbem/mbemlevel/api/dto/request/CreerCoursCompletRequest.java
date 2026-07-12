@@ -42,6 +42,7 @@ public record CreerCoursCompletRequest(
     @NotNull
     NiveauCours niveau,
 
+    @NotNull
     UUID categorieId,
 
     /** Durée totale estimée en minutes — calculée automatiquement si omise */
@@ -55,7 +56,7 @@ public record CreerCoursCompletRequest(
      * Seuil (0.0 – 1.0) après lequel le paiement est demandé.
      * Ex: 0.30 = après 30% du cours. Défaut: 0.30
      */
-    @DecimalMin("0.01") @DecimalMax("1.0")
+    @DecimalMin("0.0") @DecimalMax("1.0")
     double seuilPaiement,
 
     @Min(0)

@@ -123,6 +123,7 @@ mbemnova:
     xp-bonus-module: 100
     score-min-qcm: 70               # Score minimum pour valider un QCM (%)
   security:
+    bcrypt-cost: 12
     refresh-token-ttl-jours: 30
     reset-token-ttl-minutes: 60
     max-tentatives-connexion: 5

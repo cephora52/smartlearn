@@ -103,4 +103,22 @@ public class UploadMediaController {
             "typeBloc", type
         ), "Lien vidéo valide. Utilisez urlEmbed dans votre bloc " + type + "."));
     }
+
+    /**
+     * Upload une vidéo de leçon.
+     * Max 100 Mo — formats autorisés : mp4, webm, ogg, quicktime.
+     */
+    @PostMapping(value = "/cours/{coursId}/videos",
+                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload vidéo pour une leçon (S19)")
+    public ResponseEntity<ApiResponse<Map<String, String>>> uploadVideo(
+            @PathVariable UUID coursId,
+            @RequestPart("fichier") MultipartFile fichier) {
+        var result = uploadService.uploadVideoLecon(fichier, coursId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(Map.of(
+            "urlVideo",  result.urlStockage(),
+            "nomVideo",  result.nomAffiche(),
+            "tailleMo",  String.format("%.2f", result.tailleBytes() / (1024.0 * 1024.0))
+        ), "Vidéo uploadée."));
+    }
 }

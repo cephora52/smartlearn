@@ -36,9 +36,9 @@ export class CourseDetailComponent implements OnInit {
   readonly #toast       = inject(ToastService);
   readonly Math         = Math;
 
-  readonly detail   = signal<CoursDetailResponse | null>(MOCK_COURS_DETAIL);
-  readonly sessions = signal<SessionResponse[]>(MOCK_SESSIONS);
-  readonly avis     = signal<AvisCoursResponse[]>(MOCK_AVIS);
+  readonly detail   = signal<CoursDetailResponse | null>(null);
+  readonly sessions = signal<SessionResponse[]>([]);
+  readonly avis     = signal<AvisCoursResponse[]>([]);
   readonly loading  = signal(true);
   readonly isAuth   = this.#auth.isAuthenticated;
 

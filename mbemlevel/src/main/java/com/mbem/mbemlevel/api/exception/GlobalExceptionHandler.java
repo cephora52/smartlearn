@@ -77,7 +77,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handle(Exception e, WebRequest req) {
         log.error("[EX] Erreur interne: {} — {}", e.getClass().getSimpleName(), e.getMessage(), e);
+        String details = e.getClass().getSimpleName() + ": " + e.getMessage();
         return ResponseEntity.internalServerError()
-            .body(ApiResponse.err("Erreur interne. Réessayez ou contactez le support.", "INTERNAL_ERROR"));
+            .body(ApiResponse.err("Erreur interne: " + details, "INTERNAL_ERROR"));
     }
 }

@@ -90,12 +90,12 @@
               <div class="col-span-2 p-4">
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-xs font-semibold text-slate-800 uppercase tracking-widest">{{ getActiveCatLabel() }}</p>
-                  <a href="#" class="text-xs text-indigo-600 hover:text-indigo-300 transition-colors">Voir tous →</a>
+                  <a [routerLink]="['/catalogue']" [queryParams]="{ categoryId: getCategoryId(activeCat) }" (click)="forceClose()" class="text-xs text-indigo-600 hover:text-indigo-300 transition-colors font-semibold">Voir tous →</a>
                 </div>
                 <div class="space-y-2">
                   <a
                     *ngFor="let bc of getActiveBootcamps()"
-                    href="#"
+                    [routerLink]="['/catalogue']" [queryParams]="{ categoryId: getCategoryId(activeCat) }" (click)="forceClose()"
                     class="flex items-start justify-between p-3 rounded-xl border border-transparent hover:border-indigo-500/40 hover:bg-indigo-600/10 transition-all duration-150 group"
                   >
                     <div>

@@ -15,12 +15,27 @@ import java.util.*;
  */
 @Service @RequiredArgsConstructor @Slf4j
 public class EffectuerTirageAuSortUseCase {
-    private final UtilisateurRepository utilisateurRepo;
-    private final EmailPort             emailPort;
-    private static final SecureRandom   RANDOM = new SecureRandom();
+    private final UtilisateurRepository  utilisateurRepo;
+    private final TirageAuSortRepository tirageRepo;
+    private final EmailPort              emailPort;
+    private static final SecureRandom    RANDOM = new SecureRandom();
 
     @Transactional
     public TirageAuSort executer(String prixDescription) {
+        // Recherche d'un admin/super admin existant en base de données pour associer le tirage automatique
+        UUID defaultAdminId = utilisateurRepo.findAll().stream()
+            .filter(u -> "SUPER_ADMIN".equals(u.getRole().name()) || "ADMIN".equals(u.getRole().name()))
+            .map(Utilisateur::getId)
+            .findFirst()
+            .orElseGet(() -> utilisateurRepo.findAll().stream()
+                .findFirst()
+                .map(Utilisateur::getId)
+                .orElse(UUID.randomUUID())); // Fallback ultime si base vide
+        return executer(prixDescription, defaultAdminId);
+    }
+
+    @Transactional
+    public TirageAuSort executer(String prixDescription, UUID adminId) {
         // Participants : tous les apprenants actifs
         List<Utilisateur> eligibles = utilisateurRepo.findAll().stream()
             .filter(u -> "APPRENANT".equals(u.getRole().name())
@@ -29,7 +44,9 @@ public class EffectuerTirageAuSortUseCase {
 
         if (eligibles.isEmpty()) {
             log.warn("[TIRAGE] Aucun participant éligible ce mois");
-            return TirageAuSort.creer(LocalDate.now().withDayOfMonth(1), 0, prixDescription);
+            TirageAuSort tirage = TirageAuSort.creer(LocalDate.now().withDayOfMonth(1), 0, prixDescription);
+            tirageRepo.sauvegarder(tirage, adminId);
+            return tirage;
         }
 
         // Tirage aléatoire cryptographiquement sécurisé
@@ -37,6 +54,9 @@ public class EffectuerTirageAuSortUseCase {
         TirageAuSort tirage = TirageAuSort.creer(
             LocalDate.now().withDayOfMonth(1), eligibles.size(), prixDescription);
         tirage.designerGagnant(gagnant.getId());
+
+        // Sauvegarder le tirage et le gagnant en base
+        tirageRepo.sauvegarder(tirage, adminId);
 
         // Notifier le gagnant
         emailPort.envoyerGagnantTirage(gagnant.getEmail(), gagnant.getPrenom(), prixDescription);

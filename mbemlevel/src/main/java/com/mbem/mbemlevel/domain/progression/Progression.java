@@ -41,6 +41,13 @@ public class Progression extends AggregateRoot {
         this.seuilPaiementCours = seuilPaiementCours;
     }
 
+    private boolean isSeuilAtteint(double pct) {
+        if (seuilPaiementCours >= 1.0) {
+            return false;
+        }
+        return pct >= (seuilPaiementCours * 100);
+    }
+
     /**
      * Avance la progression et publie SeuilPaiementAtteintEvent si seuil franchi.
      * @param nouveauPct    Nouveau pourcentage calculé
@@ -52,8 +59,8 @@ public class Progression extends AggregateRoot {
      */
     public void avancer(double nouveauPct, int xpLecon, String prenom,
                         String email, String telephone, String nomCours) {
-        boolean dejaSeuilAtteint = this.pourcentage >= (seuilPaiementCours * 100);
-        boolean nouveauSeuilAtteint = nouveauPct >= (seuilPaiementCours * 100);
+        boolean dejaSeuilAtteint = isSeuilAtteint(this.pourcentage);
+        boolean nouveauSeuilAtteint = isSeuilAtteint(nouveauPct);
         this.pourcentage = Math.min(100.0, nouveauPct);
         this.xpGagne += xpLecon;
         // Publier l'event seulement la première fois que le seuil est franchi
@@ -69,7 +76,7 @@ public class Progression extends AggregateRoot {
     }
 
     public void activerPaiement() { this.estPaye = true; markUpdated(); }
-    public boolean seuilAtteint() { return pourcentage >= (seuilPaiementCours * 100); }
+    public boolean seuilAtteint() { return isSeuilAtteint(this.pourcentage); }
     public boolean estTermine()   { return pourcentage >= 100.0; }
     public boolean peutAccederLeconSuivante() { return estPaye || !seuilAtteint(); }
 

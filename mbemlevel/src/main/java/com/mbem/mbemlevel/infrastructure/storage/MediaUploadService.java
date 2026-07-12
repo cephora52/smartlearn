@@ -223,4 +223,36 @@ public class MediaUploadService {
         String nomAffiche,
         long   tailleBytes
     ) {}
+
+    // Size limit for videos: 100 Mo
+    private static final long MAX_VIDEO_SIZE = 100 * 1024 * 1024L;
+
+    // MIME type validations for video uploads
+    private static final Set<String> MIME_VIDEO = Set.of("video/mp4", "video/webm", "video/ogg", "video/quicktime");
+
+    public UploadVideoResult uploadVideoLecon(MultipartFile file, UUID coursId) {
+        validerFichierNonVide(file);
+        if (!MIME_VIDEO.contains(file.getContentType())) {
+            throw new IllegalArgumentException("Format vidéo non autorisé: " + file.getContentType() + ". Seul MP4, WebM et Ogg sont acceptés.");
+        }
+        if (file.getSize() > MAX_VIDEO_SIZE) {
+            throw new IllegalArgumentException(String.format("Vidéo trop lourde : %.1f Mo. Maximum : 100 Mo.", file.getSize() / (1024.0 * 1024.0)));
+        }
+
+        byte[] bytes = lireBytes(file);
+        String uuid = UUID.randomUUID().toString();
+        String nomSanitise = file.getOriginalFilename() != null ? file.getOriginalFilename().replaceAll("[^a-zA-Z0-9._-]", "_").toLowerCase() : "video.mp4";
+        String path = "cours/" + coursId + "/videos/" + uuid + "-" + nomSanitise;
+
+        String url = storagePort.upload(path, bytes, file.getContentType());
+
+        log.info("[MEDIA] Vidéo uploadée: {} ({}Ko) → {}", nomSanitise, bytes.length / 1024, url);
+        return new UploadVideoResult(url, nomSanitise, file.getSize());
+    }
+
+    public record UploadVideoResult(
+        String urlStockage,
+        String nomAffiche,
+        long   tailleBytes
+    ) {}
 }

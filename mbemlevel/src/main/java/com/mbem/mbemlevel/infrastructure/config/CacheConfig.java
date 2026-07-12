@@ -34,7 +34,7 @@ public class CacheConfig {
             .activateDefaultTyping(
                com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
     .builder().allowIfSubType(Object.class).build(),
-                ObjectMapper.DefaultTyping.NON_FINAL
+                ObjectMapper.DefaultTyping.EVERYTHING
             );
 
         RedisSerializer<Object> jsonSerializer =

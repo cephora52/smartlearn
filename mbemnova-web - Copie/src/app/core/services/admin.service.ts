@@ -49,4 +49,22 @@ export class AdminService {
   exporterMesDonnees(): Observable<ApiResponse<unknown>> {
     return this.#api.get<unknown>('/utilisateurs/me/export');
   }
+
+  uploadBanniere(coursId: string, file: File): Observable<ApiResponse<{ urlOriginal: string, urlThumbnail: string }>> {
+    const formData = new FormData();
+    formData.append('fichier', file);
+    return this.#api.post<{ urlOriginal: string, urlThumbnail: string }>(`/media/cours/${coursId}/banniere`, formData);
+  }
+
+  uploadPdf(coursId: string, file: File): Observable<ApiResponse<{ urlPdf: string, nomPdf: string }>> {
+    const formData = new FormData();
+    formData.append('fichier', file);
+    return this.#api.post<{ urlPdf: string, nomPdf: string }>(`/media/cours/${coursId}/pdfs`, formData);
+  }
+
+  uploadVideo(coursId: string, file: File): Observable<ApiResponse<{ urlVideo: string, nomVideo: string }>> {
+    const formData = new FormData();
+    formData.append('fichier', file);
+    return this.#api.post<{ urlVideo: string, nomVideo: string }>(`/media/cours/${coursId}/videos`, formData);
+  }
 }

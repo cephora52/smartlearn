@@ -32,4 +32,9 @@ export class CourseService {
     const params = sessionId ? `?sessionId=${sessionId}` : '';
     return this.#api.post<null>(`/cours/${coursId}/liste-attente${params}`, {});
   }
+
+  // GET /api/v1/cours/{coursId}/modules/{moduleId}/lecons/{leconId}
+  getLecon(coursId: string, moduleId: string, leconId: string): Observable<ApiResponse<any>> {
+    return this.#api.get<any>(`/cours/${coursId}/modules/${moduleId}/lecons/${leconId}`);
+  }
 }

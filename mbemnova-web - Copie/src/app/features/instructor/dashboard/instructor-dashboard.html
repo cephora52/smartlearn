@@ -252,32 +252,37 @@
                           last:border-0 hover:bg-slate-50/70 transition-colors duration-150 fade-in"
                    [style.animation-delay]="(i * 50) + 'ms'">
 
-                <!-- Level indicator -->
-                <div class="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center"
-                     [class]="levelBg(c.niveau)">
-                  <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                  </svg>
-                </div>
+                <!-- Clickable course area to view course player -->
+                <a [routerLink]="['/app/cours', c.slug]"
+                   class="flex flex-1 items-center gap-4 min-w-0 cursor-pointer group/item"
+                   title="Voir le cours dans le lecteur">
+                  <!-- Level indicator -->
+                  <div class="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors group-hover/item:opacity-90"
+                       [class]="levelBg(c.niveau)">
+                    <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                  </div>
 
-                <!-- Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-0.5">
-                    <p class="text-sm font-semibold text-slate-900 truncate">{{ c.titre }}</p>
-                    <span class="statut-badge flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full"
-                          [class.published]="c.statut === 'PUBLIE'"
-                          [class.draft]="c.statut !== 'PUBLIE'">
-                      {{ c.statut === 'PUBLIE' ? 'Publié' : 'Brouillon' }}
-                    </span>
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <p class="text-sm font-semibold text-slate-900 group-hover/item:text-blue-600 transition-colors truncate">{{ c.titre }}</p>
+                      @if (c.statut === 'PUBLIE') {
+                        <span class="statut-badge flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                          Publié
+                        </span>
+                      }
+                    </div>
+                    <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                      <span>{{ levelLabel(c.niveau) }}</span>
+                      <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                      <span>{{ c.nbApprenants }} inscrits</span>
+                      <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                      <span>{{ c.prixAffichage }}</span>
+                    </div>
                   </div>
-                  <div class="flex items-center gap-3 text-[11px] text-slate-400">
-                    <span>{{ levelLabel(c.niveau) }}</span>
-                    <span class="w-1 h-1 rounded-full bg-slate-200"></span>
-                    <span>{{ c.nbApprenants }} inscrits</span>
-                    <span class="w-1 h-1 rounded-full bg-slate-200"></span>
-                    <span>{{ c.prixAffichage }}</span>
-                  </div>
-                </div>
+                </a>
 
                 <!-- Note -->
                 <div *ngIf="c.noteMoyenne" class="flex items-center gap-1 flex-shrink-0">
@@ -289,6 +294,15 @@
 
                 <!-- Actions -->
                 <div class="flex items-center gap-1 flex-shrink-0">
+                  <a [routerLink]="['/cours', c.slug]"
+                     class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400
+                            hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                     title="Voir la page publique">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </a>
                   <a [routerLink]="['/instructor/cours', c.id, 'editer']"
                      class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400
                             hover:text-blue-600 hover:bg-blue-50 transition-colors"

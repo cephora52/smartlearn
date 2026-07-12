@@ -41,8 +41,8 @@ public class CoursController {
             @RequestParam(required = false) UUID categorieId,
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "12") int size) {
-        Page<CoursResponse> result = catalogueUC.executer(niveau, categorieId, page, size);
-        return ResponseEntity.ok(ApiResponse.ok(PageResponse.of(result)));
+        PageResponse<CoursResponse> result = catalogueUC.executer(niveau, categorieId, page, size);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     /**
@@ -78,8 +78,8 @@ public class CoursController {
     public ResponseEntity<ApiResponse<CoursDetailResponse>> detailParSlug(
             @PathVariable String slug,
             @AuthenticationPrincipal String userId) {
-        // TODO: ajouter findBySlug dans GetCoursDetailUseCase
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        UUID apprenantId = userId != null ? parseUUID(userId) : null;
+        return ResponseEntity.ok(ApiResponse.ok(detailUC.executerParSlug(slug, apprenantId)));
     }
 
     private UUID parseUUID(String s) {

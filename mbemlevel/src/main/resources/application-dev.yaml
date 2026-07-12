@@ -110,3 +110,8 @@ logging:
   pattern:
     # Pattern lisible humain pour le terminal dev
     console: "%d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%X{requestId:--})] %logger{36} — %msg%n"
+
+mbemnova:
+  security:
+    bcrypt-cost: 4
+

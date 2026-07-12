@@ -40,7 +40,7 @@ public class GetCatalogueUseCase {
         unless  = "#result == null"
     )
     @Transactional(readOnly = true)
-    public Page<CoursResponse> executer(NiveauCours niveau, UUID categorieId, int page, int size) {
+    public PageResponse<CoursResponse> executer(NiveauCours niveau, UUID categorieId, int page, int size) {
         int pageSize = Math.min(size, 20); // Max 20 items par page
         Pageable pageable = PageRequest.of(page, pageSize,
             Sort.by(Sort.Direction.DESC, "nbApprenants")); // Les plus populaires en premier
@@ -49,15 +49,18 @@ public class GetCatalogueUseCase {
             niveau, categorieId, page);
 
         // Projection légère (pas de description_longue, objectifs, etc.)
-        return coursRepo.findCatalogueProjection(niveau, categorieId, pageable)
+        Page<CoursResponse> pageResult = coursRepo.findCatalogueProjection(niveau, categorieId, pageable)
           .map(p -> new CoursResponse(
-    p.getId(), p.getTitre(), p.getDescriptionCourte(),
-    p.getNiveau(), p.getLangue(),
-    p.getImageCouvertureThumbnail(),
-    p.getNbApprenants(), p.getNoteMoyenne(), p.getNbLecons(),
-    p.getDureeTotaleMinutes(), p.getPrixFcfa(), p.getSeuilPaiement(),
-    null,   // slug — ajouter à CoursCatalogueProjection si nécessaire
-    null    // statut — toujours "PUBLIE" dans ce contexte
-));
+              p.getId(), p.getTitre(), p.getDescriptionCourte(),
+              p.getNiveau(), p.getLangue(),
+              p.getImageCouvertureThumbnail(),
+              p.getNbApprenants(), p.getNoteMoyenne(), p.getNbLecons(),
+              p.getDureeTotaleMinutes(), p.getPrixFcfa(), p.getSeuilPaiement(),
+              "PUBLIE",
+              p.getSlug(),
+              (p.getFormateurPrenom() != null ? p.getFormateurPrenom() : "") + " " + (p.getFormateurNom() != null ? p.getFormateurNom() : ""),
+              p.getCategorieNom()
+          ));
+        return PageResponse.of(pageResult);
     }
 }

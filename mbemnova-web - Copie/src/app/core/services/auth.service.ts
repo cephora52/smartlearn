@@ -76,8 +76,9 @@ export class AuthService {
 
   // ── Refresh token (auto depuis intercepteur) ──────────
   refreshToken(): Observable<ApiResponse<{ accessToken: string }>> {
+    const rt = isPlatformBrowser(this.#plat) ? sessionStorage.getItem('mn_rt') : null;
     return this.#api
-      .post<{ accessToken: string }>('/auth/refresh', {})
+      .post<{ accessToken: string }>('/auth/refresh', { refreshToken: rt || '' })
       .pipe(
         tap(r => { if (r.success && r.data) this.#token.set(r.data.accessToken); }),
         catchError(err => {
@@ -110,13 +111,17 @@ export class AuthService {
     this.currentUser.set(u);
     if (isPlatformBrowser(this.#plat)) {
       sessionStorage.setItem('mn_u', JSON.stringify(u));
+      sessionStorage.setItem('mn_rt', a.refreshToken);
     }
   }
 
   #clear(): void {
     this.#token.clear();
     this.currentUser.set(null);
-    if (isPlatformBrowser(this.#plat)) sessionStorage.removeItem('mn_u');
+    if (isPlatformBrowser(this.#plat)) {
+      sessionStorage.removeItem('mn_u');
+      sessionStorage.removeItem('mn_rt');
+    }
   }
 
   #restore(): UserProfile | null {
@@ -128,7 +133,9 @@ export class AuthService {
   }
 
   #silentRefresh(): void {
-    this.#api.post<{ accessToken: string }>('/auth/refresh', {}).subscribe({
+    const rt = isPlatformBrowser(this.#plat) ? sessionStorage.getItem('mn_rt') : null;
+    if (!rt) return;
+    this.#api.post<{ accessToken: string }>('/auth/refresh', { refreshToken: rt }).subscribe({
       next: r => {
         if (r.success && r.data) {
           this.#token.set(r.data.accessToken);
