@@ -32,7 +32,6 @@ public class CreerCoursCompletUseCase {
 
     private final CoursRepository            coursRepo;
     private final CoursJpaRepository         coursJpaRepo;
-    private final ModuleJpaRepository        moduleRepo;
     private final LeconJpaRepository         leconRepo;
     private final BlocContenuJpaRepository   blocRepo;
     private final QCMJpaRepository           qcmRepo;
@@ -40,11 +39,11 @@ public class CreerCoursCompletUseCase {
     @Transactional
     @CacheEvict(value = "catalogue", allEntries = true)
     public UUID executer(CreerCoursCompletRequest req, UUID formateurId) {
-        // Supprimer tout brouillon vide existant (sans modules) pour le même formateur avec le même titre
+        // Supprimer tout brouillon vide existant (sans leçons) pour le même formateur avec le même titre
         List<CoursJpaEntity> duplicates = coursJpaRepo.findByFormateurIdAndTitre(formateurId, req.titre());
         if (duplicates != null && !duplicates.isEmpty()) {
             for (CoursJpaEntity dup : duplicates) {
-                if (dup.getNbModules() == 0) {
+                if (dup.getNbLecons() == 0) {
                     coursJpaRepo.delete(dup);
                     log.info("[COURS] Brouillon vide doublon supprimé: {}", dup.getId());
                 }
@@ -72,80 +71,55 @@ public class CreerCoursCompletUseCase {
         cours.publier();
         
         coursRepo.save(cours);
-        log.info("[COURS] Cours créé en brouillon: {} par formateur: {}", cours.getId(), formateurId);
+        log.info("[COURS] Cours créé: {} par formateur: {}", cours.getId(), formateurId);
 
-        // 2. Créer les modules
+        // 2. Créer les leçons
         int totalDuree = 0;
-        int nbModules = 0;
-        if (req.modules() != null) {
-            nbModules = req.modules().size();
-            for (CreerModuleRequest mr : req.modules()) {
-                UUID moduleId = UUID.randomUUID();
-                int nbLecons = mr.lecons() != null ? mr.lecons().size() : 0;
-                ModuleJpaEntity module = ModuleJpaEntity.builder()
-                    .id(moduleId)
+        int nbLecons = 0;
+        if (req.lecons() != null) {
+            nbLecons = req.lecons().size();
+            for (CreerLeconRequest lr : req.lecons()) {
+                UUID leconId = UUID.randomUUID();
+                LeconJpaEntity lecon = LeconJpaEntity.builder()
+                    .id(leconId)
                     .coursId(cours.getId())
-                    .titre(mr.titre())
-                    .description(mr.description())
-                    .ordre(mr.ordre())
-                    .xpBonus(mr.xpBonus())
-                    .estGratuit(mr.estGratuit())
-                    .estVerrouille(true)
-                    .nbLecons(nbLecons)
+                    .titre(lr.titre())
+                    .descriptionCourte(lr.descriptionCourte())
+                    .ordre(lr.ordre())
+                    .dureeMinutes(lr.dureeMinutes())
+                    .xpValeur(lr.xpValeur())
+                    .estPreview(lr.estPreview())
+                    .aQCM(lr.aQCM())
                     .build();
-                moduleRepo.save(module);
+                leconRepo.save(lecon);
+                totalDuree += lr.dureeMinutes();
 
-                // 3. Créer les leçons du module
-                int dureeTotaleModule = 0;
-                if (mr.lecons() != null) {
-                    for (CreerLeconRequest lr : mr.lecons()) {
-                        UUID leconId = UUID.randomUUID();
-                        LeconJpaEntity lecon = LeconJpaEntity.builder()
-                            .id(leconId)
-                            .moduleId(moduleId)
-                            .titre(lr.titre())
-                            .descriptionCourte(lr.descriptionCourte())
-                            .ordre(lr.ordre())
-                            .dureeMinutes(lr.dureeMinutes())
-                            .xpValeur(lr.xpValeur())
-                            .estPreview(lr.estPreview())
-                            .aQCM(lr.aQCM())
-                            .build();
-                        leconRepo.save(lecon);
-                        dureeTotaleModule += lr.dureeMinutes();
-
-                        // 4. Créer les blocs de contenu
-                        if (lr.blocs() != null) {
-                            for (BlocContenuRequest br : lr.blocs()) {
-                                BlocContenuJpaEntity bloc = creerBloc(leconId, br);
-                                blocRepo.save(bloc);
-                            }
-                        }
-
-                        // 5. Créer le QCM si présent
-                        if (lr.aQCM() && lr.qcm() != null) {
-                            creerQCM(leconId, lr.qcm(), qcmRepo);
-                        }
+                // 4. Créer les blocs de contenu
+                if (lr.blocs() != null) {
+                    for (BlocContenuRequest br : lr.blocs()) {
+                        BlocContenuJpaEntity bloc = creerBloc(leconId, br);
+                        blocRepo.save(bloc);
                     }
                 }
-                totalDuree += dureeTotaleModule;
 
-                // Mettre à jour la durée totale du module
-                module.setDureeTotaleMinutes(dureeTotaleModule);
-                moduleRepo.save(module);
+                // 5. Créer le QCM si présent
+                if (lr.aQCM() && lr.qcm() != null) {
+                    creerQCM(leconId, lr.qcm(), qcmRepo);
+                }
             }
         }
 
         // Mettre à jour stats du cours
-        cours.setNbModules(nbModules);
+        cours.setNbModules(0);
+        cours.setNbLecons(nbLecons);
         cours.setDureeTotaleMinutes(
             req.dureeTotaleMinutes() != null ? req.dureeTotaleMinutes() : totalDuree
         );
 
         coursRepo.save(cours);
 
-        log.info("[COURS] Cours complet persisté: {} modules, {} minutes, statut: {}",
-            nbModules, totalDuree, cours.getStatut());
+        log.info("[COURS] Cours complet persisté: {} leçons, {} minutes, statut: {}",
+            nbLecons, totalDuree, cours.getStatut());
         return cours.getId();
     }
 

@@ -26,7 +26,6 @@ public class ModifierBlocsLeconUseCase {
 
     private final BlocContenuJpaRepository blocRepo;
     private final LeconJpaRepository       leconRepo;
-    private final ModuleJpaRepository      moduleRepo;
     private final CoursJpaRepository       coursRepo;
     private final UtilisateurJpaRepository utilisateurRepo;
 
@@ -36,13 +35,9 @@ public class ModifierBlocsLeconUseCase {
         LeconJpaEntity lecon = leconRepo.findById(leconId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:LECON:" + leconId));
 
-        // Trouver le module
-        ModuleJpaEntity module = moduleRepo.findById(lecon.getModuleId())
-            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:MODULE:" + lecon.getModuleId()));
-
         // Trouver le cours
-        CoursJpaEntity cours = coursRepo.findById(module.getCoursId())
-            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + module.getCoursId()));
+        CoursJpaEntity cours = coursRepo.findById(lecon.getCoursId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + lecon.getCoursId()));
 
         // Vérifier la propriété (le formateur du cours doit être formateurId, sauf si admin/super_admin)
         boolean isAdmin = utilisateurRepo.findById(formateurId)

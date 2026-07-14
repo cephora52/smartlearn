@@ -14,10 +14,10 @@ import java.net.URI;
  */
 @Configuration
 public class StorageConfig {
-    @Value("${storage.minio.endpoint:http://localhost:9000}") private String endpoint;
-    @Value("${storage.minio.access-key:minioadmin}")          private String accessKey;
-    @Value("${storage.minio.secret-key:minioadmin}")          private String secretKey;
-    @Value("${storage.minio.region:af-central-1}")            private String region;
+    @Value("${storage.minio.endpoint:${MINIO_ENDPOINT:http://localhost:9000}}") private String endpoint;
+    @Value("${storage.minio.access-key:${MINIO_ACCESS_KEY:minioadmin}}")          private String accessKey;
+    @Value("${storage.minio.secret-key:${MINIO_SECRET_KEY:minioadmin}}")          private String secretKey;
+    @Value("${storage.minio.region:${MINIO_REGION:af-central-1}}")            private String region;
 
     private AwsCredentialsProvider credentials() {
         return StaticCredentialsProvider.create(
@@ -41,6 +41,8 @@ public class StorageConfig {
             .endpointOverride(URI.create(endpoint))
             .credentialsProvider(credentials())
             .region(Region.of(region))
+            .serviceConfiguration(S3Configuration.builder()
+                .pathStyleAccessEnabled(true).build())
             .build();
     }
 }

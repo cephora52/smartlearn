@@ -12,7 +12,7 @@ import { ProgressionService } from '../../../core/services/progression.service';
 import { QcmService }         from '../../../core/services/qcm.service';
 import { ToastService }       from '../../../core/services/toast.service';
 import type {
-  CoursDetailResponse, ModuleDetail, LeconDetail,
+  CoursDetailResponse, LeconDetail,
 } from '../../../core/models';
 import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
 
@@ -152,88 +152,50 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
         @if (detail()) {
           <p [class]="'text-xs mt-0.5 ' + (dark() ? 'text-slate-600' : 'text-slate-400')">
             {{ detail()!.nbLecons }} leçons ·
-            {{ Math.floor(detail()!.dureeTotaleMinutes / 60) }}h{{ detail()!.dureeTotaleMinutes % 60 ? detail()!.dureeTotaleMinutes % 60 + 'min' : '' }}
+            {{ formatDuration(detail()!.dureeTotaleMinutes) }}
           </p>
         }
       </div>
 
-      <!-- Modules et leçons -->
-      <nav class="flex-1 py-2 overflow-y-auto" aria-label="Modules et leçons">
-        @for (mod of detail()?.modules ?? []; track mod.id; let mi = $index) {
-          <div class="mb-0.5">
-            <!-- En-tête module -->
-            <button (click)="toggleModule(mod.id)"
-                    [class]="'flex items-center gap-2.5 w-full px-4 py-3 text-left transition-colors '
-                             + (dark() ? 'hover:bg-slate-800/60' : 'hover:bg-white')"
-                    [attr.aria-expanded]="isModuleOpen(mod.id)">
-              <!-- Indicateur complété -->
-              <div [class]="'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors '
-                            + (isModuleComplete(mod)
-                            ? 'bg-green-500 border-green-500'
-                            : dark() ? 'border-slate-600' : 'border-slate-300')">
-                @if (isModuleComplete(mod)) {
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                }
-              </div>
-              <span [class]="'text-xs font-semibold flex-1 leading-snug '
-                             + (dark() ? 'text-slate-300' : 'text-slate-700')">
-                {{ mi + 1 }}. {{ mod.titre }}
+      <!-- Leçons -->
+      <nav class="flex-1 py-2 overflow-y-auto space-y-0.5" aria-label="Leçons du cours">
+        @for (lecon of detail()?.lecons ?? []; track lecon.id; let li = $index) {
+          <button (click)="!lecon.estVerrouille && selectLecon(lecon)"
+                  [disabled]="lecon.estVerrouille"
+                  [class]="leconClass(lecon)"
+                  [attr.aria-current]="activeLecon()?.id === lecon.id ? 'true' : null">
+
+            <!-- Icône état -->
+            <div class="shrink-0 w-4 flex items-center justify-center">
+              @if (lecon.estTerminee) {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              } @else if (activeLecon()?.id === lecon.id) {
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              } @else if (lecon.estVerrouille) {
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              } @else if (lecon.typeContenu === 'VIDEO') {
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              } @else if (lecon.typeContenu === 'QCM') {
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+              } @else {
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              }
+            </div>
+
+            <span class="flex-1 text-left leading-snug line-clamp-2">{{ li + 1 }}. {{ lecon.titre }}</span>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+              @if (!lecon.estVerrouille && !lecon.estTerminee) {
+                <span [class]="'text-xs font-medium px-1.5 py-0.5 rounded '
+                               + (dark() ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600')">
+                  Gratuit
+                </span>
+              }
+              <span [class]="'text-xs ' + (dark() ? 'text-slate-600' : 'text-slate-400')">
+                {{ lecon.dureeMinutes }}m
               </span>
-              <span [class]="'text-xs shrink-0 ' + (dark() ? 'text-slate-600' : 'text-slate-400')">
-                {{ mod.lecons.filter(l => l.estTerminee).length }}/{{ mod.lecons.length }}
-              </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                   [attr.stroke]="dark() ? '#475569' : '#94a3b8'"
-                   stroke-width="2" class="shrink-0 transition-transform"
-                   [class.rotate-180]="isModuleOpen(mod.id)" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </button>
-
-            <!-- Leçons -->
-            @if (isModuleOpen(mod.id)) {
-              <div [class]="'border-l-2 ml-[1.625rem] ' + (dark() ? 'border-slate-800' : 'border-slate-200')">
-                @for (lecon of mod.lecons; track lecon.id) {
-                  <button (click)="!lecon.estVerrouille && selectLecon(lecon)"
-                          [disabled]="lecon.estVerrouille"
-                          [class]="leconClass(lecon)"
-                          [attr.aria-current]="activeLecon()?.id === lecon.id ? 'true' : null">
-
-                    <!-- Icône état -->
-                    <div class="shrink-0 w-4 flex items-center justify-center">
-                      @if (lecon.estTerminee) {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                      } @else if (activeLecon()?.id === lecon.id) {
-                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      } @else if (lecon.estVerrouille) {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                      } @else if (lecon.typeContenu === 'VIDEO') {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                      } @else if (lecon.typeContenu === 'QCM') {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
-                      } @else {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                      }
-                    </div>
-
-                    <span class="flex-1 text-left leading-snug line-clamp-2">{{ lecon.titre }}</span>
-
-                    <div class="flex items-center gap-1.5 shrink-0">
-                      @if (!lecon.estVerrouille && !lecon.estTerminee) {
-                        <span [class]="'text-xs font-medium px-1.5 py-0.5 rounded '
-                                       + (dark() ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600')">
-                          Gratuit
-                        </span>
-                      }
-                      <span [class]="'text-xs ' + (dark() ? 'text-slate-600' : 'text-slate-400')">
-                        {{ lecon.dureeMinutes }}m
-                      </span>
-                    </div>
-                  </button>
-                }
-              </div>
-            }
-          </div>
+            </div>
+          </button>
         }
       </nav>
     </aside>
@@ -628,20 +590,18 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     return Object.entries(q.options || {}).map(([key, value]) => ({ key, value }));
   });
   readonly activeModuleTitle = computed(() => {
-    const l = this.activeLecon();
-    return l ? this.detail()?.modules.find(m => m.id === l.moduleId)?.titre ?? '' : '';
+    return 'Programme';
   });
   readonly activeLeconIndex = computed(() => {
     const l = this.activeLecon();
-    if (!l) return 0;
-    const mod = this.detail()?.modules.find(m => m.id === l.moduleId);
-    return mod?.lecons.findIndex(x => x.id === l.id) ?? 0;
+    if (!l) return -1;
+    return this.detail()?.lecons.findIndex(x => x.id === l.id) ?? -1;
   });
-  readonly hasPrev = computed(() => { const { mi, li } = this.#pos(); return li > 0 || mi > 0; });
+  readonly hasPrev = computed(() => this.activeLeconIndex() > 0);
   readonly hasNext = computed(() => {
-    const mods = this.detail()?.modules ?? [];
-    const { mi, li } = this.#pos();
-    return li < (mods[mi]?.lecons.length ?? 0) - 1 || mi < mods.length - 1;
+    const index = this.activeLeconIndex();
+    const lecons = this.detail()?.lecons ?? [];
+    return index >= 0 && index < lecons.length - 1;
   });
 
   ngOnInit(): void {
@@ -651,12 +611,6 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
         next: r => {
           if (r.success && r.data) {
             this.detail.set(r.data);
-            if (r.data.modules && r.data.modules[0]) {
-              this.openModules.update(set => {
-                set.add(r.data!.modules[0].id);
-                return set;
-              });
-            }
             this.startFirstLecon();
             this.#progressSvc.commencer(r.data.id).subscribe({
               next: pr => {
@@ -677,10 +631,9 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   }
 
   selectLecon(l: LeconDetail): void {
-    const moduleId = l.moduleId;
     const coursId = this.detail()?.id;
-    if (coursId && moduleId) {
-      this.#courseSvc.getLecon(coursId, moduleId, l.id).subscribe({
+    if (coursId) {
+      this.#courseSvc.getLecon(coursId, l.id).subscribe({
         next: r => {
           if (r.success && r.data) {
             const fullLecon = r.data;
@@ -690,15 +643,13 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
             
             const mappedLecon: any = {
               id: fullLecon.id,
-              moduleId: fullLecon.moduleId,
+              coursId: fullLecon.coursId,
               titre: fullLecon.titre,
               typeContenu: videoBloc ? 'VIDEO' : (pdfBloc ? 'PDF' : 'TEXTE'),
               contenu: textBloc ? textBloc.contenuHtml : null,
               videoUrl: videoBloc ? (videoBloc.urlVideo || videoBloc.urlVideo) : null,
               pdfUrl: pdfBloc ? pdfBloc.urlPdf : null,
               dureeMinutes: fullLecon.dureeMinutes,
-              sortOrder: fullLecon.ordre,
-              aQuiz: fullLecon.aQCM,
               xpReward: fullLecon.xpValeur,
               estTerminee: !!l.estTerminee,
               estVerrouille: !!l.estVerrouille,
@@ -725,20 +676,8 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   }
 
   startFirstLecon(): void {
-    const first = this.detail()?.modules[0]?.lecons[0];
+    const first = this.detail()?.lecons[0];
     if (first && !first.estVerrouille) this.selectLecon(first);
-  }
-
-  toggleModule(id: string): void {
-    this.openModules.update(s => {
-      const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
-    });
-  }
-  isModuleOpen(id: string): boolean { return this.openModules().has(id); }
-  isModuleComplete(mod: ModuleDetail): boolean {
-    return mod.lecons.length > 0 && mod.lecons.every(l => l.estTerminee);
   }
 
   submitQCM(answer: string): void {
@@ -766,9 +705,9 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     const lecon = this.activeLecon();
     if (!lecon || lecon.estTerminee || this.completing()) return;
     this.completing.set(true);
-    const mods  = this.detail()?.modules ?? [];
-    const total = mods.reduce((s, m) => s + m.lecons.length, 0);
-    const done  = mods.reduce((s, m) => s + m.lecons.filter(l => l.estTerminee).length, 0);
+    const lecons  = this.detail()?.lecons ?? [];
+    const total = lecons.length;
+    const done  = lecons.filter(l => l.estTerminee).length;
     const coursId = this.detail()?.id;
     if (!coursId) return;
     this.#progressSvc.terminerLecon(coursId, {
@@ -779,9 +718,7 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
         this.completing.set(false);
         // Mise à jour locale
         this.detail.update(d => d ? {
-          ...d, modules: d.modules.map(m => ({
-            ...m, lecons: m.lecons.map(l => l.id === lecon.id ? { ...l, estTerminee: true } : l)
-          }))
+          ...d, lecons: d.lecons.map(l => l.id === lecon.id ? { ...l, estTerminee: true } : l)
         } : d);
         this.activeLecon.update(l => l ? { ...l, estTerminee: true } : l);
         if (r.success && r.data) {
@@ -799,22 +736,14 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   }
 
   prevLecon(): void {
-    const { mi, li } = this.#pos(); const mods = this.detail()?.modules ?? [];
-    if (li > 0) this.selectLecon(mods[mi].lecons[li - 1]);
-    else if (mi > 0) { const prev = mods[mi - 1]; this.selectLecon(prev.lecons[prev.lecons.length - 1]); }
+    const idx = this.activeLeconIndex();
+    const lecons = this.detail()?.lecons ?? [];
+    if (idx > 0) this.selectLecon(lecons[idx - 1]);
   }
   nextLecon(): void {
-    const { mi, li } = this.#pos(); const mods = this.detail()?.modules ?? [];
-    if (li < mods[mi].lecons.length - 1) this.selectLecon(mods[mi].lecons[li + 1]);
-    else if (mi < mods.length - 1) this.selectLecon(mods[mi + 1].lecons[0]);
-  }
-
-  #pos(): { mi: number; li: number } {
-    const l = this.activeLecon(); if (!l) return { mi: 0, li: 0 };
-    const mods = this.detail()?.modules ?? [];
-    const mi = mods.findIndex(m => m.id === l.moduleId);
-    const li = mods[Math.max(0, mi)]?.lecons.findIndex(x => x.id === l.id) ?? 0;
-    return { mi: Math.max(0, mi), li };
+    const idx = this.activeLeconIndex();
+    const lecons = this.detail()?.lecons ?? [];
+    if (idx >= 0 && idx < lecons.length - 1) this.selectLecon(lecons[idx + 1]);
   }
 
   leconClass(lecon: LeconDetail): string {
@@ -851,5 +780,15 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
       ${d ? 'bg-red-500/30 text-red-400' : 'bg-red-200 text-red-700'}`;
     return `w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0
       ${d ? 'bg-slate-800 text-slate-600' : 'bg-slate-100 text-slate-400'}`;
+  }
+
+  formatDuration(minutes: number): string {
+    if (!minutes) return '0 min';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h > 0) {
+      return `${h}h${m > 0 ? m + 'm' : ''}`;
+    }
+    return `${m} min`;
   }
 }

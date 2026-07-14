@@ -33,8 +33,8 @@ export class CourseService {
     return this.#api.post<null>(`/cours/${coursId}/liste-attente${params}`, {});
   }
 
-  // GET /api/v1/cours/{coursId}/modules/{moduleId}/lecons/{leconId}
-  getLecon(coursId: string, moduleId: string, leconId: string): Observable<ApiResponse<any>> {
-    return this.#api.get<any>(`/cours/${coursId}/modules/${moduleId}/lecons/${leconId}`);
+  // GET /api/v1/cours/{coursId}/lecons/{leconId}
+  getLecon(coursId: string, leconId: string): Observable<ApiResponse<any>> {
+    return this.#api.get<any>(`/cours/${coursId}/lecons/${leconId}`);
   }
 }

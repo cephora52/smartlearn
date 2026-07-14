@@ -42,15 +42,22 @@ export class CourseDetailComponent implements OnInit {
   readonly loading  = signal(true);
   readonly isAuth   = this.#auth.isAuthenticated;
 
+  readonly isFormateur = computed(() => {
+    const detail = this.detail();
+    const user = this.#auth.currentUser();
+    return !!detail && !!user && detail.formateurId === user.id;
+  });
+
   readonly prixFormateurPct = () => 30;
   readonly prixAvecFormateur = computed(() =>
     Math.round((this.detail()?.prixFcfa ?? 0) * (1 + this.prixFormateurPct() / 100))
   );
 
+
   readonly avantages = [
     'Accès illimité à tout le contenu',
     '1 séance hebdomadaire avec votre mentor attribué',
-    'Certificat officiel MbemX',
+    'Certificat officiel SmartLearn',
     'Projets concrets pour votre portfolio',
     'Paiement en plusieurs fois disponible',
   ];
@@ -174,7 +181,7 @@ export class CourseDetailComponent implements OnInit {
         <circle cx="84" cy="38" r="6" fill="white" opacity=".18"/>
         <text x="44" y="86" font-family="monospace" font-size="13" fill="white" opacity=".45">&lt;div class="app"&gt;</text>
         <text x="62" y="110" font-family="monospace" font-size="13" fill="white" opacity=".65">  const skills = [];</text>
-        <text x="62" y="134" font-family="monospace" font-size="12" fill="white" opacity=".4">  skills.push('MbemX');</text>
+        <text x="62" y="134" font-family="monospace" font-size="12" fill="white" opacity=".4">  skills.push('SmartLearn');</text>
         <text x="62" y="158" font-family="monospace" font-size="12" fill="white" opacity=".35">  return success;</text>
         <text x="44" y="182" font-family="monospace" font-size="13" fill="white" opacity=".45">&lt;/div&gt;</text>
         <rect x="44" y="200" width="70" height="3" rx="1.5" fill="white" opacity=".12"/>
@@ -251,5 +258,14 @@ levelDotColor(): string {
   }
   formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  formatDuration(minutes: number): string {
+    if (!minutes) return '0 min';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h > 0) {
+      return `${h}h${m > 0 ? m + 'm' : ''}`;
+    }
+    return `${m} min`;
   }
 }

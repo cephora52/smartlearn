@@ -163,13 +163,12 @@ Aucune connaissance préalable en programmation n'est requise.
 
 ## Pourquoi cette formation ?
 
-Basée sur des exemples concrets du contexte camerounais, avec des projets pratiques
-que vous pourrez montrer à vos futurs employeurs dès la fin de la formation.
+Basée sur des exemples concrets du contexte camerounais, avec des projets pratiques que vous pourrez montrer à vos futurs employeurs dès la fin de la formation.
   `.trim(),
   niveau: 'DEBUTANT', langue: 'Français', statut: 'PUBLIE',
   imageCouverture: null, imageCouvertureThumbnail: null,
   slug: 'dev-web-html-css-js',
-  nbModules: 3, nbLecons: 8, dureeTotaleMinutes: 240,
+  nbLecons: 8, dureeTotaleMinutes: 240,
   nbApprenants: 142, noteMoyenne: 4.7, nbAvis: 38,
   prixFcfa: 25000, seuilPaiement: 0.30,
   sessionsDisponibles: [
@@ -177,13 +176,10 @@ que vous pourrez montrer à vos futurs employeurs dès la fin de la formation.
     { id: 's-002', dateDebut: new Date(Date.now() + 14 * 86400000).toISOString(), dateFin: new Date(Date.now() + 44 * 86400000).toISOString(), modalite: 'PRESENTIEL', lieuOuLien: 'Centre MbemNova, Akwa — Douala', placesDisponibles: 0, capaciteMax: 15 },
   ],
   progressionApprenant: { pourcentage: 37, estPaye: false, seuilAtteint: false, xpGagne: 120, derniereLeconTitre: 'CSS : mise en forme' },
-  modules: [
+  lecons: [
     {
-      id: 'mod-01', titre: 'Module 1 — Introduction au Web', sortOrder: 1,
-      lecons: [
-        {
-          id: 'l-01', moduleId: 'mod-01', titre: 'Comment fonctionne Internet ?', typeContenu: 'TEXTE',
-          contenu: `<h2>Comment fonctionne Internet ?</h2>
+      id: 'l-01', coursId: 'c-001', titre: 'Comment fonctionne Internet ?', typeContenu: 'TEXTE',
+      contenu: `<h2>Comment fonctionne Internet ?</h2>
 <p>Internet est un réseau mondial de milliards d'appareils connectés entre eux. Chaque appareil possède une <strong>adresse IP</strong> unique, comme une adresse postale.</p>
 <h3>Le modèle Client-Serveur</h3>
 <p>Quand vous tapez <code>mbemnova.com</code> dans votre navigateur :</p>
@@ -199,11 +195,11 @@ que vous pourrez montrer à vos futurs employeurs dès la fin de la formation.
 <li><strong>TCP/IP</strong> — transport fiable des données</li>
 </ul>
 <div class="tip">💡 <strong>Exemple africain :</strong> Mobile Money utilise ces mêmes protocoles pour sécuriser vos transferts.</div>`,
-          videoUrl: null, pdfUrl: null, dureeMinutes: 6, sortOrder: 1, aQuiz: true, xpReward: 10, estTerminee: true, estVerrouille: false
-        },
-        {
-          id: 'l-02', moduleId: 'mod-01', titre: 'HTML : structure d\'une page', typeContenu: 'TEXTE',
-          contenu: `<h2>HTML — HyperText Markup Language</h2>
+      videoUrl: null, pdfUrl: null, dureeMinutes: 6, sortOrder: 1, aQuiz: true, xpReward: 10, estTerminee: true, estVerrouille: false
+    },
+    {
+      id: 'l-02', coursId: 'c-001', titre: 'HTML : structure d\'une page', typeContenu: 'TEXTE',
+      contenu: `<h2>HTML — HyperText Markup Language</h2>
 <p>Le HTML est le <strong>squelette</strong> de toute page web. Il structure le contenu avec des balises.</p>
 <h3>Structure de base</h3>
 <pre><code>&lt;!DOCTYPE html&gt;
@@ -217,11 +213,11 @@ que vous pourrez montrer à vos futurs employeurs dès la fin de la formation.
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
 <div class="tip">💡 Créez ce fichier et ouvrez-le dans votre navigateur !</div>`,
-          videoUrl: null, pdfUrl: null, dureeMinutes: 8, sortOrder: 2, aQuiz: true, xpReward: 10, estTerminee: true, estVerrouille: false
-        },
-        {
-          id: 'l-03', moduleId: 'mod-01', titre: 'CSS : mise en forme', typeContenu: 'TEXTE',
-          contenu: `<h2>CSS — Cascading Style Sheets</h2>
+      videoUrl: null, pdfUrl: null, dureeMinutes: 8, sortOrder: 2, aQuiz: true, xpReward: 10, estTerminee: true, estVerrouille: false
+    },
+    {
+      id: 'l-03', coursId: 'c-001', titre: 'CSS : mise en forme', typeContenu: 'TEXTE',
+      contenu: `<h2>CSS — Cascading Style Sheets</h2>
 <p>Le CSS donne du <strong>style</strong> à votre HTML : couleurs, polices, espacement, mise en page.</p>
 <h3>La syntaxe CSS</h3>
 <pre><code>/* sélecteur { propriété: valeur } */
@@ -236,16 +232,11 @@ h1 {
   padding: 24px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.07);
 }</code></pre>`,
-          videoUrl: null, pdfUrl: null, dureeMinutes: 7, sortOrder: 3, aQuiz: false, xpReward: 10, estTerminee: false, estVerrouille: false
-        },
-      ]
+      videoUrl: null, pdfUrl: null, dureeMinutes: 7, sortOrder: 3, aQuiz: false, xpReward: 10, estTerminee: false, estVerrouille: false
     },
     {
-      id: 'mod-02', titre: 'Module 2 — JavaScript Fondamentaux', sortOrder: 2,
-      lecons: [
-        {
-          id: 'l-04', moduleId: 'mod-02', titre: 'Variables et types de données', typeContenu: 'TEXTE',
-          contenu: `<h2>Variables en JavaScript</h2>
+      id: 'l-04', coursId: 'c-001', titre: 'Variables et types de données', typeContenu: 'TEXTE',
+      contenu: `<h2>Variables en JavaScript</h2>
 <p>Une variable est une <strong>boîte</strong> qui stocke une valeur.</p>
 <pre><code>// const : valeur immuable (préféré)
 const ville = "Douala";
@@ -262,11 +253,11 @@ const vrai    = true;           // Boolean
 const tableau = [1, 2, 3];      // Array
 const objet   = { nom: "Jean"}; // Object</code></pre>
 <div class="tip">💡 <strong>Règle :</strong> Utilisez <code>const</code> par défaut. <code>let</code> seulement si vous devez réassigner.</div>`,
-          videoUrl: null, pdfUrl: null, dureeMinutes: 5, sortOrder: 1, aQuiz: true, xpReward: 10, estTerminee: false, estVerrouille: false
-        },
-        {
-          id: 'l-05', moduleId: 'mod-02', titre: 'Fonctions', typeContenu: 'TEXTE',
-          contenu: `<h2>Les fonctions en JavaScript</h2>
+      videoUrl: null, pdfUrl: null, dureeMinutes: 5, sortOrder: 4, aQuiz: true, xpReward: 10, estTerminee: false, estVerrouille: false
+    },
+    {
+      id: 'l-05', coursId: 'c-001', titre: 'Fonctions', typeContenu: 'TEXTE',
+      contenu: `<h2>Les fonctions en JavaScript</h2>
 <p>Une fonction est un bloc de code <strong>réutilisable</strong>.</p>
 <pre><code>function saluer(prenom) {
   return "Bonjour " + prenom + " !";
@@ -279,31 +270,23 @@ const message = saluer("Jean-Paul");
 // Fonction fléchée (moderne)
 const calculer = (a, b) => a + b;
 // console.log(calculer(5, 3)); // 8</code></pre>`,
-          videoUrl: null, pdfUrl: null, dureeMinutes: 8, sortOrder: 2, aQuiz: true, xpReward: 10, estTerminee: false, estVerrouille: false
-        },
-      ]
+      videoUrl: null, pdfUrl: null, dureeMinutes: 8, sortOrder: 5, aQuiz: true, xpReward: 10, estTerminee: false, estVerrouille: false
     },
     {
-      id: 'mod-03', titre: 'Module 3 — Projet Pratique', sortOrder: 3,
-      lecons: [
-        {
-          id: 'l-06', moduleId: 'mod-03', titre: 'Projet : Site vitrine complet', typeContenu: 'TEXTE',
-          contenu: '<p>Contenu du projet pratique...</p>',
-          videoUrl: null, pdfUrl: null, dureeMinutes: 30, sortOrder: 1, aQuiz: false, xpReward: 30, estTerminee: false, estVerrouille: true
-        },
-        {
-          id: 'l-07', moduleId: 'mod-03', titre: 'Déploiement sur Netlify', typeContenu: 'TEXTE',
-          contenu: '<p>Déployer votre site gratuitement...</p>',
-          videoUrl: null, pdfUrl: null, dureeMinutes: 15, sortOrder: 2, aQuiz: false, xpReward: 20, estTerminee: false, estVerrouille: true
-        },
-        {
-          id: 'l-08', moduleId: 'mod-03', titre: 'Révision et quiz final', typeContenu: 'QCM',
-          contenu: null, videoUrl: null, pdfUrl: null, dureeMinutes: 10, sortOrder: 3, aQuiz: true, xpReward: 30, estTerminee: false, estVerrouille: true
-        },
-      ]
+      id: 'l-06', coursId: 'c-001', titre: 'Projet : Site vitrine complet', typeContenu: 'TEXTE',
+      contenu: '<p>Contenu du projet pratique...</p>',
+      videoUrl: null, pdfUrl: null, dureeMinutes: 30, sortOrder: 6, aQuiz: false, xpReward: 30, estTerminee: false, estVerrouille: true
+    },
+    {
+      id: 'l-07', coursId: 'c-001', titre: 'Déploiement sur Netlify', typeContenu: 'TEXTE',
+      contenu: '<p>Déployer votre site gratuitement...</p>',
+      videoUrl: null, pdfUrl: null, dureeMinutes: 15, sortOrder: 7, aQuiz: false, xpReward: 20, estTerminee: false, estVerrouille: true
+    },
+    {
+      id: 'l-08', coursId: 'c-001', titre: 'Révision et quiz final', typeContenu: 'QCM',
+      contenu: null, videoUrl: null, pdfUrl: null, dureeMinutes: 10, sortOrder: 8, aQuiz: true, xpReward: 30, estTerminee: false, estVerrouille: true
     }
-  ],
-   
+  ]
 };
 
 // QCM par leçon

@@ -31,10 +31,10 @@ public record CoursDetailResponse(
     String      imageCouvertureThumbnail,
     String      slug,
     String      formateurNom,
+    UUID        formateurId,
     String      categorieNom,
 
     // ── Stats ─────────────────────────────────────────────────────────────────
-    int          nbModules,
     int          nbLecons,
     int          dureeTotaleMinutes,  // Pour afficher "15h de contenu"
     int          nbApprenants,
@@ -71,11 +71,9 @@ public record CoursDetailResponse(
     // ── Programme ─────────────────────────────────────────────────────────────
 
     /**
-     * Programme complet — modules avec leurs leçons sommaires.
-     * Les 2 premiers modules sont ouverts par défaut (accordéon).
-     * Modules verrouillés visibles mais grisés.
+     * Programme complet — liste ordonnée des leçons sommaires.
      */
-    List<ModuleResponse> modules,
+    List<LeconSommaireResponse> lecons,
 
     // ── Sessions (formation avec formateur) ───────────────────────────────────
 

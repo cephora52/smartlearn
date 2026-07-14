@@ -86,6 +86,6 @@ public record CreerCoursCompletRequest(
      * Chaque module contient ses leçons avec leur contenu complet.
      */
     @Valid
-    List<CreerModuleRequest> modules
+    List<CreerLeconRequest> lecons
 
 ) {}

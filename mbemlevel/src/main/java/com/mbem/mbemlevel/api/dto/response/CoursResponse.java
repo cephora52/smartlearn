@@ -32,21 +32,25 @@ public record CoursResponse(
     String      statut,
     String      slug,
     String      formateurNom,
-    String      categorieNom
+    String      categorieNom,
+    Double      completionRate
 ) {
     /**
      * Depuis le domain Cours — utilisé dans la plupart des use cases.
      */
-    public static CoursResponse from(Cours c) {
+    public static CoursResponse from(Cours c, com.mbem.mbemlevel.application.port.out.StoragePort storagePort) {
         return new CoursResponse(
             c.getId(), c.getTitre(), c.getDescriptionCourte(),
             c.getNiveau(), c.getLangue(),
-            c.getImageCouvertureThumbnail(),
+            c.getImageCouvertureThumbnail() != null && !c.getImageCouvertureThumbnail().isBlank()
+                ? storagePort.presignedUrl(c.getImageCouvertureThumbnail())
+                : null,
             c.getNbApprenants(), c.getNoteMoyenne(),
             c.getNbLecons(), c.getDureeTotaleMinutes(),
             c.getPrixFcfa(), c.getSeuilPaiement(),
             c.getStatut(), c.getSlug(),
-            null, null
+            null, null,
+            null
         );
     }
 
@@ -54,16 +58,35 @@ public record CoursResponse(
      * CORRECTION s23 — Depuis l'entité JPA directement.
      * Utilisé dans GetCoursEnAttenteUseCase (lecture sans passer par le domain).
      */
-    public static CoursResponse fromEntity(CoursJpaEntity e) {
+    public static CoursResponse fromEntity(CoursJpaEntity e, com.mbem.mbemlevel.application.port.out.StoragePort storagePort) {
         return new CoursResponse(
             e.getId(), e.getTitre(), e.getDescriptionCourte(),
             e.getNiveau(), e.getLangue(),
-            e.getImageCouvertureThumbnail(),
+            e.getImageCouvertureThumbnail() != null && !e.getImageCouvertureThumbnail().isBlank()
+                ? storagePort.presignedUrl(e.getImageCouvertureThumbnail())
+                : null,
             e.getNbApprenants(), e.getNoteMoyenne(),
             e.getNbLecons(), e.getDureeTotaleMinutes(),
             e.getPrixFcfa(), e.getSeuilPaiement(),
             e.getStatut(), e.getSlug(),
-            null, null
+            null, null,
+            null
+        );
+    }
+
+    public static CoursResponse fromEntityWithCompletion(CoursJpaEntity e, com.mbem.mbemlevel.application.port.out.StoragePort storagePort, Double completionRate) {
+        return new CoursResponse(
+            e.getId(), e.getTitre(), e.getDescriptionCourte(),
+            e.getNiveau(), e.getLangue(),
+            e.getImageCouvertureThumbnail() != null && !e.getImageCouvertureThumbnail().isBlank()
+                ? storagePort.presignedUrl(e.getImageCouvertureThumbnail())
+                : null,
+            e.getNbApprenants(), e.getNoteMoyenne(),
+            e.getNbLecons(), e.getDureeTotaleMinutes(),
+            e.getPrixFcfa(), e.getSeuilPaiement(),
+            e.getStatut(), e.getSlug(),
+            null, null,
+            completionRate
         );
     }
 }

@@ -64,9 +64,10 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   readonly #platformId = inject(PLATFORM_ID);
 
   // ── State ──
-  readonly cours    = signal<CoursResponse[]>([]);
-  readonly sessions = signal<SessionResponse[]>([]);
-  readonly isLoading = signal(true);
+  readonly cours           = signal<CoursResponse[]>([]);
+  readonly completionCours = signal<CoursResponse[]>([]);
+  readonly sessions        = signal<SessionResponse[]>([]);
+  readonly isLoading       = signal(true);
 
   readonly prenom = computed(() => this.#auth.currentUser()?.prenom ?? 'Formateur');
   readonly rendusAttente = MOCK_RENDUS_ATTENTE.filter(r => r.note === null);
@@ -87,19 +88,15 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   private loadTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    // Simule skeleton → données réelles
-    if (isPlatformBrowser(this.#platformId)) {
-      this.loadTimer = setTimeout(() => this.isLoading.set(false), 600);
-    } else {
-      this.isLoading.set(false);
-    }
+    const courses$ = this.#adminSvc.getMesCours({ limit: 3, sortBy: 'nbApprenants', sortDir: 'DESC' });
+    const completion$ = this.#adminSvc.getMesCours({ limit: 3, sortBy: 'completionRate', sortDir: 'DESC' });
 
-    this.#adminSvc.getMesCours().subscribe({
-      next: r => {
-        if (r.success && r.data) {
-          this.cours.set(r.data);
-          if (r.data.length > 0) {
-            const courseIds = r.data.map(c => c.id);
+    forkJoin({ courses: courses$, completion: completion$ }).subscribe({
+      next: ({ courses, completion }) => {
+        if (courses.success && courses.data) {
+          this.cours.set(courses.data);
+          if (courses.data.length > 0) {
+            const courseIds = courses.data.map(c => c.id);
             forkJoin(courseIds.map(id => this.#sessionSvc.getByCours(id))).subscribe({
               next: results => {
                 const allSessions = results
@@ -110,7 +107,14 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
             });
           }
         }
+        if (completion.success && completion.data) {
+          this.completionCours.set(completion.data);
+        }
+        this.isLoading.set(false);
       },
+      error: () => {
+        this.isLoading.set(false);
+      }
     });
   }
 

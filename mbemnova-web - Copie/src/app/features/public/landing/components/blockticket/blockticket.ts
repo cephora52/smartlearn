@@ -61,7 +61,7 @@ private isBrowser = isPlatformBrowser(this.platformId);
   ];
  
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
-  private readonly DISMISS_KEY = 'mbemx_ticket_dismissed';
+  private readonly DISMISS_KEY = 'smartlearn_ticket_dismissed';
  
   // ── Lifecycle ──
  

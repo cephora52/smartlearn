@@ -18,6 +18,11 @@ public interface ProgressionJpaRepository extends JpaRepository<ProgressionJpaEn
            "WHERE p.apprenantId = :uid AND p.coursId = :cid")
     int activerPaiement(@Param("uid") UUID apprenantId, @Param("cid") UUID coursId);
 
+    @Query("SELECT COALESCE(AVG(p.pourcentage), 0.0) FROM ProgressionJpaEntity p WHERE p.coursId = :coursId")
+    Double getAverageCompletionRateByCoursId(@Param("coursId") UUID coursId);
+
+    long countByCoursId(UUID coursId);
+
 
 
 

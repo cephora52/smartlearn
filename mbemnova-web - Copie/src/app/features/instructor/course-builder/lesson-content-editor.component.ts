@@ -292,11 +292,7 @@ export class LessonContentEditorComponent implements OnInit {
       this.#toast.error('Formulaire invalide', 'La description courte doit faire au moins 10 caractères.');
       return;
     }
-    if (c.modules.length === 0) {
-      this.#toast.error('Formulaire invalide', 'Le cours doit contenir au moins un module.');
-      return;
-    }
-    const hasLessons = c.modules.some(m => m.lessons && m.lessons.length > 0);
+    const hasLessons = this.allLessons().length > 0;
     if (!hasLessons) {
       this.#toast.error('Formulaire invalide', 'Le cours doit contenir au moins une leçon.');
       return;
@@ -317,41 +313,34 @@ export class LessonContentEditorComponent implements OnInit {
       objectifsApprentissage: c.whatYouLearn ? c.whatYouLearn.split('\n').filter((l: string) => l.trim()) : ['Apprendre ' + c.title],
       prerequis: c.prerequis || 'Aucun prérequis',
       publicCible: c.publicCible || 'Tout public',
-      modules: c.modules.map((m, mIdx) => ({
-        titre: m.title,
-        description: m.description || '',
-        ordre: mIdx + 1,
-        xpBonus: 100,
-        estGratuit: m.estGratuit ?? false,
-        lecons: m.lessons.map((l, lIdx) => ({
-          titre: l.title,
-          descriptionCourte: l.shortDescription || '',
-          ordre: lIdx + 1,
-          dureeMinutes: l.durationMinutes || 10,
-          xpValeur: 25,
-          estPreview: l.estPreview ?? false,
-          blocs: l.blocks && l.blocks.length > 0 ? l.blocks.map((b, bIdx) => ({
-            typeBloc: this.#mapTypeBloc(b.type),
-            ordre: bIdx + 1,
-            contenuHtml: b.type === 'TEXT' ? b.content : null,
-            urlImage: b.type === 'IMAGE' ? b.content : null,
-            altImage: b.type === 'IMAGE' ? b.title : null,
-            legendeImage: null,
-            urlVideo: b.type === 'VIDEO' ? b.content : null,
-            dureeVideoSec: null,
-            urlPdf: b.type === 'FILE' ? b.content : null,
-            nomPdf: b.type === 'FILE' ? b.fileName : null,
-            langageCode: b.type === 'CODE' ? (b.language || 'javascript') : null,
-            codeSource: b.type === 'CODE' ? b.content : null,
-            typeCallout: b.type === 'TIP' ? (b.tipColor || 'INFO').toUpperCase() : null,
-            texteCallout: b.type === 'TIP' ? b.content : null
-          })) : [{
-            typeBloc: 'TEXTE_HTML',
-            ordre: 1,
-            contenuHtml: 'Introduction de la leçon'
-          }],
-          qcm: null
-        }))
+      lecons: c.modules.flatMap(m => m.lessons).map((l, lIdx) => ({
+        titre: l.title,
+        descriptionCourte: l.shortDescription || '',
+        ordre: lIdx + 1,
+        dureeMinutes: l.durationMinutes || 10,
+        xpValeur: 25,
+        estPreview: l.estPreview ?? false,
+        blocs: l.blocks && l.blocks.length > 0 ? l.blocks.map((b, bIdx) => ({
+          typeBloc: this.#mapTypeBloc(b.type),
+          ordre: bIdx + 1,
+          contenuHtml: b.type === 'TEXT' ? b.content : null,
+          urlImage: b.type === 'IMAGE' ? b.content : null,
+          altImage: b.type === 'IMAGE' ? b.title : null,
+          legendeImage: null,
+          urlVideo: b.type === 'VIDEO' ? b.content : null,
+          dureeVideoSec: null,
+          urlPdf: b.type === 'FILE' ? b.content : null,
+          nomPdf: b.type === 'FILE' ? b.fileName : null,
+          langageCode: b.type === 'CODE' ? (b.language || 'javascript') : null,
+          codeSource: b.type === 'CODE' ? b.content : null,
+          typeCallout: b.type === 'TIP' ? (b.tipColor || 'INFO').toUpperCase() : null,
+          texteCallout: b.type === 'TIP' ? b.content : null
+        })) : [{
+          typeBloc: 'TEXTE_HTML',
+          ordre: 1,
+          contenuHtml: 'Introduction de la leçon'
+        }],
+        qcm: null
       }))
     };
 

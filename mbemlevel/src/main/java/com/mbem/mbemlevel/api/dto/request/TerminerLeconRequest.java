@@ -9,7 +9,7 @@ public record TerminerLeconRequest(
         @Min(0) int nbLeconsTotales,
         @Min(0) int nbLeconsTerminees,
         @Min(0) int xpLecon,
-        @NotBlank String nomCours,
+        String nomCours,
         String telephone) {
     public TerminerLeconRequest {
         java.util.Objects.requireNonNull(leconId);

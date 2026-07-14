@@ -32,7 +32,14 @@ public class TerminerLeconUseCase {
         double nouveauPct = nbLeconsTotales > 0
             ? Math.min(100.0, (double) nbLeconsTerminees / nbLeconsTotales * 100.0) : 0;
 
-        p.avancer(nouveauPct, xpLecon, prenom, email, telephone, nomCours);
+        String resolvedNomCours = nomCours;
+        if (resolvedNomCours == null || resolvedNomCours.isBlank()) {
+            resolvedNomCours = coursRepo.findById(coursId)
+                .map(com.mbem.mbemlevel.domain.cours.Cours::getTitre)
+                .orElse("Cours");
+        }
+
+        p.avancer(nouveauPct, xpLecon, prenom, email, telephone, resolvedNomCours);
         Progression saved = progressionRepo.save(p);
 
         // Publier les domain events (SeuilPaiementAtteintEvent, CoursTermineEvent…)

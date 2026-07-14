@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
   template: `
     <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
-        <a routerLink="/app" class="font-black text-lg text-[#312e81]">mbem<span class="text-[#0f172a]">X</span></a>
+        <a routerLink="/app" class="font-black text-lg text-[#312e81]">Smart<span class="text-[#0f172a]">Learn</span></a>
         <nav class="hidden md:flex items-center gap-1">
           <a routerLink="/app" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Dashboard</a>
           <a routerLink="/app/sessions" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Sessions</a>

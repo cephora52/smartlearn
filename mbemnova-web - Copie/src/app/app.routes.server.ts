@@ -48,6 +48,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'instructor/cours/:id/lecons/:lessonId/contenu', renderMode: RenderMode.Client },
   { path: 'instructor/sessions',        renderMode: RenderMode.Client },
   { path: 'instructor/correction',      renderMode: RenderMode.Client },
+  { path: 'instructor/formations',      renderMode: RenderMode.Client },
 
   // Espace admin
   { path: 'admin',                      renderMode: RenderMode.Client },

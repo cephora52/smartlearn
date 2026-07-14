@@ -32,8 +32,16 @@ export class AdminService {
   creerCours(req: any): Observable<ApiResponse<{ id: string }>> {
     return this.#api.post<{ id: string }>('/admin/cours', req);
   }
-  getMesCours(): Observable<ApiResponse<CoursResponse[]>> {
-    return this.#api.get<CoursResponse[]>('/admin/cours');
+  getMesCours(params?: {
+    limit?: number;
+    sortBy?: string;
+    sortDir?: string;
+    domaine?: string;
+    niveau?: string;
+    statut?: string;
+    q?: string;
+  }): Observable<ApiResponse<CoursResponse[]>> {
+    return this.#api.get<CoursResponse[]>('/admin/cours', params);
   }
   publierCours(id: string): Observable<ApiResponse<null>> {
     return this.#api.post<null>(`/admin/cours/${id}/publier`, {});

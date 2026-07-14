@@ -1,9 +1,8 @@
 import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CourseService } from '../../../../../core/services/course.service';
-import { CoursResponse, DrawResponse } from '../../../../../core/models';
-import { MOCK_COURS, MOCK_DRAW, MOCK_LEADERBOARD } from '../../../../../core/services/mock.data';
-import { RouterLink } from '@angular/router';
+import { CoursResponse } from '../../../../../core/models';
 import { CommonModule } from '@angular/common';
+import { CourseCardComponent } from '../../../../../shared/components/course-card/course-card.component';
 
 // ── Local types ──────────────────────────────────────────────────────────────
  
@@ -20,7 +19,7 @@ interface TrustItem {
 
 @Component({
   selector: 'app-foramtions',
-  imports: [RouterLink,CommonModule],
+  imports: [CommonModule, CourseCardComponent],
   templateUrl: './foramtions.html',
   styleUrl: './foramtions.css',
 })
@@ -112,53 +111,6 @@ export class Foramtions implements OnInit {
  
   setDomaine(label: string | null): void {
     this.activeDomaine.set(label);
-  }
- 
-  // ── View helpers ─────────────────────────────────────────────────────────
- 
-  /** Gradient stop 1 per level */
-  levelColor1(niveau: string): string {
-    return {
-      DEBUTANT:      '#059669',
-      INTERMEDIAIRE: '#4f46e5',
-      AVANCE:        '#7c3aed',
-    }[niveau] ?? '#4f46e5';
-  }
- 
-  /** Gradient stop 2 per level */
-  levelColor2(niveau: string): string {
-    return {
-      DEBUTANT:      '#065f46',
-      INTERMEDIAIRE: '#1e1b4b',
-      AVANCE:        '#4c1d95',
-    }[niveau] ?? '#1e1b4b';
-  }
- 
-  /** Background class for banner container */
-  levelBg(niveau: string): string {
-    return {
-      DEBUTANT:      'bg-emerald-900',
-      INTERMEDIAIRE: 'bg-indigo-950',
-      AVANCE:        'bg-violet-950',
-    }[niveau] ?? 'bg-indigo-950';
-  }
- 
-  /** Dot color for level badge */
-  levelDot(niveau: string): string {
-    return {
-      DEBUTANT:      'bg-emerald-400',
-      INTERMEDIAIRE: 'bg-indigo-400',
-      AVANCE:        'bg-violet-400',
-    }[niveau] ?? 'bg-indigo-400';
-  }
- 
-  /** Human-readable level label */
-  levelLabel(niveau: string): string {
-    return {
-      DEBUTANT:      'Débutant',
-      INTERMEDIAIRE: 'Intermédiaire',
-      AVANCE:        'Avancé',
-    }[niveau] ?? niveau;
   }
 }
  

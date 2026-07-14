@@ -1,5 +1,6 @@
 package com.mbem.mbemlevel.application.usecase.cours;
 
+import com.mbem.mbemlevel.application.port.out.StoragePort;
 import com.mbem.mbemlevel.api.dto.response.*;
 import com.mbem.mbemlevel.infrastructure.persistence.entity.*;
 import com.mbem.mbemlevel.infrastructure.persistence.repository.*;
@@ -21,6 +22,7 @@ public class GetLeconDetailUseCase {
     private final QCMJpaRepository         qcmRepo;
     private final RessourceCoursJpaRepository ressourceRepo;
     private final ProgressionJpaRepository progressionRepo;
+    private final StoragePort              storagePort;
 
     @Transactional(readOnly = true)
     public LeconDetailResponse executer(UUID leconId, UUID apprenantId) {
@@ -31,7 +33,18 @@ public class GetLeconDetailUseCase {
         List<BlocContenuResponse> blocs = blocRepo
             .findByLeconIdOrderByOrdreAsc(leconId)
             .stream()
-            .map(BlocContenuResponse::from)
+            .map(b -> new BlocContenuResponse(
+                b.getId(), b.getTypeBloc(), b.getOrdre(),
+                b.getContenuHtml(),
+                b.getUrlImage() != null && !b.getUrlImage().isBlank() ? (b.getUrlImage().startsWith("http") ? b.getUrlImage() : storagePort.presignedUrl(b.getUrlImage())) : null,
+                b.getAltImage(), b.getLegendeImage(),
+                b.getUrlVideo() != null && !b.getUrlVideo().isBlank() ? (b.getUrlVideo().startsWith("http") ? b.getUrlVideo() : storagePort.presignedUrl(b.getUrlVideo())) : null,
+                b.getDureeVideoSec(),
+                b.getUrlPdf() != null && !b.getUrlPdf().isBlank() ? (b.getUrlPdf().startsWith("http") ? b.getUrlPdf() : storagePort.presignedUrl(b.getUrlPdf())) : null,
+                b.getNomPdf(),
+                b.getLangageCode(), b.getCodeSource(),
+                b.getTypeCallout(), b.getTexteCallout()
+            ))
             .toList();
 
         // QCM sans la bonne réponse (sécurité)
@@ -57,7 +70,7 @@ public class GetLeconDetailUseCase {
             .toList();
 
         return new LeconDetailResponse(
-            lecon.getId(), lecon.getModuleId(),
+            lecon.getId(), lecon.getCoursId(),
             lecon.getTitre(), lecon.getDescriptionCourte(),
             lecon.getOrdre(), lecon.getDureeMinutes(), lecon.getXpValeur(),
             lecon.isEstPreview(), lecon.isAQCM(),

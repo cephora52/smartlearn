@@ -548,51 +548,44 @@ export class CourseModulesComponent implements OnInit {
       objectifsApprentissage: ['Apprendre ' + c.title],
       prerequis: 'Aucun prérequis',
       publicCible: 'Tout public',
-      modules: [{
-        titre: 'Module Principal',
-        description: 'Module principal de la formation',
-        ordre: 1,
-        xpBonus: 100,
-        estGratuit: true,
-        lecons: this.lessons().map((l, lIdx) => {
-          let blocks = l.blocks;
-          const typeContenu = (l as any).typeContenu || 'TEXTE';
-          if (typeContenu === 'TEXTE') {
-            const editorEl = document.getElementById(`editor-${lIdx}`);
-            const content = editorEl ? editorEl.innerHTML : (l.blocks[0]?.content || '');
-            blocks = [{ id: l.blocks[0]?.id || 'block-' + Date.now(), type: 'TEXT', content, title: '' }];
-          }
-          return {
-            titre: l.title,
-            descriptionCourte: '',
-            ordre: lIdx + 1,
-            dureeMinutes: l.durationMinutes || 10,
-            xpValeur: (l as any).xpReward || 25,
-            estPreview: l.estPreview ?? false,
-            blocs: blocks && blocks.length > 0 ? blocks.map((b, bIdx) => ({
-              typeBloc: b.type === 'TEXT' ? 'TEXTE_HTML' : (b.type === 'VIDEO' ? 'VIDEO' : 'PDF_EMBED'),
-              ordre: bIdx + 1,
-              contenuHtml: b.type === 'TEXT' ? b.content : null,
-              urlImage: null,
-              altImage: null,
-              legendeImage: null,
-              urlVideo: b.type === 'VIDEO' ? b.content : null,
-              dureeVideoSec: null,
-              urlPdf: b.type === 'FILE' ? b.content : null,
-              nomPdf: b.type === 'FILE' ? b.fileName : null,
-              langageCode: null,
-              codeSource: null,
-              typeCallout: null,
-              texteCallout: null
-            })) : [{
-              typeBloc: 'TEXTE_HTML',
-              ordre: 1,
-              contenuHtml: 'Introduction de la leçon'
-            }],
-            qcm: null
-          };
-        })
-      }]
+      lecons: this.lessons().map((l, lIdx) => {
+        let blocks = l.blocks;
+        const typeContenu = (l as any).typeContenu || 'TEXTE';
+        if (typeContenu === 'TEXTE') {
+          const editorEl = document.getElementById(`editor-${lIdx}`);
+          const content = editorEl ? editorEl.innerHTML : (l.blocks[0]?.content || '');
+          blocks = [{ id: l.blocks[0]?.id || 'block-' + Date.now(), type: 'TEXT', content, title: '' }];
+        }
+        return {
+          titre: l.title,
+          descriptionCourte: '',
+          ordre: lIdx + 1,
+          dureeMinutes: l.durationMinutes || 10,
+          xpValeur: (l as any).xpReward || 25,
+          estPreview: l.estPreview ?? false,
+          blocs: blocks && blocks.length > 0 ? blocks.map((b, bIdx) => ({
+            typeBloc: b.type === 'TEXT' ? 'TEXTE_HTML' : (b.type === 'VIDEO' ? 'VIDEO' : 'PDF_EMBED'),
+            ordre: bIdx + 1,
+            contenuHtml: b.type === 'TEXT' ? b.content : null,
+            urlImage: null,
+            altImage: null,
+            legendeImage: null,
+            urlVideo: b.type === 'VIDEO' ? b.content : null,
+            dureeVideoSec: null,
+            urlPdf: b.type === 'FILE' ? b.content : null,
+            nomPdf: b.type === 'FILE' ? b.fileName : null,
+            langageCode: null,
+            codeSource: null,
+            typeCallout: null,
+            texteCallout: null
+          })) : [{
+            typeBloc: 'TEXTE_HTML',
+            ordre: 1,
+            contenuHtml: 'Introduction de la leçon'
+          }],
+          qcm: null
+        };
+      })
     };
 
     this.#adminSvc.creerCours(req).subscribe({

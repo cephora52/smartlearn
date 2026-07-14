@@ -31,8 +31,6 @@ public class DevoirJpaEntity {
     private UUID id;
     @Column(name = "session_id", nullable = false)
     private UUID sessionId;
-    @Column(name = "module_id")
-    private UUID moduleId;
     @Column(nullable = false, length = 200)
     private String titre;
     @Column(nullable = false, columnDefinition = "TEXT")

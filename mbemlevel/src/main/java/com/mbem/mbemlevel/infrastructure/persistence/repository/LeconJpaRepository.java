@@ -9,11 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface LeconJpaRepository extends JpaRepository<LeconJpaEntity, UUID> {
-    List<LeconJpaEntity> findByModuleIdOrderByOrdreAsc(UUID moduleId);
-    int countByModuleId(UUID moduleId);
-
-    @Query("SELECT COUNT(l) FROM LeconJpaEntity l " +
-           "JOIN ModuleJpaEntity m ON l.moduleId = m.id " +
-           "WHERE m.coursId = :coursId")
+    List<LeconJpaEntity> findByCoursIdOrderByOrdreAsc(UUID coursId);
     int countByCoursId(UUID coursId);
 }

@@ -38,6 +38,42 @@ public interface CoursJpaRepository extends JpaRepository<CoursJpaEntity, UUID> 
     /** Cours du formateur */
     List<CoursJpaEntity> findByFormateurId(UUID formateurId);
 
+    @Query("SELECT c FROM CoursJpaEntity c " +
+           "WHERE c.formateurId = :formateurId " +
+           "AND (:statut IS NULL OR c.statut = :statut) " +
+           "AND (:niveau IS NULL OR c.niveau = :niveau) " +
+           "AND (:categorieId IS NULL OR c.categorieId = :categorieId) " +
+           "AND (:q IS NULL OR LOWER(c.titre) LIKE :q) " +
+           "ORDER BY c.id DESC")
+    Page<CoursJpaEntity> findByFormateurIdWithFilters(
+        @Param("formateurId") UUID formateurId,
+        @Param("statut")      String statut,
+        @Param("niveau")      NiveauCours niveau,
+        @Param("categorieId") UUID categorieId,
+        @Param("q")           String q,
+        Pageable pageable
+    );
+
+    @Query("SELECT c, COALESCE(AVG(p.pourcentage), 0.0) as avgCompletion " +
+           "FROM CoursJpaEntity c " +
+           "LEFT JOIN ProgressionJpaEntity p ON c.id = p.coursId " +
+           "WHERE c.formateurId = :formateurId " +
+           "GROUP BY c.id, c.titre, c.descriptionCourte, c.niveau, c.langue, c.imageCouverture, c.imageCouvertureThumbnail, c.nbApprenants, c.noteMoyenne, c.nbLecons, c.dureeTotaleMinutes, c.prixFcfa, c.seuilPaiement, c.statut, c.slug, c.categorieId, c.createdAt, c.updatedAt " +
+           "ORDER BY avgCompletion DESC, c.id DESC")
+    List<Object[]> findTopCoursesByCompletionRate(
+        @Param("formateurId") UUID formateurId,
+        Pageable pageable
+    );
+
+    @Query("SELECT c, (SELECT COUNT(p.id) FROM ProgressionJpaEntity p WHERE p.coursId = c.id) as countProg " +
+           "FROM CoursJpaEntity c " +
+           "WHERE c.formateurId = :formateurId " +
+           "ORDER BY countProg DESC, c.id DESC")
+    List<Object[]> findTopCoursesByEnrollments(
+        @Param("formateurId") UUID formateurId,
+        Pageable pageable
+    );
+
 
     @Query("SELECT c.id as id, c.titre as titre, c.descriptionCourte as descriptionCourte, " +
        "c.niveau as niveau, c.langue as langue, " +

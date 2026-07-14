@@ -107,14 +107,14 @@ private SessionJpaEntity toSessionEntity(Session s) {
     }
 
     private Devoir toDevoirDomain(DevoirJpaEntity e) {
-        return new Devoir(e.getId(), e.getSessionId(), e.getModuleId(), e.getTitre(),
+        return new Devoir(e.getId(), e.getSessionId(), e.getTitre(),
                 e.getConsignes(), e.getDateRemise(), e.isEstVerrouille(),
                 e.getLienRessources(), e.getCreatedAt(), e.getUpdatedAt());
     }
 
     private DevoirJpaEntity toDevoirEntity(Devoir d) {
         return DevoirJpaEntity.builder().id(d.getId() != null ? d.getId() : UUID.randomUUID())
-                .sessionId(d.getSessionId()).moduleId(d.getModuleId()).titre(d.getTitre())
+                .sessionId(d.getSessionId()).titre(d.getTitre())
                 .consignes(d.getConsignes()).dateRemise(d.getDateRemise())
                 .estVerrouille(d.isEstVerrouille()).lienRessources(d.getLienRessources()).build();
     }

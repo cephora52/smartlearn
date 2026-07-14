@@ -9,7 +9,6 @@ import java.util.UUID;
  */
 public class Devoir extends AggregateRoot {
     private UUID          sessionId;
-    private UUID          moduleId;
     private String        titre;
     private String        consignes;
     private LocalDateTime dateRemise;
@@ -17,9 +16,9 @@ public class Devoir extends AggregateRoot {
     private String        lienRessources;
     
 
-    public static Devoir creer(UUID sessionId, UUID moduleId, String titre,
+    public static Devoir creer(UUID sessionId, String titre,
                                 String consignes, LocalDateTime dateRemise) {
-        Devoir d = new Devoir(); d.sessionId = sessionId; d.moduleId = moduleId;
+        Devoir d = new Devoir(); d.sessionId = sessionId;
         d.titre = titre.trim(); d.consignes = consignes;
         d.dateRemise = dateRemise; d.estVerrouille = false; return d;
     }
@@ -29,11 +28,11 @@ public class Devoir extends AggregateRoot {
             }
 
 
-    public Devoir(UUID id, UUID sessionId, UUID moduleId, String titre,
+    public Devoir(UUID id, UUID sessionId, String titre,
                   String consignes, LocalDateTime dateRemise, boolean verrouille,
                   String lienRessources, LocalDateTime ca, LocalDateTime ua) {
         super(id, ca, ua);
-        this.sessionId = sessionId; this.moduleId = moduleId; this.titre = titre;
+        this.sessionId = sessionId; this.titre = titre;
         this.consignes = consignes; this.dateRemise = dateRemise;
         this.estVerrouille = verrouille; this.lienRessources = lienRessources;
     }
@@ -47,7 +46,6 @@ public class Devoir extends AggregateRoot {
         return maintenant.isAfter(dateRemise);
     }
     public UUID          getSessionId()      { return sessionId; }
-    public UUID          getModuleId()       { return moduleId; }
     public String        getTitre()          { return titre; }
     public String        getConsignes()      { return consignes; }
     public LocalDateTime getDateRemise()     { return dateRemise; }

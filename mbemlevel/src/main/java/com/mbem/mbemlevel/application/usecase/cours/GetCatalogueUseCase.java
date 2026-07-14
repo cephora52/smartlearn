@@ -1,6 +1,7 @@
 package com.mbem.mbemlevel.application.usecase.cours;
 
 import com.mbem.mbemlevel.api.dto.response.*;
+import com.mbem.mbemlevel.application.port.out.StoragePort;
 import com.mbem.mbemlevel.domain.shared.enums.NiveauCours;
 import com.mbem.mbemlevel.infrastructure.persistence.repository.*;
 import com.mbem.mbemlevel.infrastructure.persistence.repository.projection.CoursCatalogueProjection;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class GetCatalogueUseCase {
 
     private final CoursJpaRepository coursRepo;
+    private final StoragePort storagePort;
 
     /**
      * Cache clé : niveau-categorieId-page-size
@@ -53,13 +55,16 @@ public class GetCatalogueUseCase {
           .map(p -> new CoursResponse(
               p.getId(), p.getTitre(), p.getDescriptionCourte(),
               p.getNiveau(), p.getLangue(),
-              p.getImageCouvertureThumbnail(),
+              p.getImageCouvertureThumbnail() != null && !p.getImageCouvertureThumbnail().isBlank()
+                  ? storagePort.presignedUrl(p.getImageCouvertureThumbnail())
+                  : null,
               p.getNbApprenants(), p.getNoteMoyenne(), p.getNbLecons(),
               p.getDureeTotaleMinutes(), p.getPrixFcfa(), p.getSeuilPaiement(),
               "PUBLIE",
               p.getSlug(),
               (p.getFormateurPrenom() != null ? p.getFormateurPrenom() : "") + " " + (p.getFormateurNom() != null ? p.getFormateurNom() : ""),
-              p.getCategorieNom()
+              p.getCategorieNom(),
+              null
           ));
         return PageResponse.of(pageResult);
     }

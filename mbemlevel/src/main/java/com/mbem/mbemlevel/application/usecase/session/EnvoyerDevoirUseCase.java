@@ -18,9 +18,9 @@ public class EnvoyerDevoirUseCase {
     private final ApplicationEventPublisher publisher;
 
     @Transactional
-    public Devoir executer(UUID sessionId, UUID moduleId, String titre,
+    public Devoir executer(UUID sessionId, String titre,
                             String consignes, LocalDateTime dateRemise) {
-        Devoir devoir = Devoir.creer(sessionId, moduleId, titre, consignes, dateRemise);
+        Devoir devoir = Devoir.creer(sessionId, titre, consignes, dateRemise);
         String dateStr = dateRemise.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         devoir.publier(titre, dateStr);
         Devoir saved = sessionRepo.saveDevoir(devoir);

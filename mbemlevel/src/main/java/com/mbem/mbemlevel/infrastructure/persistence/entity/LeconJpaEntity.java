@@ -17,8 +17,8 @@ public class LeconJpaEntity {
     @Id
     private UUID id;
 
-    @Column(name = "module_id", nullable = false)
-    private UUID moduleId;
+    @Column(name = "cours_id", nullable = false)
+    private UUID coursId;
 
     @Column(nullable = false, length = 200)
     private String titre;

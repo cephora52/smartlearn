@@ -99,10 +99,19 @@ public class CoursAdminController {
      * Lister les cours créés par le formateur connecté (publiés + brouillons).
      */
     @GetMapping
-    @Operation(summary = "Lister les cours du formateur connecté")
+    @Operation(summary = "Lister les cours du formateur connecté avec filtres et tri")
     public ResponseEntity<ApiResponse<List<CoursResponse>>> mesCours(
-            @AuthenticationPrincipal String userId) {
-        List<CoursResponse> responses = getCoursFormateurUC.executer(UUID.fromString(userId));
+            @AuthenticationPrincipal String userId,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            @RequestParam(required = false) String domaine,
+            @RequestParam(required = false) String niveau,
+            @RequestParam(required = false) String statut,
+            @RequestParam(required = false) String q) {
+        List<CoursResponse> responses = getCoursFormateurUC.executer(
+            UUID.fromString(userId), limit, sortBy, sortDir, domaine, niveau, statut, q
+        );
         return ResponseEntity.ok(ApiResponse.ok(responses));
     }
 }

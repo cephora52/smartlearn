@@ -21,7 +21,7 @@ const pwdMatch = (c: AbstractControl) => {
     <div class="relative z-10 text-center max-w-sm">
       <div class="text-6xl mb-6" aria-hidden="true">🚀</div>
       <h2 class="text-2xl font-bold text-white mb-3">Votre parcours commence ici</h2>
-      <p class="text-emerald-200 text-sm leading-relaxed mb-8">Rejoignez 247 apprenants qui développent leurs compétences tech avec MbemNova. Formations certifiantes, paiement en tranches.</p>
+      <p class="text-emerald-200 text-sm leading-relaxed mb-8">Rejoignez 247 apprenants qui développent leurs compétences tech avec SmartLearn. Formations certifiantes, paiement en tranches.</p>
       <div class="space-y-3 text-left">
         @for (a of avantages; track a) {
           <div class="flex items-center gap-3">
@@ -39,11 +39,13 @@ const pwdMatch = (c: AbstractControl) => {
     <div class="w-full max-w-sm animate-fade-up">
       <a routerLink="/" class="inline-flex items-center gap-2.5 mb-8 group">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none" class="group-hover:scale-105 transition-transform" aria-hidden="true">
-          <circle cx="18" cy="18" r="18" fill="#2563eb"/>
-          <path d="M8 26V11l10 8 10-8v15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="28" cy="10" r="3" fill="#f59e0b" class="animate-dot-pulse"/>
+          <rect width="36" height="36" rx="10" fill="#2563eb"/>
+          <path d="M18 9L29 14L18 19L7 14L18 9Z" fill="white"/>
+          <path d="M12 17V21C12 23.5 14.7 25 18 25C21.3 25 24 23.5 24 21V17L18 20L12 17Z" fill="white" opacity="0.9"/>
+          <path d="M25 14.5V20.5L26.5 21.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="28" cy="8" r="2.5" fill="#f59e0b" class="animate-dot-pulse"/>
         </svg>
-        <span class="font-bold text-xl text-slate-900">Mbem<span class="text-blue-600">Nova</span></span>
+        <span class="font-bold text-xl text-slate-900">Smart<span class="text-blue-600">Learn</span></span>
       </a>
       <h1 class="text-2xl font-black text-slate-900 mb-1">Créer votre compte</h1>
       <p class="text-slate-500 text-sm mb-8">Gratuit. Aucune carte bancaire requise.</p>
@@ -125,7 +127,7 @@ const pwdMatch = (c: AbstractControl) => {
         <label class="flex items-start gap-2.5 cursor-pointer">
           <input type="checkbox" formControlName="consent" class="w-4 h-4 rounded mt-0.5 text-blue-600 border-slate-300 focus:ring-blue-500 shrink-0">
           <span class="text-sm text-slate-600 leading-relaxed">
-            J'accepte la <a routerLink="/politique-confidentialite" target="_blank" class="link font-medium">politique de confidentialité</a> de MbemNova.
+            J'accepte la <a routerLink="/politique-confidentialite" target="_blank" class="link font-medium">politique de confidentialité</a> de SmartLearn.
           </span>
         </label>
         @if (s && form.get('consent')?.hasError('required')) {

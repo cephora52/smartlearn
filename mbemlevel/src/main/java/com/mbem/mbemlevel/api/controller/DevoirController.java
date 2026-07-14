@@ -30,7 +30,7 @@ public class DevoirController {
     public ResponseEntity<ApiResponse<DevoirResponse>> publier(
             @PathVariable UUID sessionId,
             @Valid @RequestBody EnvoyerDevoirRequest req) {
-        var d = envoyerUC.executer(sessionId, req.moduleId(), req.titre(),
+        var d = envoyerUC.executer(sessionId, req.titre(),
             req.consignes(), req.dateRemise());
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok(DevoirResponse.from(d), "Devoir publié !"));

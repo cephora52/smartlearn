@@ -35,7 +35,7 @@ import { AuthService }  from '../../../core/services/auth.service';
         <text x="36" y="150" text-anchor="middle" font-size="13" fill="#f59e0b">🏆</text>
       </svg>
       <h2 class="text-2xl font-bold text-white mb-3">Continuez votre apprentissage</h2>
-      <p class="text-blue-200 text-sm leading-relaxed mb-8">Accédez à vos cours, suivez votre progression et rejoignez la communauté MbemNova.</p>
+      <p class="text-blue-200 text-sm leading-relaxed mb-8">Accédez à vos cours, suivez votre progression et rejoignez la communauté SmartLearn.</p>
       <div class="flex justify-center gap-8">
         @for (s of [['247+','apprenants'],['6','formations'],['95%','satisfaction']]; track s[0]) {
           <div class="text-center">
@@ -52,11 +52,13 @@ import { AuthService }  from '../../../core/services/auth.service';
     <div class="w-full max-w-sm animate-fade-up">
       <a routerLink="/" class="inline-flex items-center gap-2.5 mb-10 group">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none" class="group-hover:scale-105 transition-transform" aria-hidden="true">
-          <circle cx="18" cy="18" r="18" fill="#2563eb"/>
-          <path d="M8 26V11l10 8 10-8v15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <circle cx="28" cy="10" r="3" fill="#f59e0b" class="animate-dot-pulse"/>
+          <rect width="36" height="36" rx="10" fill="#2563eb"/>
+          <path d="M18 9L29 14L18 19L7 14L18 9Z" fill="white"/>
+          <path d="M12 17V21C12 23.5 14.7 25 18 25C21.3 25 24 23.5 24 21V17L18 20L12 17Z" fill="white" opacity="0.9"/>
+          <path d="M25 14.5V20.5L26.5 21.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="28" cy="8" r="2.5" fill="#f59e0b" class="animate-dot-pulse"/>
         </svg>
-        <span class="font-bold text-xl text-slate-900">Mbem<span class="text-blue-600">Nova</span></span>
+        <span class="font-bold text-xl text-slate-900">Smart<span class="text-blue-600">Learn</span></span>
       </a>
       <h1 class="text-2xl font-black text-slate-900 mb-1">Bon retour !</h1>
       <p class="text-slate-500 text-sm mb-8">Connectez-vous pour continuer votre parcours.</p>

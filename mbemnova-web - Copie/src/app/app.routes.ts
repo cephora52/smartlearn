@@ -247,7 +247,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/instructor/grading/grading.component')
             .then(m => m.GradingComponent),
-        title: 'Correction — MbemNova',
+        title: 'Correction — SmartLearn',
+      },
+      // Mes formations formateur
+      {
+        path: 'formations',
+        loadComponent: () =>
+          import('./features/instructor/formations/formations.component')
+            .then(m => m.FormationsComponent),
+        title: 'Mes formations — SmartLearn',
       },
     ],
   },

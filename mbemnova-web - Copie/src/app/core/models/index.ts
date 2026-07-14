@@ -114,6 +114,7 @@ export interface CoursResponse {
   slug: string;
   formateurNom?: string;
   categorieNom?: string;
+  completionRate?: number | null;
 }
 
 // ── CoursDetailResponse (s21 — arbre complet) ──────────────
@@ -130,7 +131,6 @@ export interface CoursDetailResponse {
   imageCouvertureThumbnail: string | null;
   slug: string;
   statut: string;
-  nbModules: number;
   nbLecons: number;
   dureeTotaleMinutes: number;
   nbApprenants: number;
@@ -138,21 +138,16 @@ export interface CoursDetailResponse {
   nbAvis: number;
   prixFcfa: number;
   seuilPaiement: number;
-  modules: ModuleDetail[];
+  lecons: LeconDetail[];
   sessionsDisponibles: SessionSommaireResponse[];
   progressionApprenant: ProgressionApprenanteResponse | null;
   formateurNom?: string;
+  formateurId?: string;
   categorieNom?: string;
-}
-export interface ModuleDetail {
-  id: string;
-  titre: string;
-  sortOrder: number;
-  lecons: LeconDetail[];
 }
 export interface LeconDetail {
   id: string;
-  moduleId: string;
+  coursId: string;
   titre: string;
   typeContenu: 'TEXTE' | 'VIDEO' | 'PDF' | 'QCM';
   contenu: string | null;

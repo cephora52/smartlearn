@@ -11,7 +11,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LeconDetailResponse(
     UUID                      id,
-    UUID                      moduleId,
+    UUID                      coursId,
     String                    titre,
     String                    descriptionCourte,
     int                       ordre,

@@ -17,12 +17,14 @@ const pwdMatch = (c: AbstractControl) => {
 <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
   <div class="w-full max-w-sm animate-fade-up">
     <a routerLink="/" class="inline-flex items-center gap-2.5 mb-10 group">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" class="group-hover:scale-105 transition-transform" aria-hidden="true">
-        <circle cx="18" cy="18" r="18" fill="#2563eb"/>
-        <path d="M8 26V11l10 8 10-8v15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <circle cx="28" cy="10" r="3" fill="#f59e0b" class="animate-dot-pulse"/>
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none" class="group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+        <rect width="36" height="36" rx="10" fill="#2563eb"/>
+        <path d="M18 9L29 14L18 19L7 14L18 9Z" fill="white"/>
+        <path d="M12 17V21C12 23.5 14.7 25 18 25C21.3 25 24 23.5 24 21V17L18 20L12 17Z" fill="white" opacity="0.9"/>
+        <path d="M25 14.5V20.5L26.5 21.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="28" cy="8" r="2.5" fill="#f59e0b" class="animate-dot-pulse"/>
       </svg>
-      <span class="font-bold text-xl text-slate-900">Mbem<span class="text-blue-600">Nova</span></span>
+      <span class="font-bold text-xl text-slate-900">Smart<span class="text-blue-600">Learn</span></span>
     </a>
 
     @if (!tokenValid()) {

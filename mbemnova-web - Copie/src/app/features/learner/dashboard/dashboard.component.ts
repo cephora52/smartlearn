@@ -272,7 +272,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getCoursTitle(id: string): string {
-    return this.tousLesCours().find(c => c.id === id)?.titre ?? 'Formation MbemX';
+    return this.tousLesCours().find(c => c.id === id)?.titre ?? 'Formation SmartLearn';
   }
 
   getCoursSlug(id: string): string {

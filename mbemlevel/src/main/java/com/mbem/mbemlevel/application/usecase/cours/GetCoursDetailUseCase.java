@@ -33,14 +33,14 @@ import java.util.*;
 public class GetCoursDetailUseCase {
 
     private final CoursJpaRepository        coursRepo;
-    private final ModuleJpaRepository       moduleRepo;
-    private final LeconJpaRepository        leconRepo;
+    private final LeconJpaRepository         leconRepo;
     private final SessionJpaRepository      sessionRepo;
     private final AvisCoursJpaRepository    avisRepo;
     private final ProgressionJpaRepository  progressionRepo;
     private final UtilisateurJpaRepository  utilisateurRepo;
     private final CategorieJpaRepository    categorieRepo;
     private final ObjectMapper              objectMapper;
+    private final com.mbem.mbemlevel.application.port.out.StoragePort storagePort;
 
     @Transactional(readOnly = true)
     public CoursDetailResponse executer(UUID coursId, UUID apprenantId) {
@@ -59,14 +59,15 @@ public class GetCoursDetailUseCase {
     private CoursDetailResponse executerPourCours(CoursJpaEntity cours, UUID apprenantId) {
         UUID coursId = cours.getId();
 
+        boolean isFormateur = apprenantId != null && apprenantId.equals(cours.getFormateurId());
+        boolean isAdmin = false;
+        if (apprenantId != null) {
+            isAdmin = utilisateurRepo.findById(apprenantId)
+                .map(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.ADMIN || u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.SUPER_ADMIN)
+                .orElse(false);
+        }
+
         if (!"PUBLIE".equals(cours.getStatut())) {
-            boolean isFormateur = apprenantId != null && apprenantId.equals(cours.getFormateurId());
-            boolean isAdmin = false;
-            if (apprenantId != null) {
-                isAdmin = utilisateurRepo.findById(apprenantId)
-                    .map(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.ADMIN || u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.SUPER_ADMIN)
-                    .orElse(false);
-            }
             if (!isFormateur && !isAdmin) {
                 throw new RuntimeException("ACCESS_DENIED: Ce cours n'est pas accessible.");
             }
@@ -79,57 +80,45 @@ public class GetCoursDetailUseCase {
                 .findByApprenantIdAndCoursId(apprenantId, coursId)
                 .orElse(null);
         }
-        final boolean estPaye = progression != null && progression.isEstPaye();
+        final boolean estPaye = (progression != null && progression.isEstPaye()) || isFormateur || isAdmin;
 
-        // ── 3. Modules et leçons ─────────────────────────────────────────────
-        List<ModuleJpaEntity> modules = moduleRepo.findByCoursIdOrderByOrdreAsc(coursId);
+        // ── 3. Leçons ────────────────────────────────────────────────────────
+        List<LeconJpaEntity> lecons = leconRepo.findByCoursIdOrderByOrdreAsc(coursId);
 
         // Compter les leçons terminées par l'apprenant
         Set<UUID> leconsTerminees = progression != null
             ? getLeconIdsTerminees(apprenantId, coursId)
             : Set.of();
 
-        List<ModuleResponse> modulesResp = modules.stream().map(m -> {
-            List<LeconJpaEntity> lecons = leconRepo.findByModuleIdOrderByOrdreAsc(m.getId());
+        int totalLecons = lecons.size();
+        double seuilVal = cours.getSeuilPaiement().doubleValue();
+        int maxLeconsGratuites = (int) Math.ceil(totalLecons * seuilVal);
 
-            // Un module est verrouillé si l'apprenant n'a pas payé ET le module n'est pas gratuit
-            boolean moduleVerrouille = !estPaye && !m.isEstGratuit();
+        List<LeconSommaireResponse> leconsResp = new ArrayList<>();
+        for (int i = 0; i < totalLecons; i++) {
+            LeconJpaEntity l = lecons.get(i);
+            boolean estDansSeuilGratuit = (i < maxLeconsGratuites);
+            boolean accessible = l.isEstPreview() || estDansSeuilGratuit || estPaye;
+            boolean estVerrouille = !accessible;
 
-            List<LeconSommaireResponse> leconsResp = lecons.stream().map(l -> {
-                // Une leçon est accessible si :
-                // - le module est gratuit
-                // - ou la leçon est marquée preview
-                // - ou l'apprenant a payé
-                boolean accessible = m.isEstGratuit() || l.isEstPreview() || estPaye;
-                boolean estVerrouille = !accessible;
+            String typeContenu = "TEXTE";
+            if (l.isAQCM()) {
+                typeContenu = "QCM";
+            } else if (l.getLienVideo() != null && !l.getLienVideo().isBlank()) {
+                typeContenu = "VIDEO";
+            } else if (l.getLienPdf() != null && !l.getLienPdf().isBlank()) {
+                typeContenu = "PDF";
+            }
 
-                String typeContenu = "TEXTE";
-                if (l.isAQCM()) {
-                    typeContenu = "QCM";
-                } else if (l.getLienVideo() != null && !l.getLienVideo().isBlank()) {
-                    typeContenu = "VIDEO";
-                } else if (l.getLienPdf() != null && !l.getLienPdf().isBlank()) {
-                    typeContenu = "PDF";
-                }
-
-                return new LeconSommaireResponse(
-                    l.getId(), l.getTitre(), l.getOrdre(),
-                    l.getDureeMinutes(), l.getXpValeur(),
-                    l.isEstPreview(), l.isAQCM(),
-                    apprenantId != null ? leconsTerminees.contains(l.getId()) : null,
-                    estVerrouille,
-                    typeContenu
-                );
-            }).toList();
-
-            return new ModuleResponse(
-                m.getId(), m.getTitre(), m.getDescription(),
-                m.getOrdre(), m.getXpBonus(), m.isEstGratuit(),
-                moduleVerrouille,
-                m.getNbLecons(), m.getDureeTotaleMinutes(),
-                leconsResp
-            );
-        }).toList();
+            leconsResp.add(new LeconSommaireResponse(
+                l.getId(), l.getTitre(), l.getOrdre(),
+                l.getDureeMinutes(), l.getXpValeur(),
+                l.isEstPreview(), l.isAQCM(),
+                apprenantId != null ? leconsTerminees.contains(l.getId()) : null,
+                estVerrouille,
+                typeContenu
+            ));
+        }
 
         // ── 4. Sessions disponibles ───────────────────────────────────────────
         List<CoursDetailResponse.SessionSommaireResponse> sessions =
@@ -186,18 +175,25 @@ public class GetCoursDetailUseCase {
                 .orElse("Non spécifié");
         }
 
+        String imageCouvertureUrl = cours.getImageCouverture() != null && !cours.getImageCouverture().isBlank()
+            ? storagePort.presignedUrl(cours.getImageCouverture())
+            : null;
+        String imageCouvertureThumbnailUrl = cours.getImageCouvertureThumbnail() != null && !cours.getImageCouvertureThumbnail().isBlank()
+            ? storagePort.presignedUrl(cours.getImageCouvertureThumbnail())
+            : null;
+
         return new CoursDetailResponse(
             cours.getId(), cours.getTitre(),
             cours.getDescriptionCourte(), cours.getDescriptionLongue(),
             cours.getNiveau(), cours.getLangue(),
-            cours.getImageCouverture(), cours.getImageCouvertureThumbnail(),
+            imageCouvertureUrl, imageCouvertureThumbnailUrl,
             cours.getSlug(),
-            formateurNom, categorieNom,
-            cours.getNbModules(), cours.getNbLecons(), cours.getDureeTotaleMinutes(),
+            formateurNom, cours.getFormateurId(), categorieNom,
+            cours.getNbLecons(), cours.getDureeTotaleMinutes(),
             cours.getNbApprenants(), cours.getNoteMoyenne(), cours.getNbAvis(),
             cours.getPrixFcfa(), cours.getSeuilPaiement().doubleValue(),
             objectifs, cours.getPrerequis(), cours.getPublicCible(),
-            debouches, modulesResp, sessions, dist, avisRecents,
+            debouches, leconsResp, sessions, dist, avisRecents,
             progResp, cours.getStatut()
         );
     }

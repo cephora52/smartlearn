@@ -11,11 +11,23 @@ import { Injectable, signal } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class TokenService {
-  readonly #token = signal<string | null>(null);
+  readonly #token = signal<string | null>(
+    typeof window !== 'undefined' ? sessionStorage.getItem('mn_at') : null
+  );
 
-  set(t: string):   void { this.#token.set(t); }
+  set(t: string):   void { 
+    this.#token.set(t); 
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mn_at', t);
+    }
+  }
   get():  string | null  { return this.#token(); }
-  clear():          void { this.#token.set(null); }
+  clear():          void { 
+    this.#token.set(null); 
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('mn_at');
+    }
+  }
   has():         boolean { return this.#token() !== null; }
 
   /** Décodage payload JWT (sans vérification signature — côté serveur uniquement) */

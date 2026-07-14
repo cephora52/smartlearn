@@ -8,13 +8,15 @@ import {
 } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { CourseService } from '../../../core/services/course.service';
 import type { CoursResponse, NiveauCours } from '../../../core/models';
+import { CourseCardComponent } from '../../../shared/components/course-card/course-card.component';
 
 @Component({
   selector: 'app-catalog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, CommonModule, CourseCardComponent],
   template: `
     <div class="min-h-screen bg-white">
       <!-- Header section sombre -->
@@ -81,9 +83,31 @@ import type { CoursResponse, NiveauCours } from '../../../core/models';
                         class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                       />
                       <span
-                        class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-2"
                       >
-                        <span aria-hidden="true">{{ dom.icon }}</span>
+                        @switch (dom.value) {
+                          @case ('') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                          }
+                          @case ('11111111-1111-1111-1111-111111111111') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/><line x1="12" y1="17" x2="12" y2="20"/></svg>
+                          }
+                          @case ('22222222-2222-2222-2222-222222222222') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+                          }
+                          @case ('33333333-3333-3333-3333-333333333333') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.03345 19.177 5.14143 19.4189 5.14143 19.6735C5.14143 20.9584 6.18306 22 7.46794 22H12Z"/><circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16.5" cy="9.5" r="1.5" fill="currentColor"/></svg>
+                          }
+                          @case ('44444444-4444-4444-4444-444444444444') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                          }
+                          @case ('55555555-5555-5555-5555-555555555555') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                          }
+                          @case ('66666666-6666-6666-6666-666666666666') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                          }
+                        }
                         {{ dom.label }}
                       </span>
                     </label>
@@ -108,9 +132,22 @@ import type { CoursResponse, NiveauCours } from '../../../core/models';
                         class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500"
                       />
                       <span
-                        class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-1.5"
+                        class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors flex items-center gap-2"
                       >
-                        <span aria-hidden="true">{{ n.icon }}</span>
+                        @switch (n.value) {
+                          @case ('') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                          }
+                          @case ('DEBUTANT') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8A7 7 0 0 1 11 20z"/><path d="M9 22V12"/></svg>
+                          }
+                          @case ('INTERMEDIAIRE') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                          }
+                          @case ('AVANCE') {
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400 group-hover:text-blue-600 transition-colors"><path d="M4.5 16.5c-1.5 1.26-2.5 3.5-2.5 3.5s2.24-1 3.5-2.5L18 5l-8.5 8.5-5 3z"/><path d="M12 9l6-6 3 3-6 6-3-3z"/></svg>
+                          }
+                        }
                         {{ n.label }}
                       </span>
                     </label>
@@ -198,92 +235,10 @@ import type { CoursResponse, NiveauCours } from '../../../core/models';
             @if (!loading() && cours().length > 0) {
               <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 @for (c of cours(); track c.id; let i = $index) {
-                  <a
-                    [routerLink]="['/cours', c.slug]"
-                    class="group flex flex-col bg-white rounded-2xl border border-slate-200
-                        hover:border-blue-200 hover:shadow-lg transition-all duration-200 overflow-hidden animate-fade-up"
-                    [style]="'animation-delay:' + i * 40 + 'ms'"
-                    [attr.aria-label]="c.titre"
-                  >
-                    <div class="h-36 relative overflow-hidden bg-slate-100">
-                      @if (c.imageCouvertureThumbnail) {
-                        <img [src]="c.imageCouvertureThumbnail" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" alt="couverture">
-                      } @else {
-                        <div [class]="'absolute inset-0 ' + levelGradient(c.niveau)"></div>
-                      }
-                      <div
-                        class="absolute inset-0 opacity-10"
-                        style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:20px 20px"
-                        aria-hidden="true"
-                      ></div>
-                      <div class="absolute top-3 left-3">
-                        <span
-                          class="bg-black/25 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full"
-                        >
-                          {{ levelEmoji(c.niveau) }} {{ levelLabel(c.niveau) }}
-                        </span>
-                      </div>
-                      @if (c.noteMoyenne) {
-                        <div
-                          class="absolute bottom-3 right-3 flex items-center gap-1 bg-black/25 backdrop-blur-sm rounded-full px-2 py-0.5"
-                        >
-                          <svg
-                            width="10"
-                            height="10"
-                            viewBox="0 0 24 24"
-                            fill="#fbbf24"
-                            aria-hidden="true"
-                          >
-                            <polygon
-                              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                            />
-                          </svg>
-                          <span class="text-white text-xs font-bold">{{ c.noteMoyenne }}</span>
-                        </div>
-                      }
-                    </div>
-
-                    <div class="flex-1 flex flex-col p-4">
-                      <div class="flex items-center gap-2 mb-1.5">
-                        @if (c.formateurNom) {
-                          <span class="text-[11px] font-semibold text-slate-600">Par {{ c.formateurNom }}</span>
-                        }
-                        @if (c.categorieNom) {
-                          @if (c.formateurNom) { <span class="text-[10px] text-slate-400">·</span> }
-                          <span class="text-[10px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-bold">{{ c.categorieNom }}</span>
-                        }
-                      </div>
-                      <h3
-                        class="font-bold text-slate-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors"
-                      >
-                        {{ c.titre }}
-                      </h3>
-                      <p class="text-xs text-slate-500 line-clamp-2 mb-3 flex-1 leading-relaxed">
-                        {{ c.descriptionCourte }}
-                      </p>
-
-                      <div class="flex items-center gap-3 text-xs text-slate-400 mb-3">
-                        <span>{{ c.nbLecons }} leçons</span>
-                        <span>·</span>
-                        <span>{{ Math.floor(c.dureeTotaleMinutes / 60) }}h</span>
-                        <span class="ml-auto font-bold text-slate-700">
-                          {{ c.prixFcfa === 0 ? 'Gratuit' : c.prixFcfa + ' FCFA' }}
-                        </span>
-                          <!-- {{ c.prixFcfa | number: '1.0-0' }} FCFA</span> -->
-                      </div>
-
-                      <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1.5">
-                        <div
-                          class="h-full bg-green-500 rounded-full"
-                          [style.width.%]="c.seuilPaiement * 100"
-                        ></div>
-                      </div>
-                      <p class="text-xs text-green-600 font-medium">
-                        {{ c.seuilPaiement * 100  }}% gratuit
-                        <!-- {{ c.seuilPaiement * 100 | number: '1.0-0' }}% gratuit -->
-                      </p>
-                    </div>
-                  </a>
+                  <app-course-card
+                    [course]="c"
+                    [delay]="i * 40"
+                  ></app-course-card>
                 }
               </div>
 
@@ -439,19 +394,5 @@ export class CatalogComponent implements OnInit {
     this.load();
   }
 
-  levelGradient(n: string): string {
-    return (
-      {
-        DEBUTANT: 'bg-gradient-to-br from-emerald-500 to-green-700',
-        INTERMEDIAIRE: 'bg-gradient-to-br from-blue-500 to-indigo-700',
-        AVANCE: 'bg-gradient-to-br from-purple-600 to-violet-700',
-      }[n] ?? 'bg-blue-700'
-    );
-  }
-  levelEmoji(n: string): string {
-    return { DEBUTANT: '🌱', INTERMEDIAIRE: '⚡', AVANCE: '🚀' }[n] ?? '📚';
-  }
-  levelLabel(n: string): string {
-    return { DEBUTANT: 'Débutant', INTERMEDIAIRE: 'Intermédiaire', AVANCE: 'Avancé' }[n] ?? n;
-  }
+
 }

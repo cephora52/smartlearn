@@ -30,12 +30,11 @@ public class LeconController {
      * Retourne les blocs ordonnés (texte, image, vidéo, PDF, code, callout)
      * et le QCM de la leçon si présent (sans la bonne réponse).
      */
-    @GetMapping("/{coursId}/modules/{moduleId}/lecons/{leconId}")
+    @GetMapping("/{coursId}/lecons/{leconId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Contenu complet d'une leçon (S6)")
     public ResponseEntity<ApiResponse<LeconDetailResponse>> getLecon(
             @PathVariable UUID coursId,
-            @PathVariable UUID moduleId,
             @PathVariable UUID leconId,
             @AuthenticationPrincipal String userId) {
         UUID apprenantId = userId != null ? UUID.fromString(userId) : null;
