@@ -87,4 +87,34 @@ public class Progression extends AggregateRoot {
     public int           getXpGagne()       { return xpGagne; }
     public LocalDateTime getDateDebut()     { return dateDebut; }
     public LocalDateTime getDateCompletion(){ return dateCompletion; }
+    public double        getSeuilPaiementCours() { return seuilPaiementCours; }
+
+    private String leconsTerminees;
+
+    public String getLeconsTerminees() {
+        return leconsTerminees;
+    }
+
+    public void setLeconsTerminees(String leconsTerminees) {
+        this.leconsTerminees = leconsTerminees;
+    }
+
+    public boolean isLeconTerminee(UUID leconId) {
+        if (leconsTerminees == null || leconsTerminees.isBlank()) {
+            return false;
+        }
+        return leconsTerminees.contains(leconId.toString());
+    }
+
+    public void marquerLeconTerminee(UUID leconId) {
+        if (isLeconTerminee(leconId)) {
+            return;
+        }
+        if (leconsTerminees == null || leconsTerminees.isBlank()) {
+            leconsTerminees = leconId.toString();
+        } else {
+            leconsTerminees = leconsTerminees + "," + leconId.toString();
+        }
+        markUpdated();
+    }
 }

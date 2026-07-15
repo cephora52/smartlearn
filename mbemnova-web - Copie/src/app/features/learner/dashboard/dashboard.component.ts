@@ -76,6 +76,16 @@ export class DashboardComponent implements OnInit {
     return this.tousLesCours().filter(c => !ids.includes(c.id)).slice(0, 4);
   });
 
+  readonly mesFormationsAffichees = computed(() => {
+    const all = this.progressions();
+    const sorted = [...all].sort((a, b) => {
+      const t1 = a.dateDebut ? new Date(a.dateDebut).getTime() : 0;
+      const t2 = b.dateDebut ? new Date(b.dateDebut).getTime() : 0;
+      return t2 - t1;
+    });
+    return sorted.slice(0, 3);
+  });
+
   readonly hasPaiementEnAttente = computed(() =>
     this.progressions().some(p => p.seuilAtteint && !p.estPaye)
   );
@@ -202,7 +212,10 @@ export class DashboardComponent implements OnInit {
   #loadProgressions(): void {
     this.#progressSvc.getAll().subscribe({
       next: r => {
-        if (r.success && r.data?.content?.length) this.progressions.set(r.data.content);
+        if (r.success && r.data) {
+          const list = (r.data as any).content || r.data;
+          if (Array.isArray(list)) this.progressions.set(list);
+        }
         this.progressionLoading.set(false);
       },
       error: () => { this.progressionLoading.set(false); },

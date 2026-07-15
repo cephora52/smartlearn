@@ -89,10 +89,10 @@ import { MOCK_PROFIL } from '../../../core/services/mock.data';
                 <code class="text-xs font-mono text-slate-600 flex-1">{{ cert.codeVerification }}</code>
               </div>
               <div class="flex gap-2">
-                <a [href]="cert.lienPdf" target="_blank" rel="noopener" class="btn-primary btn-sm flex-1 justify-center">
+                <button (click)="downloadCert(cert)" class="btn-primary btn-sm flex-1 justify-center cursor-pointer">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   PDF
-                </a>
+                </button>
                 <a [routerLink]="['/certificat/verifier', cert.codeVerification]"
                    class="btn-secondary btn-sm flex-1 justify-center">
                   Vérifier
@@ -138,6 +138,13 @@ export class CertificateComponent implements OnInit {
       navigator.clipboard.writeText(text).then(() =>
         this.#toast.success('Lien copié !', 'Partagez votre certificat sur WhatsApp ou LinkedIn.')
       );
+    }
+  }
+
+  downloadCert(cert: CertificatResponse): void {
+    if (typeof window !== 'undefined') {
+      const url = `${window.location.origin}/certificat/verifier/${cert.codeVerification}?print=true`;
+      window.open(url, '_blank');
     }
   }
 

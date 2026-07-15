@@ -3,6 +3,8 @@ package com.mbem.mbemlevel.application.usecase.paiement;
 import com.mbem.mbemlevel.api.dto.request.TraiterMoratoireRequest;
 import com.mbem.mbemlevel.application.port.out.*;
 import com.mbem.mbemlevel.domain.paiement.Moratoire;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.CoursJpaRepository;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.UtilisateurJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -12,10 +14,6 @@ import java.util.UUID;
 
 /**
  * S17 — L'admin traite une demande de moratoire.
- *
- * CORRECTION s23 :
- *   - moratoire.accorder() prend maintenant (UUID, LocalDate)
- *   - moratoire.refuser() prend (UUID, String) — inchangé
  */
 @Service
 @RequiredArgsConstructor
@@ -25,6 +23,11 @@ public class TraiterMoratoireUseCase {
     private final MoratoireRepository      moratoireRepo;
     private final TrancheRepository        trancheRepo;
     private final ApplicationEventPublisher eventBus;
+    private final PaiementRepository       paiementRepo;
+    private final NotificationRepository   notificationRepo;
+    private final CoursJpaRepository        coursRepo;
+    private final UtilisateurJpaRepository  utilisateurRepo;
+    private final EmailPort                emailPort;
 
     @Transactional
     public void executer(UUID moratoireId, TraiterMoratoireRequest req, UUID adminId) {
@@ -35,32 +38,77 @@ public class TraiterMoratoireUseCase {
             throw new RuntimeException("BUSINESS_RULE:MORATOIRE_DEJA_TRAITE");
         }
 
-        if ("ACCORDE".equals(req.decision())) {
+        var paiement = paiementRepo.findById(moratoire.getPaiementId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:PAIEMENT"));
+        var student = utilisateurRepo.findById(paiement.getApprenantId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:LEARNER"));
+        var cours = coursRepo.findById(paiement.getCoursId())
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS"));
+
+        if ("APPROUVE".equals(req.decision()) || "ACCORDE".equals(req.decision())) {
             if (req.nouvelleDateAccordee() == null) {
                 throw new RuntimeException("VALIDATION:nouvelle_date_obligatoire_si_accorde");
             }
 
-            // CORRECTION : accorder(UUID, LocalDate) — conforme au domain corrigé
             moratoire.accorder(adminId, req.nouvelleDateAccordee());
             moratoireRepo.save(moratoire);
 
             // Mettre à jour la date d'échéance de la prochaine tranche
             trancheRepo.updateDateEcheance(moratoire.getPaiementId(), req.nouvelleDateAccordee());
 
+            // Notification in-app
+            var notif = com.mbem.mbemlevel.domain.notification.Notification.creer(
+                paiement.getApprenantId(),
+                com.mbem.mbemlevel.domain.shared.enums.TypeNotification.INFO,
+                com.mbem.mbemlevel.domain.shared.enums.CanalNotification.IN_APP,
+                "Demande de délai acceptée",
+                "Votre demande de délai pour la formation '" + cours.getTitre() + "' a été acceptée. Nouvelle date : " + req.nouvelleDateAccordee(),
+                "/apprenant/formations"
+            );
+            notificationRepo.save(notif);
+
+            // Envoi email
+            try {
+                emailPort.envoyerMoratoireApprouve(
+                    student.getEmail(), student.getPrenom(), cours.getTitre(), req.nouvelleDateAccordee().toString()
+                );
+            } catch (Exception ex) {
+                log.error("[MORATOIRE] Erreur envoi email approbation: {}", ex.getMessage());
+            }
+
             eventBus.publishEvent(new MoratoireDecideEvent(
-                moratoireId, moratoire.getPaiementId(), "ACCORDE",
+                moratoireId, moratoire.getPaiementId(), "APPROUVE",
                 req.nouvelleDateAccordee().toString(), null
             ));
-            log.info("[MORATOIRE] Accordé: {} → {}", moratoireId, req.nouvelleDateAccordee());
+            log.info("[MORATOIRE] Approuvé: {} → {}", moratoireId, req.nouvelleDateAccordee());
 
         } else if ("REFUSE".equals(req.decision())) {
             if (req.justificationRefus() == null || req.justificationRefus().isBlank()) {
                 throw new RuntimeException("VALIDATION:justification_obligatoire_si_refuse");
             }
 
-            // refuser(UUID, String) — inchangé
             moratoire.refuser(adminId, req.justificationRefus());
             moratoireRepo.save(moratoire);
+
+            // Notification in-app
+            var notif = com.mbem.mbemlevel.domain.notification.Notification.creer(
+                paiement.getApprenantId(),
+                com.mbem.mbemlevel.domain.shared.enums.TypeNotification.INFO,
+                com.mbem.mbemlevel.domain.shared.enums.CanalNotification.IN_APP,
+                "Demande de délai refusée",
+                "Votre demande de délai pour la formation '" + cours.getTitre() + "' a été refusée. Justification : " + req.justificationRefus(),
+                "/apprenant/formations"
+            );
+            notificationRepo.save(notif);
+
+            // Envoi email
+            try {
+                emailPort.envoyerMoratoireRefuse(
+                    student.getEmail(), student.getPrenom(), cours.getTitre(), req.justificationRefus()
+                );
+            } catch (Exception ex) {
+                log.error("[MORATOIRE] Erreur envoi email refus: {}", ex.getMessage());
+            }
 
             eventBus.publishEvent(new MoratoireDecideEvent(
                 moratoireId, moratoire.getPaiementId(), "REFUSE",

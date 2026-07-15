@@ -8,16 +8,14 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ThemeService }       from '../../../core/services/theme.service';
 import { ThemeToggleComponent }from '../../../shared/components/theme-toggle/theme-toggle.component';
 import { CourseService }      from '../../../core/services/course.service';
-import { ProgressionService } from '../../../core/services/progression.service';
 import { QcmService }         from '../../../core/services/qcm.service';
 import { ToastService }       from '../../../core/services/toast.service';
 import type {
   CoursDetailResponse, LeconDetail,
 } from '../../../core/models';
-import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
 
 @Component({
-  selector: 'app-course-player',
+  selector: 'app-instructor-course-player',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, ThemeToggleComponent],
   styles: [`
@@ -51,9 +49,6 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
       padding:.875rem 1.125rem; border-radius:0 10px 10px 0;
       color:#1e40af; margin:1.375rem 0; font-size:.9rem;
     }
-    /* Numérotation ordonnée -->
-    .lesson-body ol { list-style:decimal; }
-    .lesson-body ol li::marker { color:#2563eb; font-weight:600; }
 
     /* Mode sombre */
     .dark .lesson-body h2 { color:#f1f5f9; }
@@ -67,7 +62,6 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
     .dark .lesson-body .tip  { background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
   `],
   template: `
-<!-- Le player prend TOUT l'écran — pas de navbar globale visible -->
 <div [class]="'flex flex-col h-screen transition-colors duration-200 '
               + (dark() ? 'bg-slate-950 text-slate-100' : 'bg-white text-slate-900')"
      [attr.data-theme]="dark() ? 'dark' : 'light'">
@@ -79,11 +73,11 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
                    + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200')">
 
     <!-- Retour -->
-    <a routerLink="/catalogue"
+    <a routerLink="/instructor/formations"
        [class]="'flex items-center gap-1.5 text-sm shrink-0 transition-colors '
                 + (dark() ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      <span class="hidden sm:inline">Catalogue</span>
+      <span class="hidden sm:inline">Mes formations</span>
     </a>
 
     <div [class]="'w-px h-5 ' + (dark() ? 'bg-slate-700' : 'bg-slate-200')" aria-hidden="true"></div>
@@ -94,29 +88,10 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
       @if (detail()) { {{ detail()!.titre }} }
     </h1>
 
-    <!-- Progression -->
-    @if (progression()) {
-      <div class="hidden sm:flex items-center gap-2.5 shrink-0">
-        <div [class]="'w-32 h-1.5 rounded-full overflow-hidden ' + (dark() ? 'bg-slate-700' : 'bg-slate-200')">
-          <div class="h-full bg-blue-500 rounded-full transition-all duration-500"
-               [style.width.%]="progression()!.pourcentage"></div>
-        </div>
-        <span class="text-xs font-bold text-blue-500">{{ progression()!.pourcentage }}%</span>
-      </div>
-    }
-
-    <!-- XP Badge -->
-    @if (totalXP() > 0) {
-      <div [class]="'hidden sm:flex items-center gap-1.5 rounded-lg px-2.5 py-1 border shrink-0 '
-                    + (dark()
-                    ? 'bg-amber-500/10 border-amber-500/20'
-                    : 'bg-amber-50 border-amber-200')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span [class]="'text-xs font-bold ' + (dark() ? 'text-amber-400' : 'text-amber-600')">
-          {{ totalXP() }} XP
-        </span>
-      </div>
-    }
+    <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-full '
+                   + (dark() ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-700')">
+      Mode Formateur
+    </span>
 
     <!-- Toggle thème -->
     <app-theme-toggle />
@@ -160,19 +135,14 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
       <!-- Leçons -->
       <nav class="flex-1 py-2 overflow-y-auto space-y-0.5" aria-label="Leçons du cours">
         @for (lecon of detail()?.lecons ?? []; track lecon.id; let li = $index) {
-          <button (click)="!lecon.estVerrouille && selectLecon(lecon)"
-                  [disabled]="lecon.estVerrouille"
+          <button (click)="selectLecon(lecon)"
                   [class]="leconClass(lecon)"
                   [attr.aria-current]="activeLecon()?.id === lecon.id ? 'true' : null">
 
             <!-- Icône état -->
             <div class="shrink-0 w-4 flex items-center justify-center">
-              @if (lecon.estTerminee) {
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              } @else if (activeLecon()?.id === lecon.id) {
+              @if (activeLecon()?.id === lecon.id) {
                 <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              } @else if (lecon.estVerrouille) {
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               } @else if (lecon.typeContenu === 'VIDEO') {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               } @else if (lecon.typeContenu === 'QCM') {
@@ -185,12 +155,6 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
             <span class="flex-1 text-left leading-snug line-clamp-2">{{ li + 1 }}. {{ lecon.titre }}</span>
 
             <div class="flex items-center gap-1.5 shrink-0">
-              @if (!lecon.estVerrouille && !lecon.estTerminee) {
-                <span [class]="'text-xs font-medium px-1.5 py-0.5 rounded '
-                               + (dark() ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600')">
-                  Gratuit
-                </span>
-              }
               <span [class]="'text-xs ' + (dark() ? 'text-slate-600' : 'text-slate-400')">
                 {{ lecon.dureeMinutes }}m
               </span>
@@ -211,68 +175,8 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
                    + (dark() ? 'bg-slate-950' : 'bg-white')"
           id="lesson-scroll">
 
-      <!-- ── MUR DE PAIEMENT (S7) ──────────────────────── -->
-      @if (showPaywall()) {
-        <div class="flex items-center justify-center min-h-full p-6">
-          <div class="max-w-lg w-full text-center animate-scale-in">
-            <div [class]="'w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 '
-                          + (dark() ? 'bg-blue-600/10 border border-blue-500/20' : 'bg-blue-50 border border-blue-200')">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5" aria-hidden="true">
-                <rect x="3" y="11" width="18" height="11" rx="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                <circle cx="12" cy="16" r="1.5" fill="#3b82f6"/>
-              </svg>
-            </div>
-            <h2 [class]="'text-2xl font-black mb-3 ' + (dark() ? 'text-white' : 'text-slate-900')">
-              Continuez votre apprentissage !
-            </h2>
-            <p [class]="'mb-2 ' + (dark() ? 'text-slate-400' : 'text-slate-600')">
-              Vous avez complété
-              <span class="text-blue-500 font-bold">{{ progression()?.pourcentage ?? 0 }}%</span>
-              gratuitement.
-            </p>
-            <p [class]="'text-sm mb-8 ' + (dark() ? 'text-slate-500' : 'text-slate-500')">
-              Débloquez l'accès complet pour obtenir votre certificat.
-            </p>
-
-            <div [class]="'rounded-2xl p-6 mb-6 text-left border '
-                          + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm')">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <p [class]="'text-2xl font-black ' + (dark() ? 'text-white' : 'text-slate-900')">
-                    {{ (detail()?.prixFcfa ?? 0)   }} FCFA
-                    <!-- {{ (detail()?.prixFcfa ?? 0) | number:'1.0-0' }} FCFA -->
-                  </p>
-                  <p [class]="'text-xs ' + (dark() ? 'text-slate-500' : 'text-slate-400')">Accès à vie</p>
-                </div>
-                <span class="badge-green">Certifiant</span>
-              </div>
-              <ul class="space-y-2">
-                @for (av of paywallAvantages; track av) {
-                  <li [class]="'flex items-center gap-2 text-sm '
-                               + (dark() ? 'text-slate-400' : 'text-slate-600')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                    {{ av }}
-                  </li>
-                }
-              </ul>
-            </div>
-
-            <div class="flex flex-col gap-3">
-              <a routerLink="/app/paiements" class="btn-primary w-full justify-center py-3 text-base font-semibold">
-                Débloquer l'accès complet
-              </a>
-              <button (click)="showPaywall.set(false)"
-                      [class]="'text-sm transition-colors ' + (dark() ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600')">
-                Revoir les leçons gratuites
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-
       <!-- ── WELCOME SCREEN ────────────────────────────── -->
-      @if (!showPaywall() && !activeLecon()) {
+      @if (!activeLecon()) {
         <div class="flex items-center justify-center min-h-full p-6">
           <div class="text-center max-w-md animate-fade-up">
             <div [class]="'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 border '
@@ -283,13 +187,13 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
               </svg>
             </div>
             <h2 [class]="'text-xl font-bold mb-2 ' + (dark() ? 'text-white' : 'text-slate-900')">
-              Prêt à apprendre ?
+              Consultation de cours
             </h2>
             <p [class]="'text-sm mb-6 ' + (dark() ? 'text-slate-400' : 'text-slate-500')">
-              Sélectionnez une leçon dans le sommaire.
+              Sélectionnez une leçon dans le sommaire pour commencer la lecture.
             </p>
             <button (click)="startFirstLecon()" class="btn-primary px-6 py-2.5">
-              Commencer la première leçon
+              Commencer la lecture
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
@@ -297,22 +201,18 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
       }
 
       <!-- ── CONTENU LEÇON ─────────────────────────────── -->
-      @if (!showPaywall() && activeLecon()) {
+      @if (activeLecon()) {
         <div class="max-w-3xl mx-auto px-5 sm:px-8 py-8 pb-24">
 
           <!-- Breadcrumb -->
           <div [class]="'flex items-center gap-2 text-xs mb-5 ' + (dark() ? 'text-slate-500' : 'text-slate-400')">
-            <span>{{ activeModuleTitle() }}</span>
+            <span>Programme</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
             <span [class]="dark() ? 'text-slate-300' : 'text-slate-500'">Leçon {{ activeLeconIndex() + 1 }}</span>
             <div class="ml-auto flex items-center gap-3">
               <span class="flex items-center gap-1">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 {{ activeLecon()!.dureeMinutes }}min
-              </span>
-              <span [class]="'flex items-center gap-1 ' + (dark() ? 'text-amber-400' : 'text-amber-600')">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                +{{ activeLecon()!.xpReward }} XP
               </span>
             </div>
           </div>
@@ -341,13 +241,6 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
                              + (dark() ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-700')">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/></svg>
                 Lecture
-              </span>
-            }
-            @if (activeLecon()!.estTerminee) {
-              <span [class]="'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full '
-                             + (dark() ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-700')">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                Terminée
               </span>
             }
           </div>
@@ -393,7 +286,7 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
             </div>
           }
 
-          <!-- ── QCM INTERACTIF (S6) ───────────────────── -->
+          <!-- ── QCM INTERACTIF ────────────────────────── -->
           @if (activeLecon()!.aQuiz && currentQCM()) {
             <div [class]="'rounded-2xl p-6 mb-10 border '
                           + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
@@ -411,7 +304,7 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
                   </svg>
                 </div>
                 <span [class]="'font-bold ' + (dark() ? 'text-slate-200' : 'text-slate-900')">
-                  Quiz de validation
+                  Quiz de validation (Aperçu)
                 </span>
                 @if (qcmResult()) {
                   <span [class]="'ml-auto badge ' + (qcmResult()!.estCorrect ? 'badge-green' : 'badge-red')">
@@ -470,104 +363,54 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
           }
 
           <!-- ── NAVIGATION ─────────────────────────────── -->
-          @if (!activeLecon()!.aQuiz || qcmResult()?.leconValidee || !currentQCM()) {
-            <div [class]="'flex items-center justify-between gap-4 pt-8 border-t '
-                          + (dark() ? 'border-slate-800' : 'border-slate-100')">
-              <button (click)="prevLecon()" [disabled]="!hasPrev()"
-                      [class]="'btn border btn-sm ' + (dark()
-                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
-                        : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200')
-                        + (hasPrev() ? '' : ' opacity-30 cursor-not-allowed')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Précédent
-              </button>
+          <div [class]="'flex items-center justify-between gap-4 pt-8 border-t '
+                        + (dark() ? 'border-slate-800' : 'border-slate-100')">
+            <button (click)="prevLecon()" [disabled]="!hasPrev()"
+                    [class]="'btn border btn-sm ' + (dark()
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                      : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200')
+                      + (hasPrev() ? '' : ' opacity-30 cursor-not-allowed')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Précédent
+            </button>
 
-              <!-- Marquer terminée -->
-              @if (!activeLecon()!.estTerminee) {
-                <button (click)="marquerTerminee()" [disabled]="completing()"
-                        [class]="'btn-primary px-6 ' + (completing() ? 'opacity-70' : '')">
-                  @if (completing()) {
-                    <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                  }
-                  Marquer comme terminée
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                </button>
-              } @else {
-                <span class="flex items-center gap-1.5 text-sm font-semibold text-green-500">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                  Terminée
-                </span>
-              }
+            <button (click)="nextLecon()" [disabled]="!hasNext()"
+                    [class]="'btn border btn-sm ' + (dark()
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                      : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200')
+                      + (hasNext() ? '' : ' opacity-30 cursor-not-allowed')">
+              Suivante
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
 
-              @if (hasNext()) {
-                <button (click)="nextLecon()"
-                        [class]="'btn border btn-sm ' + (dark()
-                          ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
-                          : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200')">
-                  Suivante
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-              }
-            </div>
-          }
         </div>
       }
     </main>
   </div>
-
-  <!-- XP Burst -->
-  @if (showXP()) {
-    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                pointer-events-none z-50 animate-scale-in"
-         role="status" aria-live="polite">
-      <div class="bg-amber-500 text-slate-900 rounded-2xl px-8 py-5 shadow-2xl text-center font-black">
-        <p class="text-4xl mb-1">+{{ lastXP() }} XP</p>
-        <p class="text-sm opacity-80">Leçon terminée ! 🎉</p>
-      </div>
-    </div>
-  }
 </div>
   `,
 })
-export class CoursePlayerComponent implements OnInit, OnDestroy {
+export class InstructorCoursePlayerComponent implements OnInit, OnDestroy {
   readonly slug = input<string>('');
 
   readonly #courseSvc   = inject(CourseService);
-  readonly #progressSvc = inject(ProgressionService);
   readonly #qcmSvc      = inject(QcmService);
-  readonly #toast       = inject(ToastService);
   readonly #sanitizer   = inject(DomSanitizer);
   readonly #platform    = inject(PLATFORM_ID);
   readonly themeSvc     = inject(ThemeService);
-  readonly Math         = Math;
 
   readonly dark = this.themeSvc.isDark;
 
   readonly detail      = signal<CoursDetailResponse | null>(null);
-  readonly progression = signal<{ pourcentage: number; xpGagne: number } | null>(null);
   readonly activeLecon = signal<LeconDetail | null>(null);
   readonly sidebarOpen = signal(false);
-  readonly openModules = signal<Set<string>>(new Set());
-  readonly showPaywall = signal(false);
-  readonly completing  = signal(false);
-  readonly showXP      = signal(false);
-  readonly lastXP      = signal(0);
-  readonly totalXP     = computed(() => this.progression()?.xpGagne ?? 0);
 
   // QCM
   readonly selectedAnswer = signal<string | null>(null);
   readonly qcmResult = signal<{
     estCorrect: boolean; bonneReponse: string; explication: string; leconValidee: boolean;
   } | null>(null);
-
-  #xpTimer?: ReturnType<typeof setTimeout>;
-
-  readonly paywallAvantages = [
-    'Accès à toutes les leçons et modules',
-    'Certificat officiel MbemNova',
-    'Communauté d\'entraide & correction formateur',
-    'Accès à vie — aucune limite de temps',
-  ];
 
   readonly safeContent = computed((): SafeHtml => {
     return this.#sanitizer.bypassSecurityTrustHtml(this.activeLecon()?.contenu ?? '');
@@ -589,9 +432,6 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     }
     return Object.entries(q.options || {}).map(([key, value]) => ({ key, value }));
   });
-  readonly activeModuleTitle = computed(() => {
-    return 'Programme';
-  });
   readonly activeLeconIndex = computed(() => {
     const l = this.activeLecon();
     if (!l) return -1;
@@ -610,25 +450,20 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
       this.#courseSvc.getBySlug(s).subscribe({
         next: r => {
           if (r.success && r.data) {
-            this.detail.set(r.data);
+            // Force all lessons to be unlocked (estVerrouille = false) for the instructor
+            const unlockedCours = {
+              ...r.data,
+              lecons: r.data.lecons.map(l => ({ ...l, estVerrouille: false }))
+            };
+            this.detail.set(unlockedCours);
             this.startFirstLecon();
-            this.#progressSvc.commencer(r.data.id).subscribe({
-              next: pr => {
-                if (pr.success && pr.data) {
-                  this.progression.set({ pourcentage: pr.data.pourcentage, xpGagne: pr.data.xpGagne });
-                  if (pr.data.seuilAtteint && !pr.data.estPaye && (this.detail()?.prixFcfa ?? 0) > 0) this.showPaywall.set(true);
-                }
-              },
-            });
           }
         },
       });
     }
   }
 
-  ngOnDestroy(): void {
-    if (this.#xpTimer) clearTimeout(this.#xpTimer);
-  }
+  ngOnDestroy(): void {}
 
   selectLecon(l: LeconDetail): void {
     const coursId = this.detail()?.id;
@@ -640,7 +475,7 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
             const textBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'TEXTE_HTML');
             const videoBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'VIDEO' || b.typeBloc === 'VIDEO_YOUTUBE' || b.typeBloc === 'VIDEO_VIMEO');
             const pdfBloc = fullLecon.blocs?.find((b: any) => b.typeBloc === 'PDF_EMBED');
-            
+
             const mappedLecon: any = {
               id: fullLecon.id,
               coursId: fullLecon.coursId,
@@ -651,21 +486,21 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
               pdfUrl: pdfBloc ? pdfBloc.urlPdf : null,
               dureeMinutes: fullLecon.dureeMinutes,
               xpReward: fullLecon.xpValeur,
-              estTerminee: !!l.estTerminee,
-              estVerrouille: !!l.estVerrouille,
+              estTerminee: false,
+              estVerrouille: false,
               qcm: fullLecon.qcm
             };
             this.activeLecon.set(mappedLecon);
           } else {
-            this.activeLecon.set(l);
+            this.activeLecon.set({ ...l, estVerrouille: false });
           }
         },
         error: () => {
-          this.activeLecon.set(l);
+          this.activeLecon.set({ ...l, estVerrouille: false });
         }
       });
     } else {
-      this.activeLecon.set(l);
+      this.activeLecon.set({ ...l, estVerrouille: false });
     }
     this.sidebarOpen.set(false);
     this.selectedAnswer.set(null);
@@ -677,7 +512,7 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
 
   startFirstLecon(): void {
     const first = this.detail()?.lecons[0];
-    if (first && !first.estVerrouille) this.selectLecon(first);
+    if (first) this.selectLecon(first);
   }
 
   submitQCM(answer: string): void {
@@ -701,40 +536,6 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
 
   retryQCM(): void { this.selectedAnswer.set(null); this.qcmResult.set(null); }
 
-  marquerTerminee(): void {
-    const lecon = this.activeLecon();
-    if (!lecon || lecon.estTerminee || this.completing()) return;
-    this.completing.set(true);
-    const lecons  = this.detail()?.lecons ?? [];
-    const total = lecons.length;
-    const done  = lecons.filter(l => l.estTerminee).length;
-    const coursId = this.detail()?.id;
-    if (!coursId) return;
-    this.#progressSvc.terminerLecon(coursId, {
-      leconId: lecon.id, nbLeconsTotales: total,
-      nbLeconsTerminees: done + 1, xpLecon: lecon.xpReward,
-    }).subscribe({
-      next: r => {
-        this.completing.set(false);
-        // Mise à jour locale
-        this.detail.update(d => d ? {
-          ...d, lecons: d.lecons.map(l => l.id === lecon.id ? { ...l, estTerminee: true } : l)
-        } : d);
-        this.activeLecon.update(l => l ? { ...l, estTerminee: true } : l);
-        if (r.success && r.data) {
-          this.progression.set({ pourcentage: r.data.pourcentage, xpGagne: r.data.xpGagne });
-          if (r.data.seuilAtteint && !r.data.estPaye && (this.detail()?.prixFcfa ?? 0) > 0) { this.showPaywall.set(true); return; }
-        }
-        this.lastXP.set(lecon.xpReward);
-        this.showXP.set(true);
-        this.#xpTimer = setTimeout(() => this.showXP.set(false), 2000);
-        this.#toast.success(`+${lecon.xpReward} XP`, 'Leçon terminée !');
-        if (this.hasNext()) setTimeout(() => this.nextLecon(), 1000);
-      },
-      error: () => { this.completing.set(false); },
-    });
-  }
-
   prevLecon(): void {
     const idx = this.activeLeconIndex();
     const lecons = this.detail()?.lecons ?? [];
@@ -751,8 +552,6 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     const d = this.dark();
     if (active) return `flex items-center gap-2.5 w-full pl-4 pr-3 py-2.5 text-xs transition-colors text-left
       ${d ? 'bg-blue-600/20 text-blue-300' : 'bg-blue-50 text-blue-700 font-semibold'} border-r-2 border-blue-500`;
-    if (lecon.estVerrouille) return `flex items-center gap-2.5 w-full pl-4 pr-3 py-2.5 text-xs cursor-not-allowed
-      ${d ? 'text-slate-700' : 'text-slate-300'}`;
     return `flex items-center gap-2.5 w-full pl-4 pr-3 py-2.5 text-xs transition-colors text-left
       ${d ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}`;
   }

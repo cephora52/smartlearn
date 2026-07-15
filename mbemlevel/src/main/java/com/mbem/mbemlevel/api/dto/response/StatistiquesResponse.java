@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public record StatistiquesResponse(
     long totalApprenants,
     long apprenantsActifs,
-    long paiementsEnAttente,
-    long paiementsEnRetard,
-    long revenusTotal,
-    String revenus
+    long formateursActifs,
+    long totalFormations,
+    long paiementsEnAttente
 ) {}

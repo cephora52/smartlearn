@@ -3,11 +3,14 @@ import com.mbem.mbemlevel.api.dto.request.TerminerLeconRequest;
 import com.mbem.mbemlevel.api.dto.response.*;
 import com.mbem.mbemlevel.application.usecase.progression.*;
 import com.mbem.mbemlevel.domain.progression.Progression;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.PaiementJpaRepository;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.MoratoireJpaRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -20,11 +23,24 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/progression")
 @Tag(name="Progression", description="Avancement dans les cours")
+@PreAuthorize("hasRole('APPRENANT')")
 @RequiredArgsConstructor
 public class ProgressionController {
     private final CommencerCoursUseCase  commencerUC;
     private final TerminerLeconUseCase   terminerLeconUC;
     private final GetProgressionUseCase  getUC;
+    private final PaiementJpaRepository  paiementRepo;
+    private final MoratoireJpaRepository moratoireRepo;
+
+    private ProgressionResponse mapToResponse(Progression p, UUID apprenantId) {
+        boolean aMor = paiementRepo.findByApprenantIdAndCoursId(apprenantId, p.getCoursId())
+            .map(pay -> moratoireRepo.existsByPaiementIdAndStatut(pay.getId(), "APPROUVE")
+                   || moratoireRepo.existsByPaiementIdAndStatut(pay.getId(), "ACCORDE"))
+            .orElse(false);
+        return new ProgressionResponse(p.getId(), p.getCoursId(), p.getPourcentage(),
+            p.isEstPaye(), p.getXpGagne(), p.seuilAtteint() && !aMor, p.estTermine(),
+            p.getDateDebut(), p.getDateCompletion());
+    }
 
     /** POST /api/v1/progression/cours/{coursId}/commencer — S05 */
     @PostMapping("/cours/{coursId}/commencer")
@@ -33,7 +49,7 @@ public class ProgressionController {
             @PathVariable UUID coursId,
             @AuthenticationPrincipal String userId) {
         Progression p = commencerUC.executer(UUID.fromString(userId), coursId);
-        return ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p), "Cours commencé !"));
+        return ResponseEntity.ok(ApiResponse.ok(mapToResponse(p, UUID.fromString(userId)), "Cours commencé !"));
     }
 
     /** POST /api/v1/progression/cours/{coursId}/terminer-lecon — S06 */
@@ -49,9 +65,13 @@ public class ProgressionController {
             UUID.fromString(userId), coursId, req.leconId(),
             req.nbLeconsTotales(), req.nbLeconsTerminees(), req.xpLecon(),
             prenom, email, req.telephone(), req.nomCours());
-        String msg = p.seuilAtteint() && !p.isEstPaye()
+        boolean aMor = paiementRepo.findByApprenantIdAndCoursId(UUID.fromString(userId), coursId)
+            .map(pay -> moratoireRepo.existsByPaiementIdAndStatut(pay.getId(), "APPROUVE")
+                   || moratoireRepo.existsByPaiementIdAndStatut(pay.getId(), "ACCORDE"))
+            .orElse(false);
+        String msg = p.seuilAtteint() && !p.isEstPaye() && !aMor
             ? "Seuil atteint ! Débloquez la suite." : "+"+req.xpLecon()+" XP gagnés !";
-        return ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p), msg));
+        return ResponseEntity.ok(ApiResponse.ok(mapToResponse(p, UUID.fromString(userId)), msg));
     }
 
     /** GET /api/v1/progression — Toutes les progressions de l'apprenant */
@@ -60,7 +80,7 @@ public class ProgressionController {
     public ResponseEntity<ApiResponse<List<ProgressionResponse>>> mesPrgressions(
             @AuthenticationPrincipal String userId) {
         List<ProgressionResponse> list = getUC.toutesParApprenant(UUID.fromString(userId))
-            .stream().map(ProgressionResponse::from).collect(Collectors.toList());
+            .stream().map(p -> mapToResponse(p, UUID.fromString(userId))).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok(list));
     }
 
@@ -71,7 +91,7 @@ public class ProgressionController {
             @PathVariable UUID coursId,
             @AuthenticationPrincipal String userId) {
         return getUC.parCoursId(UUID.fromString(userId), coursId)
-            .map(p -> ResponseEntity.ok(ApiResponse.ok(ProgressionResponse.from(p))))
+            .map(p -> ResponseEntity.ok(ApiResponse.ok(mapToResponse(p, UUID.fromString(userId)))))
             .orElse(ResponseEntity.notFound().build());
     }
 }

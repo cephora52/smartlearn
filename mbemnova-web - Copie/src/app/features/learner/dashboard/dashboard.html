@@ -214,7 +214,7 @@
           }
 
           @if (!progressionLoading()) {
-            @if (progressions().length === 0) {
+            @if (mesFormationsAffichees().length === 0) {
               <div class="db-card p-10 text-center">
                 <svg class="w-20 h-20 mx-auto mb-4 opacity-60" viewBox="0 0 80 80" fill="none" aria-hidden="true">
                   <rect x="8" y="22" width="22" height="38" rx="3" fill="rgba(99,102,241,0.15)" stroke="rgba(99,102,241,0.3)" stroke-width="1.5"/>
@@ -243,9 +243,9 @@
                 </a>
               </div>
             }
-
+ 
             <div class="space-y-3">
-              @for (p of progressions(); track p.coursId; let i = $index) {
+              @for (p of mesFormationsAffichees(); track p.coursId; let i = $index) {
                 <div class="db-card p-4 group animate-fade-up" [style]="'animation-delay:' + (i * 60) + 'ms'">
                   <div class="flex gap-3">
                     <div [class]="'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ' + coursIconBg(i)">
@@ -303,7 +303,7 @@
                              [style.width.%]="p.pourcentage"></div>
                       </div>
 
-                      @if (!p.seuilAtteint || p.estPaye) {
+                      @if (!p.seuilAtteint || p.estPaye || p.estTermine) {
                         <a [routerLink]="['/app/cours', getCoursSlug(p.coursId)]" class="db-btn-primary inline-flex items-center gap-1.5">
                           {{ p.pourcentage === 0 ? 'Commencer' : (p.estTermine ? 'Revoir' : 'Continuer') }}
                           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">

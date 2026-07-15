@@ -38,6 +38,7 @@ public class DevoirController {
 
     /** POST /api/v1/devoirs/soumettre — Apprenant soumet son rendu (S11) */
     @PostMapping("/soumettre")
+    @PreAuthorize("hasRole('APPRENANT')")
     @Operation(summary="Soumettre un rendu (S11)")
     public ResponseEntity<ApiResponse<Void>> soumettre(
             @Valid @RequestBody SoumettreRenduRequest req,

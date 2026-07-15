@@ -84,22 +84,66 @@ const ACTIVITE = [
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
               </div>
-              <span class="badge-green text-xs">+12 ce mois</span>
+              <span class="badge-green text-xs">Apprenants</span>
             </div>
-            <p class="text-3xl font-black text-slate-900">{{ stats()!.apprenantsActifs }}</p>
+            <p class="text-3xl font-black text-slate-900">{{ stats()!.apprenantsActifs ?? 0 }}</p>
             <p class="text-sm text-slate-500 mb-3">Apprenants actifs</p>
             <div class="progress">
               <div class="progress-bar bg-blue-500"
-                   [style.width.%]="(stats()!.apprenantsActifs / stats()!.totalApprenants) * 100">
+                   [style.width.%]="stats()!.totalApprenants ? (stats()!.apprenantsActifs / stats()!.totalApprenants) * 100 : 0">
               </div>
             </div>
             <p class="text-xs text-slate-400 mt-1">
-              {{ stats()!.totalApprenants }} inscrits au total
+              {{ stats()!.totalApprenants ?? 0 }} inscrits au total
+            </p>
+          </div>
+
+          <!-- Formateurs actifs -->
+          <div class="card p-5 animate-fade-up delay-75">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <span class="badge-purple text-xs">Formateurs</span>
+            </div>
+            <p class="text-3xl font-black text-slate-900">{{ stats()!.formateursActifs ?? 0 }}</p>
+            <p class="text-sm text-slate-500 mb-3">Formateurs actifs</p>
+            <div class="progress">
+              <div class="progress-bar bg-purple-500" style="width: 100%"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              {{ stats()!.formateursActifs ?? 0 }} formateurs au total
+            </p>
+          </div>
+
+          <!-- Nombre total de formations -->
+          <div class="card p-5 animate-fade-up delay-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+              </div>
+              <span class="badge-indigo text-xs">Catalogue</span>
+            </div>
+            <p class="text-3xl font-black text-slate-900">{{ stats()!.totalFormations ?? 0 }}</p>
+            <p class="text-sm text-slate-500 mb-3">Nombre total de formations</p>
+            <div class="progress">
+              <div class="progress-bar bg-indigo-500" style="width: 100%"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              {{ stats()!.totalFormations ?? 0 }} formations au total
             </p>
           </div>
 
           <!-- Paiements en attente -->
-          <div class="card p-5 animate-fade-up delay-75">
+          <div class="card p-5 animate-fade-up delay-150">
             <div class="flex items-center justify-between mb-3">
               <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
@@ -107,62 +151,18 @@ const ACTIVITE = [
                   <line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
               </div>
-              <span class="badge-amber text-xs">⚠ À traiter</span>
+              <span class="badge-amber text-xs">À valider</span>
             </div>
-            <p class="text-3xl font-black text-slate-900">{{ stats()!.paiementsEnAttente }}</p>
+            <p class="text-3xl font-black text-slate-900">{{ stats()!.paiementsEnAttente ?? 0 }}</p>
             <p class="text-sm text-slate-500 mb-3">Paiements en attente</p>
-            <a routerLink="/admin/paiements"
-               class="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors flex items-center gap-1">
-              Voir les paiements
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-          </div>
-
-          <!-- Retards -->
-          <div class="card p-5 animate-fade-up delay-100"
-               [class.border-red-200]="stats()!.paiementsEnRetard > 0"
-               [class.bg-red-50]="stats()!.paiementsEnRetard > 0">
-            <div class="flex items-center justify-between mb-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-                   [class]="stats()!.paiementsEnRetard > 0 ? 'bg-red-100' : 'bg-slate-100'" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     [attr.stroke]="stats()!.paiementsEnRetard > 0 ? '#dc2626' : '#64748b'"
-                     stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="12"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-              </div>
-              @if (stats()!.paiementsEnRetard > 0) {
-                <span class="badge-red text-xs animate-pulse">Urgent</span>
-              }
+            <div class="progress">
+              <div class="progress-bar bg-amber-500" style="width: 100%"></div>
             </div>
-            <p class="text-3xl font-black"
-               [class]="stats()!.paiementsEnRetard > 0 ? 'text-red-700' : 'text-slate-900'">
-              {{ stats()!.paiementsEnRetard }}
+            <p class="text-xs text-slate-400 mt-1">
+              {{ stats()!.paiementsEnAttente ?? 0 }} transactions à confirmer
             </p>
-            <p class="text-sm text-slate-500 mb-3">Paiements en retard</p>
-            <a routerLink="/admin/paiements"
-               class="text-xs font-medium transition-colors flex items-center gap-1"
-               [class]="stats()!.paiementsEnRetard > 0 ? 'text-red-600 hover:text-red-700' : 'text-slate-400'">
-              {{ stats()!.paiementsEnRetard > 0 ? 'Traiter maintenant' : 'Aucun retard' }}
-            </a>
           </div>
 
-          <!-- Revenus total -->
-          <div class="card p-5 animate-fade-up delay-150">
-            <div class="flex items-center justify-between mb-3">
-              <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-                  <line x1="12" y1="1" x2="12" y2="23"/>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                </svg>
-              </div>
-              <span class="badge-green text-xs">+18% ce mois</span>
-            </div>
-            <p class="text-2xl font-black text-slate-900">{{ stats()!.revenus }}</p>
-            <p class="text-sm text-slate-500">Revenus totaux</p>
-          </div>
         </div>
       }
     </section>

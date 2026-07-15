@@ -93,7 +93,8 @@ export const routes: Routes = [
   // ── ESPACE APPRENANT (authentifié) ───────────────────────
   {
     path: 'app',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['APPRENANT'] },
     children: [
       // Dashboard
       {
@@ -257,6 +258,14 @@ export const routes: Routes = [
             .then(m => m.FormationsComponent),
         title: 'Mes formations — SmartLearn',
       },
+      // Lecteur de cours formateur
+      {
+        path: 'formations/:slug',
+        loadComponent: () =>
+          import('./features/instructor/course-player/instructor-course-player.component')
+            .then(m => m.InstructorCoursePlayerComponent),
+        title: 'Consultation formation — Espace Formateur',
+      },
     ],
   },
 
@@ -281,6 +290,22 @@ export const routes: Routes = [
           import('./features/admin/learner-manager/learner-manager.component')
             .then(m => m.LearnerManagerComponent),
         title: 'Gestion apprenants — MbemNova',
+      },
+      // Gestion formateurs
+      {
+        path: 'formateurs',
+        loadComponent: () =>
+          import('./features/admin/instructor-manager/instructor-manager.component')
+            .then(m => m.InstructorManagerComponent),
+        title: 'Gestion formateurs — MbemNova',
+      },
+      // Gestion formations
+      {
+        path: 'formations',
+        loadComponent: () =>
+          import('./features/admin/course-manager/course-manager.component')
+            .then(m => m.CourseManagerComponent),
+        title: 'Gestion formations — MbemNova',
       },
       // S08 · S18 · Gestion paiements
       {

@@ -41,6 +41,8 @@ public class GetCoursDetailUseCase {
     private final CategorieJpaRepository    categorieRepo;
     private final ObjectMapper              objectMapper;
     private final com.mbem.mbemlevel.application.port.out.StoragePort storagePort;
+    private final PaiementJpaRepository      paiementRepo;
+    private final MoratoireJpaRepository     moratoireRepo;
 
     @Transactional(readOnly = true)
     public CoursDetailResponse executer(UUID coursId, UUID apprenantId) {
@@ -80,7 +82,17 @@ public class GetCoursDetailUseCase {
                 .findByApprenantIdAndCoursId(apprenantId, coursId)
                 .orElse(null);
         }
-        final boolean estPaye = (progression != null && progression.isEstPaye()) || isFormateur || isAdmin;
+        boolean aMoratoireApprouve = false;
+        if (apprenantId != null) {
+            var paiementOpt = paiementRepo.findByApprenantIdAndCoursId(apprenantId, coursId);
+            if (paiementOpt.isPresent()) {
+                aMoratoireApprouve = moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "APPROUVE")
+                                  || moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "ACCORDE");
+            }
+        }
+        final boolean estPaye = (progression != null && progression.isEstPaye()) 
+            || (cours.getPrixFcfa() == 0)
+            || isFormateur || isAdmin;
 
         // ── 3. Leçons ────────────────────────────────────────────────────────
         List<LeconJpaEntity> lecons = leconRepo.findByCoursIdOrderByOrdreAsc(coursId);
@@ -98,7 +110,7 @@ public class GetCoursDetailUseCase {
         for (int i = 0; i < totalLecons; i++) {
             LeconJpaEntity l = lecons.get(i);
             boolean estDansSeuilGratuit = (i < maxLeconsGratuites);
-            boolean accessible = l.isEstPreview() || estDansSeuilGratuit || estPaye;
+            boolean accessible = l.isEstPreview() || estDansSeuilGratuit || estPaye || aMoratoireApprouve;
             boolean estVerrouille = !accessible;
 
             String typeContenu = "TEXTE";
@@ -154,7 +166,7 @@ public class GetCoursDetailUseCase {
             progResp = new CoursDetailResponse.ProgressionApprenanteResponse(
                 progression.getPourcentage(),
                 progression.isEstPaye(),
-                cours.getSeuilPaiement().doubleValue() < 1.0 && (progression.getPourcentage() >= cours.getSeuilPaiement().doubleValue() * 100),
+                cours.getSeuilPaiement().doubleValue() < 1.0 && (progression.getPourcentage() >= cours.getSeuilPaiement().doubleValue() * 100) && !aMoratoireApprouve,
                 progression.getXpGagne(),
                 null // derniereLeconTitre — à enrichir si besoin
             );
@@ -199,8 +211,23 @@ public class GetCoursDetailUseCase {
     }
 
     private Set<UUID> getLeconIdsTerminees(UUID apprenantId, UUID coursId) {
-        // TODO: à implémenter avec une table lecons_terminees
-        return Set.of();
+        return progressionRepo.findByApprenantIdAndCoursId(apprenantId, coursId)
+            .map(p -> {
+                String str = p.getLeconsTerminees();
+                if (str == null || str.isBlank()) {
+                    return Collections.<UUID>emptySet();
+                }
+                Set<UUID> set = new HashSet<>();
+                for (String idStr : str.split(",")) {
+                    try {
+                        set.add(UUID.fromString(idStr.trim()));
+                    } catch (Exception e) {
+                        // ignore malformed
+                    }
+                }
+                return set;
+            })
+            .orElse(Collections.emptySet());
     }
 
     private CoursDetailResponse.DistributionNotes calculerDistribution(

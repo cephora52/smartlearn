@@ -15,28 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class GetStatistiquesUseCase {
     private final UtilisateurRepository utilisateurRepo;
     private final PaiementRepository paiementRepo;
+    private final CoursRepository coursRepo;
 
     public record Statistiques(
-            long totalApprenants, long apprenantsActifs,
-            long paiementsEnAttente, long paiementsEnRetard,
-            long revenus) {
+            long totalApprenants,
+            long apprenantsActifs,
+            long formateursActifs,
+            long totalFormations,
+            long paiementsEnAttente) {
     }
 
     @Transactional(readOnly = true)
     public Statistiques executer() {
-        // Comptages simplifiés — à optimiser avec des requêtes COUNT en base
         long totalApp = utilisateurRepo.findAll().stream()
                 .filter(u -> "APPRENANT".equals(u.getRole().name())).count();
         long actifs = utilisateurRepo.findAll().stream()
                 .filter(u -> "APPRENANT".equals(u.getRole().name())
                         && "ACTIF".equals(u.getStatut().name()))
                 .count();
+        long formateurs = utilisateurRepo.findAll().stream()
+                .filter(u -> "FORMATEUR".equals(u.getRole().name()))
+                .count();
+        long totalFormations = coursRepo.count();
         long enAttente = paiementRepo.findPaiementsEnCours().stream()
                 .filter(p -> "EN_ATTENTE".equals(p.getStatut().name())).count();
-        long enRetard = paiementRepo.findPaiementsEnCours().stream()
-                .filter(p -> "EN_RETARD".equals(p.getStatut().name())).count();
-        long revenus = paiementRepo.findPaiementsEnCours().stream()
-                .mapToLong(p -> p.getMontantPaye().toLong()).sum();
-        return new Statistiques(totalApp, actifs, enAttente, enRetard, revenus);
+        
+        return new Statistiques(totalApp, actifs, formateurs, totalFormations, enAttente);
     }
 }

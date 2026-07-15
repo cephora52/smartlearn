@@ -31,7 +31,8 @@ public class ProgressionRepositoryAdapter implements ProgressionRepository {
 
     private ProgressionJpaEntity update(Progression p, ProgressionJpaEntity e) {
         e.setPourcentage(p.getPourcentage()); e.setEstPaye(p.isEstPaye());
-        e.setXpGagne(p.getXpGagne()); e.setDateCompletion(p.getDateCompletion()); return e;
+        e.setXpGagne(p.getXpGagne()); e.setDateCompletion(p.getDateCompletion());
+        e.setLeconsTerminees(p.getLeconsTerminees()); return e;
     }
     private ProgressionJpaEntity toEntity(Progression p) {
         return ProgressionJpaEntity.builder().id(p.getId())
@@ -39,11 +40,14 @@ public class ProgressionRepositoryAdapter implements ProgressionRepository {
             .pourcentage(p.getPourcentage()).estPaye(p.isEstPaye())
             .xpGagne(p.getXpGagne()).dateDebut(p.getDateDebut()!=null?p.getDateDebut():LocalDateTime.now())
             .dateCompletion(p.getDateCompletion())
-            .seuilPaiementCours(0.30).build();
+            .seuilPaiementCours(p.getSeuilPaiementCours())
+            .leconsTerminees(p.getLeconsTerminees()).build();
     }
     private Progression toDomain(ProgressionJpaEntity e) {
-        return new Progression(e.getId(),e.getApprenantId(),e.getCoursId(),
+        Progression p = new Progression(e.getId(),e.getApprenantId(),e.getCoursId(),
             e.getPourcentage(),e.isEstPaye(),e.getXpGagne(),e.getDateDebut(),
             e.getDateCompletion(),e.getSeuilPaiementCours(),e.getCreatedAt(),e.getUpdatedAt());
+        p.setLeconsTerminees(e.getLeconsTerminees());
+        return p;
     }
 }

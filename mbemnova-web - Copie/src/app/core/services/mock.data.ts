@@ -439,9 +439,11 @@ export const MOCK_REFERRAL: ReferralResponse = {
 };
 
 export const MOCK_STATS: StatistiquesResponse = {
-  totalApprenants: 247, apprenantsActifs: 189,
-  paiementsEnAttente: 12, paiementsEnRetard: 5,
-  revenusTotal: 3_750_000, revenus: '3 750 000 FCFA',
+  totalApprenants: 247,
+  apprenantsActifs: 189,
+  formateursActifs: 14,
+  totalFormations: 8,
+  paiementsEnAttente: 12,
 };
 
 export const MOCK_APPRENANTS: ApprenantAdminView[] = [

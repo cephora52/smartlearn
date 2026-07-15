@@ -29,6 +29,7 @@ public interface PaiementRepository {
     List<Tranche>      findTranchesParPaiement(UUID paiementId);
     List<Tranche>      findTranchesEnRetard();
     List<Tranche>      findTranchesEcheantEntre(LocalDate debut, LocalDate fin);
+    List<Paiement>     findAll();
 }
 // ── Note pour l'implémentation JPA ───────────────────────────────────────────
 // Dans PaiementRepositoryAdapter.java, ajouter :

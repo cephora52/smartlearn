@@ -42,8 +42,33 @@ String[] IGNORED_FIELDS = {
         "niveauAcces", "createdAt", "updatedAt", "domainEvents"
     };
 
-    @Mapping(target = "domainEvents", ignore = true)
-    Utilisateur toDomain(UtilisateurJpaEntity entity);
+    default Utilisateur toDomain(UtilisateurJpaEntity entity) {
+        if (entity == null) return null;
+        if (entity.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.APPRENANT) {
+            return new com.mbem.mbemlevel.domain.user.Apprenant(
+                entity.getId(), entity.getPrenom(), entity.getNom(), entity.getEmail(),
+                entity.getMotDePasseHache(), entity.getStatut(),
+                entity.getTentativesEchouees(),
+                entity.getBloqueJusquAu(), entity.getDerniereConnexion(),
+                entity.isEmailVerifie(), entity.getTokenVerificationEmail(),
+                entity.getTokenVerificationEmailExpireAt(), entity.getTelephone(),
+                entity.getCreatedAt(), entity.getUpdatedAt(),
+                entity.getXpTotal(),
+                entity.getStreakJours(),
+                entity.getRangPlateforme(),
+                entity.isDisponiblePourEmploi()
+            );
+        }
+        return new Utilisateur(
+            entity.getId(), entity.getPrenom(), entity.getNom(), entity.getEmail(),
+            entity.getMotDePasseHache(), entity.getRole(), entity.getStatut(),
+            entity.getTentativesEchouees(),
+            entity.getBloqueJusquAu(), entity.getDerniereConnexion(),
+            entity.isEmailVerifie(), entity.getTokenVerificationEmail(),
+            entity.getTokenVerificationEmailExpireAt(), entity.getTelephone(),
+            entity.getCreatedAt(), entity.getUpdatedAt()
+        );
+    }
 
     /**
      * Convertit un objet domaine en entité JPA pour l'insertion.

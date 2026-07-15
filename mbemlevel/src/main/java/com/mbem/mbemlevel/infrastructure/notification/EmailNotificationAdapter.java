@@ -85,4 +85,12 @@ public class EmailNotificationAdapter implements EmailPort {
     @Override @Async public void envoyerRecomparainageActive(String emailParrain, String prenomParrain, String prenomFilleul) {
         envoyerHtml(emailParrain, "Ton filleul vient de commencer sa formation !", "parrainage-active",
             Map.of("prenomParrain", prenomParrain, "prenomFilleul", prenomFilleul)); }
+
+    @Override @Async public void envoyerMoratoireApprouve(String email, String prenom, String nomCours, String nouvelleDate) {
+        envoyerHtml(email, "Bonne nouvelle : Votre demande de délai est approuvée !", "email/moratoire-approuve",
+            Map.of("prenom", prenom, "nomCours", nomCours, "nouvelleDate", nouvelleDate)); }
+
+    @Override @Async public void envoyerMoratoireRefuse(String email, String prenom, String nomCours, String justification) {
+        envoyerHtml(email, "Information concernant votre demande de délai", "email/moratoire-refuse",
+            Map.of("prenom", prenom, "nomCours", nomCours, "justification", justification)); }
 }

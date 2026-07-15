@@ -13,8 +13,9 @@ import { AuthService } from '../../../core/services/auth.service';
         <nav class="hidden md:flex items-center gap-1">
           <a routerLink="/admin" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Dashboard</a>
           <a routerLink="/admin/apprenants" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Apprenants</a>
+          <a routerLink="/admin/formateurs" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Formateurs</a>
+          <a routerLink="/admin/formations" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Formations</a>
           <a routerLink="/admin/paiements" routerLinkActive="bg-blue-50 text-blue-700" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Paiements</a>
-          <a routerLink="/" class="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50">Page publique</a>
         </nav>
         <div class="ml-auto flex items-center gap-2">
           <span class="hidden sm:inline-flex px-3 py-2 rounded-lg text-sm text-slate-600">Admin: {{ prenom() }}</span>

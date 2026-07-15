@@ -12,6 +12,8 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.mbem.mbemlevel.application.port.out.PaiementRepository;
+import java.util.List;
 import java.util.UUID;
 /**
  * API Paiement — S08 (paiement cash), S18 (suspension).
@@ -28,6 +30,7 @@ public class PaiementController {
     private final SuspendreCompteUseCase         suspendreUC;
     private final ReactiverCompteUseCase         reactiverUC;
     private final GetPaiementsEnRetardUseCase    enRetardUC;
+    private final PaiementRepository             paiementRepo;
 
     /** POST /api/v1/paiements — Admin enregistre paiement cash (S08) */
     @PostMapping
@@ -67,5 +70,16 @@ public class PaiementController {
             @AuthenticationPrincipal String adminId) {
         reactiverUC.executer(apprenantId, UUID.fromString(adminId));
         return ResponseEntity.ok(ApiResponse.ok("Compte réactivé."));
+    }
+
+    /** GET /api/v1/paiements — Admin consulte tous les paiements */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    @Operation(summary="Lister tous les paiements (admin)")
+    public ResponseEntity<ApiResponse<List<PaiementResponse>>> obtenirTous() {
+        List<PaiementResponse> list = paiementRepo.findAll().stream()
+            .map(PaiementResponse::from)
+            .toList();
+        return ResponseEntity.ok(ApiResponse.ok(list));
     }
 }

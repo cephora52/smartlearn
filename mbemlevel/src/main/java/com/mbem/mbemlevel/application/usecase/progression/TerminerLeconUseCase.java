@@ -1,6 +1,8 @@
 package com.mbem.mbemlevel.application.usecase.progression;
 import com.mbem.mbemlevel.application.port.out.*;
 import com.mbem.mbemlevel.domain.progression.Progression;
+import com.mbem.mbemlevel.infrastructure.persistence.entity.UtilisateurJpaEntity;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.UtilisateurJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.util.UUID;
 public class TerminerLeconUseCase {
     private final ProgressionRepository  progressionRepo;
     private final CoursRepository        coursRepo;
+    private final UtilisateurJpaRepository utilisateurRepo;
+    private final com.mbem.mbemlevel.infrastructure.persistence.repository.XpHistoriqueJpaRepository xpHistoriqueRepo;
     private final ApplicationEventPublisher publisher;
 
     @Transactional
@@ -25,12 +29,31 @@ public class TerminerLeconUseCase {
             .orElseGet(() -> {
                 var cours = coursRepo.findById(coursId)
                     .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
-                return Progression.commencer(apprenantId, coursId,
+                var prog = Progression.commencer(apprenantId, coursId,
     cours.getSeuilPaiement().doubleValue());
+                if (cours.getPrixFcfa() == 0) {
+                    prog.activerPaiement();
+                }
+                return prog;
             });
 
+        // Si le cours est gratuit, on s'assure qu'il est marqué comme payé/débloqué
+        var coursOpt = coursRepo.findById(coursId);
+        if (coursOpt.isPresent() && coursOpt.get().getPrixFcfa() == 0) {
+            p.activerPaiement();
+        }
+
+        boolean alreadyDone = p.isLeconTerminee(leconId);
+        p.marquerLeconTerminee(leconId);
+
+        // Calcule le nombre de leçons uniques terminées
+        int finishedCount = 0;
+        if (p.getLeconsTerminees() != null && !p.getLeconsTerminees().isBlank()) {
+            finishedCount = p.getLeconsTerminees().split(",").length;
+        }
+
         double nouveauPct = nbLeconsTotales > 0
-            ? Math.min(100.0, (double) nbLeconsTerminees / nbLeconsTotales * 100.0) : 0;
+            ? Math.min(100.0, (double) finishedCount / nbLeconsTotales * 100.0) : 0;
 
         String resolvedNomCours = nomCours;
         if (resolvedNomCours == null || resolvedNomCours.isBlank()) {
@@ -39,8 +62,37 @@ public class TerminerLeconUseCase {
                 .orElse("Cours");
         }
 
-        p.avancer(nouveauPct, xpLecon, prenom, email, telephone, resolvedNomCours);
+        int xpToAward = alreadyDone ? 0 : xpLecon;
+        int totalXpAwardedThisTime = xpToAward;
+
+        if (nouveauPct >= 100.0 && p.getDateCompletion() == null) {
+            // Bonus completion de formation : 200 XP
+            totalXpAwardedThisTime += 200;
+            p.avancer(nouveauPct, xpToAward + 200, prenom, email, telephone, resolvedNomCours);
+        } else {
+            p.avancer(nouveauPct, xpToAward, prenom, email, telephone, resolvedNomCours);
+        }
+
         Progression saved = progressionRepo.save(p);
+
+        // Enregistrer dans l'historique des gains XP
+        if (totalXpAwardedThisTime > 0) {
+            xpHistoriqueRepo.save(com.mbem.mbemlevel.infrastructure.persistence.entity.XpHistoriqueJpaEntity.builder()
+                .id(UUID.randomUUID())
+                .apprenantId(apprenantId)
+                .xpGagne(totalXpAwardedThisTime)
+                .dateGain(java.time.LocalDateTime.now())
+                .build());
+        }
+
+        // Met à jour l'XP total de l'utilisateur dans la base de données
+        utilisateurRepo.findById(apprenantId).ifPresent(userEntity -> {
+            int totalXp = progressionRepo.findByApprenantId(apprenantId).stream()
+                .mapToInt(Progression::getXpGagne)
+                .sum();
+            userEntity.setXpTotal(totalXp);
+            utilisateurRepo.save(userEntity);
+        });
 
         // Publier les domain events (SeuilPaiementAtteintEvent, CoursTermineEvent…)
         saved.getDomainEvents().forEach(publisher::publishEvent);

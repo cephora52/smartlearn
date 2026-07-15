@@ -29,15 +29,16 @@ public class GenererCertificatUseCase {
         if (certificatRepo.findByApprenantAndCours(apprenantId, coursId).isPresent()) {
             return certificatRepo.findByApprenantAndCours(apprenantId, coursId).get();
         }
-        // Vérifier les conditions
+        var cours = coursRepo.findById(coursId)
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
         Progression prog = progressionRepo.findByApprenantIdAndCoursId(apprenantId, coursId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
-        if (!domainService.peutObtenirCertificat(prog))
+        
+        boolean canGetCert = domainService.peutObtenirCertificat(prog) || (cours.getPrixFcfa() == 0 && prog.estTermine());
+        if (!canGetCert)
             throw new RuntimeException("CERTIFICATE_CONDITIONS_NOT_MET");
 
         Utilisateur user = utilisateurRepo.findById(apprenantId)
-            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
-        var cours = coursRepo.findById(coursId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND"));
 
         Certificat cert = Certificat.emettre(apprenantId, coursId,

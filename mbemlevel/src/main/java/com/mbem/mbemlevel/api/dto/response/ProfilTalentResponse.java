@@ -9,12 +9,25 @@ public record ProfilTalentResponse(
     boolean disponiblePourEmploi,
     String lienPortfolio, String lienLinkedin, String lienGithub, String lienCv,
     String bio, int xpTotal, int streakJours,
-    List<CertificatResponse> certificats
+    List<CertificatResponse> certificats,
+    List<Integer> xpParJour
 ) {
-    public static ProfilTalentResponse from(Utilisateur u, List<CertificatResponse> certs) {
+    public static ProfilTalentResponse from(Utilisateur u, List<CertificatResponse> certs, List<Integer> xpParJour) {
+        int xp = 0;
+        int streak = 0;
+        boolean dispos = false;
+        if (u instanceof com.mbem.mbemlevel.domain.user.Apprenant app) {
+            xp = app.getXpTotal();
+            streak = app.getStreakJours();
+            dispos = app.isDisponiblePourEmploi();
+        }
         return new ProfilTalentResponse(u.getId(), u.getPrenom(), u.getNom(),
-            u.getTelephone(), false,
+            u.getTelephone(), dispos,
             null, null, null, null,
-            null, 0, 0, certs);
+            null, xp, streak, certs, xpParJour);
+    }
+
+    public static ProfilTalentResponse from(Utilisateur u, List<CertificatResponse> certs) {
+        return from(u, certs, null);
     }
 }

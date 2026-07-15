@@ -109,6 +109,14 @@ public class PaiementRepositoryAdapter implements PaiementRepository {
         return e;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Paiement> findAll() {
+        return paiementRepo.findAll().stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
     private Tranche trancheToDomain(TrancheJpaEntity e) {
         return new Tranche(e.getId(), e.getPaiementId(), e.getNumero(), e.getMontant(),
                 e.getDateEcheance(), e.getDateReglement(), e.getStatut(), e.getCreatedAt(), e.getUpdatedAt());

@@ -11,4 +11,5 @@ public interface MoratoireRepository {
     List<Moratoire> findEnAttente();
     Optional<Moratoire> findEnAttenteByPaiementId(UUID paiementId);
     boolean existsEnAttenteForPaiement(UUID paiementId);
+    List<Moratoire> findAll();
 }

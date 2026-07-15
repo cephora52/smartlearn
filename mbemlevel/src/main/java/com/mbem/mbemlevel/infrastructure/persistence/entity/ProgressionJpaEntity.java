@@ -35,6 +35,8 @@ public class ProgressionJpaEntity {
     private LocalDateTime dateCompletion;
     @Column(name = "seuil_paiement_cours", nullable = false)
     private double seuilPaiementCours;
+    @Column(name = "lecons_terminees")
+    private String leconsTerminees;
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

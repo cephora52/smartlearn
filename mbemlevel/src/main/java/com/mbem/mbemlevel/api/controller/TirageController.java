@@ -17,7 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/tirage")
 @Tag(name = "Tirage au sort", description = "Consultation et participation aux tirages au sort mensuels")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('APPRENANT')")
 @RequiredArgsConstructor
 public class TirageController {
 

@@ -12,4 +12,9 @@ public record CertificatResponse(
         return new CertificatResponse(c.getId(), c.getCoursId(),
             c.getCodeVerification(), c.getLienPdf(), c.getDateEmission());
     }
+
+    public static CertificatResponse from(Certificat c, boolean estPaye) {
+        return new CertificatResponse(c.getId(), c.getCoursId(),
+            c.getCodeVerification(), estPaye ? c.getLienPdf() : null, c.getDateEmission());
+    }
 }

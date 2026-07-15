@@ -485,7 +485,7 @@ export class PaymentComponent implements OnInit {
     const req: DemanderMoratoireRequest  = {
       paiementId:            id,
       raison:                raison as DemanderMoratoireRequest['raison'],
-      explication:           explication ?? '',
+      explicationLibre:      explication ?? '',
       nouvelleDateSouhaitee: nouvelleDateSouhaitee,
     };
 
@@ -506,9 +506,12 @@ export class PaymentComponent implements OnInit {
   statutBadge(s: StatutPaiement): string {
     const m: Record<StatutPaiement, string> = {
       RECU:      'badge-green',
+      PAYE:      'badge-green',
       PARTIEL:   'badge-blue',
       EN_ATTENTE:'badge-amber',
       RETARD:    'badge-red',
+      EN_RETARD: 'badge-red',
+      MORATOIRE: 'badge-blue',
       ANNULE:    'badge-slate',
     };
     return m[s] ?? 'badge-slate';
@@ -517,9 +520,12 @@ export class PaymentComponent implements OnInit {
   statutLabel(s: StatutPaiement): string {
     const m: Record<StatutPaiement, string> = {
       RECU:      '✓ Payé',
+      PAYE:      '✓ Payé',
       PARTIEL:   '◑ Partiel',
       EN_ATTENTE:'⏳ En attente',
       RETARD:    '⚠ Retard',
+      EN_RETARD: '⚠ Retard',
+      MORATOIRE: '📋 Moratoire',
       ANNULE:    '✕ Annulé',
     };
     return m[s] ?? s;

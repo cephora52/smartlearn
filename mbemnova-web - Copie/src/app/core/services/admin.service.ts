@@ -23,6 +23,16 @@ export class AdminService {
   ): Observable<ApiResponse<PageResponse<ApprenantAdminView>>> {
     return this.#api.getPage<ApprenantAdminView>('/admin/apprenants', p);
   }
+  getFormateurs(
+    p?: Record<string, string | number>,
+  ): Observable<ApiResponse<PageResponse<ApprenantAdminView>>> {
+    return this.#api.getPage<ApprenantAdminView>('/admin/formateurs', p);
+  }
+  getAllCourses(
+    p?: Record<string, string | number>,
+  ): Observable<ApiResponse<PageResponse<CoursResponse>>> {
+    return this.#api.getPage<CoursResponse>('/admin/formations', p);
+  }
   inscrire(req: InscriptionManuelleRequest): Observable<ApiResponse<ApprenantAdminView>> {
     return this.#api.post<ApprenantAdminView>('/admin/apprenants', req);
   }

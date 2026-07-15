@@ -43,28 +43,33 @@ public class MoratoireRepositoryAdapter implements MoratoireRepository {
         return repo.existsByPaiementIdAndStatut(paiementId, "EN_ATTENTE");
     }
 
-  private Moratoire toDomain(MoratoireJpaEntity e) {
-    return new Moratoire(
-        e.getId(), e.getPaiementId(), e.getRaison(),
-        e.getNouvelleDate(),        // nouvelleDateSouhaitee
-        null,                        // nouvelleDateAccordee — non stocké encore
-        e.getStatut(), e.getAdminId(),
-        e.getJustificationRefus(), e.getDateDecision(),
-        e.getCreatedAt(), e.getUpdatedAt());
-}
+    @Override @Transactional(readOnly = true)
+    public List<Moratoire> findAll() {
+        return repo.findAll().stream()
+            .map(this::toDomain).collect(Collectors.toList());
+    }
 
-private MoratoireJpaEntity toEntity(Moratoire m) {
-    return MoratoireJpaEntity.builder()
-        .id(m.getId() != null ? m.getId() : UUID.randomUUID())
-        .paiementId(m.getPaiementId())
-        .raison(m.getRaison())
-        .nouvelleDate(m.getNouvelleDate())   // getNouvelleDate() → nouvelleDateSouhaitee
-        .statut(m.getStatut())
-        .adminId(m.getAdminId())
-        .justificationRefus(m.getJustificationRefus())
-        .dateDecision(m.getDateDecision())
-        .build();
-}
+    private Moratoire toDomain(MoratoireJpaEntity e) {
+        return new Moratoire(
+            e.getId(), e.getPaiementId(), e.getRaison(),
+            e.getNouvelleDate(),        // nouvelleDateSouhaitee
+            e.getNouvelleDateAccordee(), // nouvelleDateAccordee
+            e.getStatut(), e.getAdminId(),
+            e.getJustificationRefus(), e.getDateDecision(),
+            e.getCreatedAt(), e.getUpdatedAt());
+    }
 
-
+    private MoratoireJpaEntity toEntity(Moratoire m) {
+        return MoratoireJpaEntity.builder()
+            .id(m.getId() != null ? m.getId() : UUID.randomUUID())
+            .paiementId(m.getPaiementId())
+            .raison(m.getRaison())
+            .nouvelleDate(m.getNouvelleDate())   // getNouvelleDate() → nouvelleDateSouhaitee
+            .nouvelleDateAccordee(m.getNouvelledateAccordee())
+            .statut(m.getStatut())
+            .adminId(m.getAdminId())
+            .justificationRefus(m.getJustificationRefus())
+            .dateDecision(m.getDateDecision())
+            .build();
+    }
 }

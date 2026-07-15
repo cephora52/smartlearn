@@ -71,6 +71,40 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   // Moratoires
   if (m === 'POST' && p === '/moratoires')                                  return r(ok('mor-new', 'Demande soumise. L\'équipe te répondra rapidement.'));
   if (m === 'PATCH' && p.includes('/moratoires/') && p.includes('/decider')) return r(ok(null, 'Décision enregistrée'));
+  if (m === 'GET' && p === '/moratoires') {
+    return r(ok([
+      {
+        id: 'mor-001',
+        paiementId: 'p-001',
+        raison: 'DIFFICULTES_FINANCIERES',
+        nouvelleDateSouhaitee: '2026-08-15',
+        nouvelleDateAccordee: null,
+        statut: 'EN_ATTENTE',
+        createdAt: new Date().toISOString(),
+        apprenantId: 'u-002',
+        apprenantNom: 'Mbemba',
+        apprenantPrenom: 'Jean-Paul',
+        apprenantEmail: 'jp.mbemba@example.com',
+        coursId: 'c-001',
+        coursTitre: 'Développement Web Moderne en Angular'
+      },
+      {
+        id: 'mor-002',
+        paiementId: 'p-002',
+        raison: 'PROBLEME_SANTE',
+        nouvelleDateSouhaitee: '2026-09-01',
+        nouvelleDateAccordee: '2026-09-01',
+        statut: 'APPROUVE',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        apprenantId: 'u-003',
+        apprenantNom: 'Kouassi',
+        apprenantPrenom: 'Amina',
+        apprenantEmail: 'amina.kouassi@example.com',
+        coursId: 'c-002',
+        coursTitre: 'Introduction à Java Spring Boot'
+      }
+    ]));
+  }
 
   // ── Sessions + Créneaux ────────────────────────────────────
   if (m === 'GET'  && p.startsWith('/sessions'))                           return r(page(MOCK_SESSIONS));

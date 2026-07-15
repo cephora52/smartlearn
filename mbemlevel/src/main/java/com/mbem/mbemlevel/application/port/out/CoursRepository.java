@@ -9,4 +9,5 @@ public interface CoursRepository {
     Page<Cours>     findCatalogue(NiveauCours niveau, UUID categorieId, Pageable pageable);
     Cours           save(Cours cours);
     boolean         existsBySlug(String slug);
+    long            count();
 }

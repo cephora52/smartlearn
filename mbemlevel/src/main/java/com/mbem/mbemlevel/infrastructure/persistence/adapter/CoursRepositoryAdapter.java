@@ -31,6 +31,9 @@ public class CoursRepositoryAdapter implements CoursRepository {
     @Override @Transactional(readOnly=true)
     public boolean existsBySlug(String slug) { return repo.existsBySlug(slug); }
 
+    @Override @Transactional(readOnly=true)
+    public long count() { return repo.count(); }
+
     private String resolveUniqueSlug(String baseSlug, UUID id) {
         if (baseSlug == null || baseSlug.isEmpty()) {
             return UUID.randomUUID().toString();

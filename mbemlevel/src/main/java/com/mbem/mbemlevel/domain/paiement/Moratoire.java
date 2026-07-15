@@ -19,7 +19,7 @@ public class Moratoire extends AggregateRoot {
     private String    raison;
     private LocalDate nouvelleDateSouhaitee;
     private LocalDate nouvelleDateAccordee;    // Remplie si accordé
-    private String    statut;                  // EN_ATTENTE | ACCORDE | REFUSE
+    private String    statut;                  // EN_ATTENTE | APPROUVE | REFUSE
     private UUID      adminId;
     private String    justificationRefus;
     private LocalDateTime dateDecision;
@@ -53,7 +53,7 @@ public class Moratoire extends AggregateRoot {
         if (!"EN_ATTENTE".equals(this.statut)) {
             throw new IllegalStateException("Moratoire déjà traité : " + this.statut);
         }
-        this.statut = "ACCORDE";
+        this.statut = "APPROUVE";
         this.adminId = adminId;
         this.nouvelleDateAccordee = nouvelleDateAccordee;
         this.dateDecision = LocalDateTime.now();

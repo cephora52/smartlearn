@@ -88,4 +88,14 @@ public class SendGridEmailAdapter implements EmailPort {
     public void envoyerRecomparainageActive(String emailParrain, String prenomParrain, String prenomFilleul) {
         log.info("Email parrainage à {}: {} - filleul: {}", emailParrain, prenomParrain, prenomFilleul);
     }
+
+    @Override
+    public void envoyerMoratoireApprouve(String email, String prenom, String nomCours, String nouvelleDate) {
+        log.info("Email moratoire approuvé à {}: {} - cours: {} - nouvelle date: {}", email, prenom, nomCours, nouvelleDate);
+    }
+
+    @Override
+    public void envoyerMoratoireRefuse(String email, String prenom, String nomCours, String justification) {
+        log.info("Email moratoire refusé à {}: {} - cours: {} - justification: {}", email, prenom, nomCours, justification);
+    }
 }

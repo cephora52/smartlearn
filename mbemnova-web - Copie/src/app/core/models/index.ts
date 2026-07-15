@@ -26,7 +26,7 @@ export type StatutCompte = 'ACTIF' | 'SUSPENDU' | 'INACTIF';
 export type NiveauCours = 'DEBUTANT' | 'INTERMEDIAIRE' | 'AVANCE';
 export type Modalite = 'PRESENTIEL' | 'MEET' | 'HYBRIDE';
 export type ModePaiement = 'CASH' | 'MOBILE_MONEY' | 'VIREMENT' | 'ONLINE';
-export type StatutPaiement = 'RECU' | 'PARTIEL' | 'EN_ATTENTE' | 'RETARD' | 'ANNULE';
+export type StatutPaiement = 'RECU' | 'PAYE' | 'PARTIEL' | 'EN_ATTENTE' | 'RETARD' | 'EN_RETARD' | 'MORATOIRE' | 'ANNULE';
 export type TypeRendu = 'TEXTE' | 'FICHIER' | 'LIEN';
 export type TypeNotif =
   | 'PAIEMENT_ECHEANCE'
@@ -246,12 +246,13 @@ export interface EnregistrerPaiementRequest {
 export interface DemanderMoratoireRequest {
   paiementId: string;
   raison: 'DIFFICULTES_FINANCIERES' | 'PROBLEME_SANTE' | 'AUTRE';
-  explication: string;
+  explicationLibre: string;
   nouvelleDateSouhaitee: string;
 }
 export interface TraiterMoratoireRequest {
-  decision: 'ACCORDE' | 'REFUSE';
-  justification?: string;
+  decision: 'APPROUVE' | 'REFUSE';
+  nouvelleDateAccordee?: string;
+  justificationRefus?: string;
 }
 
 // ── Sessions (s11) ─────────────────────────────────────────
@@ -394,6 +395,7 @@ export interface ProfilTalentResponse {
   streakJours: number;
   certificats: CertificatResponse[];
   rang?: number;
+  xpParJour?: number[];
 }
 export interface MettreAJourProfilRequest {
   bio?: string;
@@ -455,22 +457,21 @@ export interface ReferralResponse {
 export interface StatistiquesResponse {
   totalApprenants: number;
   apprenantsActifs: number;
+  formateursActifs: number;
+  totalFormations: number;
   paiementsEnAttente: number;
-  paiementsEnRetard: number;
-  revenusTotal: number;
-  revenus: string;
 }
 export interface InscriptionManuelleRequest {
   prenom: string;
-  nom: string;
+  nom?: string;
   email: string;
-  telephone: string;
+  telephone?: string;
+  motDePasse: string;
   coursId?: string;
 }
 export interface AssignerRoleRequest {
-  userId: string;
+  utilisateurId: string;
   nouveauRole: UserRole;
-  motDePasseAdmin: string;
 }
 export interface CreerCoursRequest {
   titre: string;

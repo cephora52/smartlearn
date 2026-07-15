@@ -92,4 +92,10 @@ public interface EmailPort {
     /** Récompense de parrainage activée (scénario 15). */
     void envoyerRecomparainageActive(String emailParrain, String prenomParrain,
                                      String prenomFilleul);
+
+    /** Moratoire approuvé (délai accordé). */
+    void envoyerMoratoireApprouve(String email, String prenom, String nomCours, String nouvelleDate);
+
+    /** Moratoire refusé. */
+    void envoyerMoratoireRefuse(String email, String prenom, String nomCours, String justification);
 }

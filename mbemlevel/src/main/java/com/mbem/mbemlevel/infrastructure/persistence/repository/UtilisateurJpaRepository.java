@@ -41,6 +41,9 @@ public interface UtilisateurJpaRepository extends JpaRepository<UtilisateurJpaEn
     // ✅ AJOUTER CETTE MÉTHODE - Version 1 : Query Method (recommandé)
     Optional<UtilisateurJpaEntity> findByTokenVerificationEmail(String token);
 
+    @Query("SELECT COUNT(u) > 0 FROM UtilisateurJpaEntity u WHERE u.role = :role")
+    boolean existsByRole(@Param("role") com.mbem.mbemlevel.domain.shared.enums.Role role);
+
 
     @Query("SELECT u FROM UtilisateurJpaEntity u " +
        "WHERE u.statut = 'INSCRIT' " +

@@ -4,10 +4,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { PaymentService } from '../../../core/services/payment.service';
 import { ToastService } from '../../../core/services/toast.service';
-import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../core/models';
+import type { ApprenantAdminView, AssignerRoleRequest } from '../../../core/models';
 
 @Component({
-  selector: 'app-learner-mgr',
+  selector: 'app-instructor-mgr',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
@@ -18,14 +18,14 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
     <!-- ── HEADER ── -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Gestion des Apprenants</h1>
-        <p class="text-sm text-slate-500 mt-1">Gérez les comptes des apprenants, suspendez ou réactivez les accès, et inscrivez manuellement de nouveaux candidats.</p>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Gestion des Formateurs</h1>
+        <p class="text-sm text-slate-500 mt-1">Gérez les comptes des formateurs de la plateforme, attribuez des rôles ou gérez leurs droits d'accès.</p>
       </div>
       <div class="flex gap-3">
-        <button (click)="showRegisterModal.set(true)"
+        <button (click)="showRoleModal.set(true)"
                 class="btn-primary self-start sm:self-auto flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Inscrire un Apprenant
+          Promouvoir un Utilisateur
         </button>
       </div>
     </div>
@@ -45,7 +45,7 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">
-            Total : {{ filteredApprenants().length }} apprenants
+            Total : {{ filteredFormateurs().length }} formateurs
           </span>
         </div>
       </div>
@@ -54,15 +54,15 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
       @if (loading()) {
         <div class="p-12 text-center">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-3"></div>
-          <p class="text-sm text-slate-500">Chargement des apprenants...</p>
+          <p class="text-sm text-slate-500">Chargement des formateurs...</p>
         </div>
       } @else {
         <!-- Empty State -->
-        @if (filteredApprenants().length === 0) {
+        @if (filteredFormateurs().length === 0) {
           <div class="p-16 text-center">
-            <p class="text-4xl mb-3">👥</p>
-            <h3 class="text-lg font-bold text-slate-900 mb-1">Aucun apprenant trouvé</h3>
-            <p class="text-sm text-slate-500">Modifiez vos critères de recherche ou inscrivez un nouvel apprenant.</p>
+            <p class="text-4xl mb-3">👨‍🏫</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Aucun formateur trouvé</h3>
+            <p class="text-sm text-slate-500">Modifiez vos critères de recherche ou promouvez un utilisateur au rang de formateur.</p>
           </div>
         } @else {
           <!-- Table -->
@@ -70,63 +70,62 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold uppercase text-slate-400 tracking-wider">
-                  <th class="px-6 py-4">Apprenant</th>
+                  <th class="px-6 py-4">Formateur</th>
                   <th class="px-6 py-4">Email / Téléphone</th>
-                  <th class="px-6 py-4">XP</th>
-                  <th class="px-6 py-4">Date Inscription</th>
+                  <th class="px-6 py-4">Date de Promotion</th>
                   <th class="px-6 py-4">Statut</th>
                   <th class="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 text-sm">
-                @for (app of filteredApprenants(); track app.id) {
+                @for (fmt of filteredFormateurs(); track fmt.id) {
                   <tr class="hover:bg-slate-50/50 transition-colors">
-                    <!-- Apprenant -->
+                    <!-- Formateur -->
                     <td class="px-6 py-4">
                       <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
-                          {{ initials(app) }}
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center font-bold text-purple-700">
+                          {{ initials(fmt) }}
                         </div>
                         <div>
-                          <p class="font-bold text-slate-900">{{ app.prenom }} {{ app.nom }}</p>
-                          <p class="text-xs text-slate-400">ID: {{ app.id }}</p>
+                          <p class="font-bold text-slate-900">{{ fmt.prenom }} {{ fmt.nom }}</p>
+                          <p class="text-xs text-slate-400">ID: {{ fmt.id }}</p>
                         </div>
                       </div>
                     </td>
 
                     <!-- Email / Tel -->
                     <td class="px-6 py-4">
-                      <p class="text-slate-700 font-medium">{{ app.email }}</p>
-                      <p class="text-xs text-slate-400 mt-0.5">{{ app.telephone || 'Aucun téléphone' }}</p>
-                    </td>
-
-                    <!-- XP -->
-                    <td class="px-6 py-4 font-black text-slate-900 tabular-nums">
-                      {{ app.xpTotal || 0 }} XP
+                      <p class="text-slate-700 font-medium">{{ fmt.email }}</p>
+                      <p class="text-xs text-slate-400 mt-0.5">{{ fmt.telephone || 'Aucun téléphone' }}</p>
                     </td>
 
                     <!-- Date -->
                     <td class="px-6 py-4 text-slate-500">
-                      {{ formatDate(app.inscritLe) }}
+                      {{ formatDate(fmt.inscritLe) }}
                     </td>
 
                     <!-- Status -->
                     <td class="px-6 py-4">
-                      <span [class]="'badge inline-flex ' + (app.statut === 'ACTIF' ? 'badge-green' : 'badge-red')">
-                        {{ app.statut }}
+                      <span [class]="'badge inline-flex ' + (fmt.statut === 'ACTIF' ? 'badge-green' : 'badge-red')">
+                        {{ fmt.statut }}
                       </span>
                     </td>
 
                     <!-- Actions -->
                     <td class="px-6 py-4 text-right">
                       <div class="flex justify-end gap-2">
-                        @if (app.statut === 'ACTIF') {
-                          <button (click)="suspendUser(app)"
+                        <button (click)="demoteUser(fmt)"
+                                class="px-3 py-1.5 rounded-lg border border-amber-200 text-amber-600 text-xs font-bold hover:bg-amber-50 transition-colors"
+                                title="Changer le rôle de formateur à apprenant">
+                          Retirer rôle Formateur
+                        </button>
+                        @if (fmt.statut === 'ACTIF') {
+                          <button (click)="suspendUser(fmt)"
                                   class="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-bold hover:bg-red-50 transition-colors">
                             Suspendre
                           </button>
                         } @else {
-                          <button (click)="reactivateUser(app)"
+                          <button (click)="reactivateUser(fmt)"
                                   class="px-3 py-1.5 rounded-lg border border-green-200 text-green-600 text-xs font-bold hover:bg-green-50 transition-colors">
                             Réactiver
                           </button>
@@ -144,49 +143,44 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
   </div>
 </div>
 
-<!-- ── REGISTER MODAL ── -->
-@if (showRegisterModal()) {
+<!-- ── PROMOTE ROLE MODAL ── -->
+@if (showRoleModal()) {
   <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-fade-up">
       <!-- Modal Header -->
       <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-lg font-black text-slate-900">Inscrire un Apprenant</h3>
-        <button (click)="showRegisterModal.set(false)" class="text-slate-400 hover:text-slate-600">
+        <h3 class="text-lg font-black text-slate-900">Promouvoir un Formateur</h3>
+        <button (click)="showRoleModal.set(false)" class="text-slate-400 hover:text-slate-600">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
       <!-- Modal Body Form -->
-      <form [formGroup]="registerForm" (ngSubmit)="submitRegister()" class="p-6 space-y-4">
+      <form [formGroup]="roleForm" (ngSubmit)="submitPromotion()" class="p-6 space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Prénom / Nom</label>
-          <input type="text" formControlName="prenom"
-                 placeholder="Ex: Jean-Paul"
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ID Utilisateur</label>
+          <input type="text" formControlName="utilisateurId"
+                 placeholder="Ex: u-001 ou UUID"
                  class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
-          <input type="email" formControlName="email"
-                 placeholder="Ex: jeanpaul@gmail.com"
-                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mot de Passe temporaire</label>
-          <input type="password" formControlName="motDePasse"
-                 placeholder="••••••••"
-                 class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Rôle cible</label>
+          <select formControlName="nouveauRole"
+                  class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 bg-white transition-colors">
+            <option value="FORMATEUR">Formateur</option>
+            <option value="ADMIN">Administrateur</option>
+          </select>
         </div>
 
         <div class="pt-4 flex gap-3">
-          <button type="button" (click)="showRegisterModal.set(false)"
+          <button type="button" (click)="showRoleModal.set(false)"
                   class="btn-secondary flex-1 py-3 justify-center">
             Annuler
           </button>
-          <button type="submit" [disabled]="registerForm.invalid || registering()"
+          <button type="submit" [disabled]="roleForm.invalid || promoting()"
                   class="btn-primary flex-1 py-3 justify-center">
-            @if (registering()) { Enregistrement... } @else { Inscrire }
+            @if (promoting()) { Promotion... } @else { Promouvoir }
           </button>
         </div>
       </form>
@@ -195,104 +189,118 @@ import type { ApprenantAdminView, InscriptionManuelleRequest } from '../../../co
 }
   `,
 })
-export class LearnerManagerComponent implements OnInit {
+export class InstructorManagerComponent implements OnInit {
   readonly #adminSvc   = inject(AdminService);
   readonly #paymentSvc = inject(PaymentService);
   readonly #toast      = inject(ToastService);
   readonly #fb         = inject(FormBuilder);
 
-  readonly listApprenants = signal<ApprenantAdminView[]>([]);
+  readonly listFormateurs = signal<ApprenantAdminView[]>([]);
   readonly loading        = signal(true);
   readonly searchQuery    = signal('');
 
-  // Modals / register form
-  readonly showRegisterModal = signal(false);
-  readonly registering       = signal(false);
-  readonly registerForm = this.#fb.nonNullable.group({
-    prenom: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    motDePasse: ['', [Validators.required, Validators.minLength(6)]],
+  // Role promotion
+  readonly showRoleModal = signal(false);
+  readonly promoting     = signal(false);
+  readonly roleForm = this.#fb.nonNullable.group({
+    utilisateurId: ['', [Validators.required, Validators.minLength(2)]],
+    nouveauRole: ['FORMATEUR', Validators.required],
   });
 
-  readonly filteredApprenants = computed(() => {
+  readonly filteredFormateurs = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.listApprenants();
+    const all = this.listFormateurs();
     if (!q) return all;
-    return all.filter(app =>
-      app.prenom.toLowerCase().includes(q) ||
-      (app.nom || '').toLowerCase().includes(q) ||
-      app.email.toLowerCase().includes(q)
+    return all.filter(fmt =>
+      fmt.prenom.toLowerCase().includes(q) ||
+      (fmt.nom || '').toLowerCase().includes(q) ||
+      fmt.email.toLowerCase().includes(q)
     );
   });
 
   ngOnInit(): void {
-    this.loadApprenants();
+    this.loadFormateurs();
   }
 
-  loadApprenants(): void {
+  loadFormateurs(): void {
     this.loading.set(true);
-    this.#adminSvc.getApprenants().subscribe({
+    this.#adminSvc.getFormateurs().subscribe({
       next: res => {
         if (res.success && res.data) {
-          // If pagination response or flat list
-          this.listApprenants.set((res.data as any).content || res.data || []);
+          this.listFormateurs.set((res.data as any).content || res.data || []);
         }
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.#toast.error('Impossible de charger la liste des apprenants');
+        this.#toast.error('Impossible de charger la liste des formateurs');
       }
     });
   }
 
-  suspendUser(app: ApprenantAdminView): void {
-    if (confirm(`Êtes-vous sûr de vouloir suspendre le compte de ${app.prenom} ?`)) {
-      this.#paymentSvc.suspendre(app.id).subscribe({
+  demoteUser(fmt: ApprenantAdminView): void {
+    if (confirm(`Voulez-vous vraiment retirer le rôle Formateur de ${fmt.prenom} ? Il redeviendra un simple apprenant.`)) {
+      this.#adminSvc.assignerRole({ utilisateurId: fmt.id, nouveauRole: 'APPRENANT' }).subscribe({
         next: res => {
           if (res.success) {
-            this.#toast.success('Le compte a été suspendu avec succès');
-            this.loadApprenants();
+            this.#toast.success('Rôle mis à jour avec succès');
+            this.loadFormateurs();
           }
         },
         error: () => {
-          this.#toast.error('Erreur lors de la suspension du compte');
+          this.#toast.error('Impossible de modifier le rôle');
         }
       });
     }
   }
 
-  reactivateUser(app: ApprenantAdminView): void {
-    this.#paymentSvc.reactiver(app.id).subscribe({
+  suspendUser(fmt: ApprenantAdminView): void {
+    if (confirm(`Êtes-vous sûr de vouloir suspendre le compte du formateur ${fmt.prenom} ?`)) {
+      this.#paymentSvc.suspendre(fmt.id).subscribe({
+        next: res => {
+          if (res.success) {
+            this.#toast.success('Le compte a été suspendu');
+            this.loadFormateurs();
+          }
+        },
+        error: () => {
+          this.#toast.error('Erreur lors de la suspension');
+        }
+      });
+    }
+  }
+
+  reactivateUser(fmt: ApprenantAdminView): void {
+    this.#paymentSvc.reactiver(fmt.id).subscribe({
       next: res => {
         if (res.success) {
-          this.#toast.success('Le compte a été réactivé avec succès');
-          this.loadApprenants();
+          this.#toast.success('Le compte a été réactivé');
+          this.loadFormateurs();
         }
       },
       error: () => {
-        this.#toast.error('Erreur lors de la réactivation du compte');
+        this.#toast.error('Erreur lors de la réactivation');
       }
     });
   }
 
-  submitRegister(): void {
-    if (this.registerForm.invalid) return;
-    this.registering.set(true);
-    const formVal = this.registerForm.getRawValue();
-    this.#adminSvc.inscrire(formVal as InscriptionManuelleRequest).subscribe({
+  submitPromotion(): void {
+    if (this.roleForm.invalid) return;
+    this.promoting.set(true);
+    const formVal = this.roleForm.getRawValue();
+    this.#adminSvc.assignerRole(formVal as AssignerRoleRequest).subscribe({
       next: res => {
         if (res.success) {
-          this.#toast.success('Nouvel apprenant inscrit avec succès');
-          this.showRegisterModal.set(false);
-          this.registerForm.reset();
-          this.loadApprenants();
+          this.#toast.success('Utilisateur promu avec succès');
+          this.showRoleModal.set(false);
+          this.roleForm.reset({ utilisateurId: '', nouveauRole: 'FORMATEUR' });
+          this.loadFormateurs();
         }
-        this.registering.set(false);
+        this.promoting.set(false);
       },
       error: () => {
-        this.registering.set(false);
-        this.#toast.error('Impossible d\'inscrire cet apprenant. L\'email est peut-être déjà utilisé.');
+        this.promoting.set(false);
+        this.#toast.error('Erreur lors de la promotion. Vérifiez l\'identifiant utilisateur.');
       }
     });
   }

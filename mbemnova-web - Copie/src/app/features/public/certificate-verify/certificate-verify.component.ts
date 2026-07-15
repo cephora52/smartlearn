@@ -10,6 +10,29 @@ import type { CertificatResponse } from '../../../core/models';
   selector: 'app-certificate-verify',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
+  styles: [`
+    @media print {
+      body, html {
+        background: white !important;
+      }
+      .min-h-screen {
+        background: white !important;
+        padding: 0 !important;
+      }
+      .card {
+        border: none !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .btn-primary, .btn-secondary, a, button, .flex.gap-3 {
+        display: none !important;
+      }
+    }
+  `],
   template: `
 <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4 py-16">
   <div class="w-full max-w-lg animate-fade-up">
@@ -68,11 +91,11 @@ import type { CertificatResponse } from '../../../core/models';
           </div>
 
           <div class="flex gap-3 mt-8">
-            <a [href]="cert()!.lienPdf" target="_blank" rel="noopener"
-               class="btn-primary flex-1 justify-center">
+            <button (click)="printCert()"
+               class="btn-primary flex-1 justify-center cursor-pointer">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Télécharger PDF
-            </a>
+            </button>
             <a routerLink="/catalogue" class="btn-secondary flex-1 justify-center">Voir les formations</a>
           </div>
         </div>
@@ -114,11 +137,30 @@ export class CertificateVerifyComponent implements OnInit {
         lienPdf: '#', dateEmission: new Date().toISOString(), coursTitre: 'Python & Data Science',
       });
       this.loading.set(false);
+      this.checkAndPrint();
       return;
     }
     this.#svc.verifierCertificat(c).subscribe({
-      next: r => { this.cert.set(r.data); this.loading.set(false); },
+      next: r => {
+        this.cert.set(r.data);
+        this.loading.set(false);
+        this.checkAndPrint();
+      },
       error: () => { this.cert.set(null); this.loading.set(false); },
     });
+  }
+
+  checkAndPrint(): void {
+    if (typeof window !== 'undefined' && window.location.search.includes('print=true')) {
+      setTimeout(() => {
+        window.print();
+      }, 1000);
+    }
+  }
+
+  printCert(): void {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
   }
 }

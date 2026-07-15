@@ -10,9 +10,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.UtilisateurJpaRepository;
+import com.mbem.mbemlevel.infrastructure.persistence.repository.CoursJpaRepository;
+import com.mbem.mbemlevel.application.port.out.StoragePort;
+import com.mbem.mbemlevel.api.dto.response.PageResponse;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
 /**
  * Back-office admin — accès restreint ADMIN/SUPER_ADMIN.
  *
@@ -32,6 +37,9 @@ public class AdminController {
     private final AssignerRoleUseCase            assignerRoleUC;
     private final GetStatistiquesUseCase         statsUC;
     private final EffectuerTirageAuSortUseCase   tirageUC;
+    private final UtilisateurJpaRepository       utilisateurJpaRepo;
+    private final CoursJpaRepository             coursJpaRepo;
+    private final StoragePort                    storagePort;
 
     /** S21 — Inscrire un apprenant manuellement */
     @PostMapping("/apprenants")
@@ -67,9 +75,8 @@ public class AdminController {
         var s = statsUC.executer();
         return ResponseEntity.ok(ApiResponse.ok(new StatistiquesResponse(
             s.totalApprenants(), s.apprenantsActifs(),
-            s.paiementsEnAttente(), s.paiementsEnRetard(),
-            s.revenus(),
-            com.mbem.mbemlevel.domain.shared.Money.of(s.revenus()).toDisplay())));
+            s.formateursActifs(), s.totalFormations(),
+            s.paiementsEnAttente())));
     }
 
     /** S24 — Déclencher manuellement un tirage au sort */
@@ -82,4 +89,61 @@ public class AdminController {
         tirageUC.executer(prix, UUID.fromString(adminId));
         return ResponseEntity.ok(ApiResponse.ok("Tirage effectué."));
     }
+
+    /** Lister tous les apprenants (S21) */
+    @GetMapping("/apprenants")
+    @Operation(summary="Lister tous les apprenants (S21)")
+    public ResponseEntity<ApiResponse<PageResponse<AdminUtilisateurResponse>>> getApprenants() {
+        var all = utilisateurJpaRepo.findAll().stream()
+            .filter(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.APPRENANT)
+            .toList();
+        var content = all.stream()
+            .map(u -> new AdminUtilisateurResponse(
+                u.getId(), u.getPrenom(), u.getNom(), u.getEmail(),
+                u.getTelephone(), u.getStatut().name(), u.getXpTotal(),
+                u.getCreatedAt().toString()))
+            .toList();
+        var page = new PageResponse<>(content, 0, 100, content.size(), 1, true);
+        return ResponseEntity.ok(ApiResponse.ok(page));
+    }
+
+    /** Lister tous les formateurs */
+    @GetMapping("/formateurs")
+    @Operation(summary="Lister tous les formateurs")
+    public ResponseEntity<ApiResponse<PageResponse<AdminUtilisateurResponse>>> getFormateurs() {
+        var all = utilisateurJpaRepo.findAll().stream()
+            .filter(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.FORMATEUR)
+            .toList();
+        var content = all.stream()
+            .map(u -> new AdminUtilisateurResponse(
+                u.getId(), u.getPrenom(), u.getNom(), u.getEmail(),
+                u.getTelephone(), u.getStatut().name(), u.getXpTotal(),
+                u.getCreatedAt().toString()))
+            .toList();
+        var page = new PageResponse<>(content, 0, 100, content.size(), 1, true);
+        return ResponseEntity.ok(ApiResponse.ok(page));
+    }
+
+    /** Lister toutes les formations */
+    @GetMapping("/formations")
+    @Operation(summary="Lister toutes les formations")
+    public ResponseEntity<ApiResponse<PageResponse<CoursResponse>>> getFormations() {
+        var all = coursJpaRepo.findAll();
+        var content = all.stream()
+            .map(e -> CoursResponse.fromEntity(e, storagePort))
+            .toList();
+        var page = new PageResponse<>(content, 0, 100, content.size(), 1, true);
+        return ResponseEntity.ok(ApiResponse.ok(page));
+    }
+
+    public record AdminUtilisateurResponse(
+        UUID id,
+        String prenom,
+        String nom,
+        String email,
+        String telephone,
+        String statut,
+        long xpTotal,
+        String inscritLe
+    ) {}
 }

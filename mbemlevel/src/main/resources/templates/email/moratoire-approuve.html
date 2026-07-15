@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Demande de délai approuvée</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; margin: 0; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #dddddd; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #2e7d32;">Bonne nouvelle !</h2>
+        <p>Bonjour <span th:text="${prenom}">Apprenant</span>,</p>
+        <p>Nous avons le plaisir de vous informer que votre demande de délai (moratoire) pour la formation <strong th:text="${nomCours}">Formation</strong> a été <strong>approuvée</strong>.</p>
+        <p>Vous avez désormais un accès complet aux leçons et au reste de votre formation.</p>
+        <p>Nouvelle date d'échéance accordée : <strong th:text="${nouvelleDate}">Date</strong>.</p>
+        <p>Bonne continuation dans votre apprentissage !</p>
+        <p>L'équipe MbemNova</p>
+    </div>
+</body>
+</html>
