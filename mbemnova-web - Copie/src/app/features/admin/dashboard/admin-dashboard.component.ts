@@ -4,8 +4,9 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
-import type { StatistiquesResponse } from '../../../core/models';
-import { MOCK_STATS, MOCK_APPRENANTS } from '../../../core/services/mock.data';
+import type { StatistiquesResponse, ApprenantAdminView } from '../../../core/models';
+import { MOCK_STATS } from '../../../core/services/mock.data';
+import { AuthService } from '../../../core/services/auth.service';
 
 // Données graphiques revenus (mock 6 derniers mois)
 const REVENUS_MOIS = [
@@ -41,7 +42,7 @@ const ACTIVITE = [
         <div>
           <p class="text-slate-400 text-sm mb-0.5">Back-office MbemNova</p>
           <h1 class="text-2xl font-black" style="font-family:var(--font);">
-            Dashboard admin
+            Bonjour, {{ prenom() }} 👋
           </h1>
         </div>
         <div class="flex items-center gap-2">
@@ -379,6 +380,85 @@ const ACTIVITE = [
   </div>
 </div>
   `,
+  styles: [`
+    :host { display: block; }
+    .bg-slate-50 {
+      background-color: var(--bg) !important;
+      transition: background-color 0.2s ease;
+    }
+    .bg-slate-900 {
+      background-color: var(--bg-subtle) !important;
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      color: var(--tx) !important;
+    }
+    .bg-slate-900 .text-slate-400 {
+      color: var(--tx-sec) !important;
+    }
+    .card {
+      background-color: var(--bg-subtle) !important;
+      border-color: var(--border) !important;
+      color: var(--tx) !important;
+    }
+    .text-slate-900 {
+      color: var(--tx) !important;
+    }
+    .text-slate-700 {
+      color: var(--tx) !important;
+    }
+    .text-slate-800 {
+      color: var(--tx) !important;
+    }
+    .text-slate-500 {
+      color: var(--tx-sec) !important;
+    }
+    .text-slate-400 {
+      color: var(--tx-muted) !important;
+    }
+    .bg-blue-100 {
+      background-color: var(--bg-muted) !important;
+    }
+    .bg-purple-100 {
+      background-color: var(--bg-muted) !important;
+    }
+    .bg-indigo-100 {
+      background-color: var(--bg-muted) !important;
+    }
+    .bg-amber-100 {
+      background-color: var(--bg-muted) !important;
+    }
+    .bg-red-50 {
+      background-color: rgba(239, 68, 68, 0.08) !important;
+    }
+    .border-red-200 {
+      border-color: rgba(239, 68, 68, 0.2) !important;
+    }
+    .bg-amber-50 {
+      background-color: rgba(245, 158, 11, 0.08) !important;
+    }
+    .border-amber-200 {
+      border-color: rgba(245, 158, 11, 0.2) !important;
+    }
+    /* SVG graph grid lines */
+    line[stroke="#e2e8f0"] {
+      stroke: var(--border) !important;
+    }
+    /* SVG graph text labels */
+    text[fill="#94a3b8"] {
+      fill: var(--tx-sec) !important;
+    }
+    .border-slate-50, .border-slate-100 {
+      border-color: var(--border) !important;
+    }
+    .hover\:bg-slate-50:hover {
+      background-color: var(--bg-muted) !important;
+    }
+    /* Shimmer effect for skeleton loader */
+    .shimmer {
+      background: linear-gradient(90deg, var(--bg-muted) 25%, var(--border) 50%, var(--bg-muted) 75%) !important;
+      background-size: 200% 100% !important;
+    }
+  `],
 })
 export class AdminDashboardComponent implements OnInit {
   readonly #adminSvc = inject(AdminService);

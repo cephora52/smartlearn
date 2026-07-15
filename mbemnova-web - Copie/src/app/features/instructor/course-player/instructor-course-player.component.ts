@@ -51,15 +51,15 @@ import type {
     }
 
     /* Mode sombre */
-    .dark .lesson-body h2 { color:#f1f5f9; }
-    .dark .lesson-body h3 { color:#cbd5e1; }
-    .dark .lesson-body p  { color:#94a3b8; }
-    .dark .lesson-body ul,
-    .dark .lesson-body ol { color:#94a3b8; }
-    .dark .lesson-body strong { color:#f1f5f9; }
-    .dark .lesson-body code  { background:#1e293b; color:#7dd3fc; }
-    .dark .lesson-body pre   { background:#020617; border-color:#0f172a; }
-    .dark .lesson-body .tip  { background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
+    :host-context(.dark) .lesson-body h2 { color:#f1f5f9; }
+    :host-context(.dark) .lesson-body h3 { color:#cbd5e1; }
+    :host-context(.dark) .lesson-body p  { color:#94a3b8; }
+    :host-context(.dark) .lesson-body ul,
+    :host-context(.dark) .lesson-body ol { color:#94a3b8; }
+    :host-context(.dark) .lesson-body strong { color:#f1f5f9; }
+    :host-context(.dark) .lesson-body code  { background:#1e293b; color:#7dd3fc; }
+    :host-context(.dark) .lesson-body pre   { background:#020617; border-color:#0f172a; }
+    :host-context(.dark) .lesson-body .tip  { background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
   `],
   template: `
 <div [class]="'flex flex-col h-screen transition-colors duration-200 '

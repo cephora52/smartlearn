@@ -6,22 +6,24 @@
 
 /* ── Root & background ──────────────────────────────────────── */
 .db-root {
-  background: #0f172a;
+  background: var(--bg);
   min-height: 100vh;
-  color: #e2e8f0;
+  color: var(--tx);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ── Tokens couleur ─────────────────────────────────────────── */
-.db-text-primary  { color: #f1f5f9; }
-.db-text-secondary { color: #cbd5e1; }
-.db-text-muted    { color: #64748b; }
+.db-text-primary  { color: var(--tx); }
+.db-text-secondary { color: var(--tx-sec); }
+.db-text-muted    { color: var(--tx-muted); }
 
 /* ── Topbar ─────────────────────────────────────────────────── */
 .db-topbar {
-  background: rgba(15, 23, 42, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 /* ── Avatar ─────────────────────────────────────────────────── */
@@ -59,12 +61,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: var(--tx-sec);
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 .db-icon-btn:hover {
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--tx);
+  background: var(--bg-muted);
 }
 
 /* ── Notification badge ─────────────────────────────────────── */
@@ -82,7 +84,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #0f172a;
+  border: 2px solid var(--bg);
 }
 
 /* ── Alert warning ───────────────────────────────────────────── */
@@ -108,25 +110,25 @@
 
 /* ── Base card ──────────────────────────────────────────────── */
 .db-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: 1rem;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 .db-card:hover {
-  border-color: rgba(255, 255, 255, 0.09);
+  border-color: var(--border-md);
 }
 
 /* ── Hoverable card (suggestions) ───────────────────────────── */
 .db-card-hover {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: 1rem;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   text-decoration: none;
   display: flex;
 }
@@ -155,7 +157,7 @@
 /* ── Progress bar ───────────────────────────────────────────── */
 .db-progress {
   height: 4px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--bg-muted);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -245,28 +247,34 @@
 
 /* ── Links ───────────────────────────────────────────────────── */
 .db-link-indigo {
-  color: #818cf8;
+  color: #4f46e5;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s ease;
 }
-.db-link-indigo:hover { color: #a5b4fc; }
+.db-link-indigo:hover { color: #6366f1; }
+:host-context(.dark) .db-link-indigo { color: #818cf8; }
+:host-context(.dark) .db-link-indigo:hover { color: #a5b4fc; }
 
 .db-link-emerald {
-  color: #34d399;
+  color: #059669;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s ease;
 }
-.db-link-emerald:hover { color: #6ee7b7; }
+.db-link-emerald:hover { color: #10b981; }
+:host-context(.dark) .db-link-emerald { color: #34d399; }
+:host-context(.dark) .db-link-emerald:hover { color: #6ee7b7; }
 
 .db-link-violet {
-  color: #a78bfa;
+  color: #7c3aed;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s ease;
 }
-.db-link-violet:hover { color: #c4b5fd; }
+.db-link-violet:hover { color: #8b5cf6; }
+:host-context(.dark) .db-link-violet { color: #a78bfa; }
+:host-context(.dark) .db-link-violet:hover { color: #c4b5fd; }
 
 .db-link-muted {
   color: #64748b;
@@ -274,7 +282,8 @@
   font-weight: 600;
   transition: color 0.15s ease;
 }
-.db-link-muted:hover { color: #94a3b8; }
+.db-link-muted:hover { color: #475569; }
+:host-context(.dark) .db-link-muted:hover { color: #94a3b8; }
 
 /* ── Notification item ───────────────────────────────────────── */
 .db-notif-item {
@@ -283,7 +292,7 @@
   text-decoration: none;
   transition: background-color 0.1s ease;
 }
-.db-notif-item:hover { background: rgba(255, 255, 255, 0.04); }
+.db-notif-item:hover { background: var(--bg-muted); }
 
 /* ── Tirage card accents ─────────────────────────────────────── */
 .db-tirage-top-bar {
@@ -298,9 +307,9 @@
 .db-skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.04) 100%
+    var(--bg-muted) 0%,
+    var(--border) 50%,
+    var(--bg-muted) 100%
   );
   background-size: 200% 100%;
   animation: dbShimmer 1.6s ease-in-out infinite;

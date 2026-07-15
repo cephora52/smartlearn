@@ -101,7 +101,7 @@
       <!-- Real KPIs -->
       <ng-container *ngIf="!isLoading()">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          @for (kpi of kpis; track kpi.label; let i = $index) {
+          @for (kpi of kpis(); track kpi.label; let i = $index) {
             <div class="kpi-card bg-white border border-slate-100 rounded-xl p-4 fade-in"
                  [style.animation-delay]="(i * 60) + 'ms'">
               <div class="flex items-center justify-between mb-3">

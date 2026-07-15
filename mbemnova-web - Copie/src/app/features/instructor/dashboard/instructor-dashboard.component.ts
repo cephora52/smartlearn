@@ -75,12 +75,24 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   readonly progressionData = PROGRESSION_DATA;
 
   // KPIs
-  readonly kpis = [
-    { label: 'Cours publiés',     value: '3',    delta: '+1 ce mois',  positive: true,  icon: 'book'   },
-    { label: 'Apprenants actifs', value: '142',  delta: '+7 ce mois',  positive: true,  icon: 'users'  },
-    { label: 'À corriger',        value: '2',    delta: '1 urgent',    positive: false, icon: 'check'  },
-    { label: 'Note moyenne',      value: '4.7',  delta: 'sur 5.0',     positive: true,  icon: 'star'   },
-  ];
+  readonly kpis = computed(() => {
+    const list = this.cours();
+    const nbPublies = list.filter(c => c.statut === 'PUBLIE').length;
+    const nbApprenants = list.reduce((sum, c) => sum + (c.nbApprenants ?? 0), 0);
+    const aCorriger = this.rendusAttente.length;
+    
+    const rated = list.filter(c => c.noteMoyenne);
+    const noteMoy = rated.length > 0
+      ? (rated.reduce((sum, c) => sum + c.noteMoyenne, 0) / rated.length).toFixed(1)
+      : '0.0';
+
+    return [
+      { label: 'Cours publiés',     value: String(nbPublies),    delta: nbPublies > 0 ? `+${nbPublies} au total` : 'Aucun',  positive: true,  icon: 'book'   },
+      { label: 'Apprenants actifs', value: String(nbApprenants),  delta: nbApprenants > 0 ? `+${nbApprenants} inscrits` : 'Aucun',  positive: true,  icon: 'users'  },
+      { label: 'À corriger',        value: String(aCorriger),    delta: aCorriger > 0 ? `${aCorriger} en attente` : 'Tout corrigé',    positive: aCorriger === 0, icon: 'check'  },
+      { label: 'Note moyenne',      value: noteMoy,              delta: 'sur 5.0',     positive: true,  icon: 'star'   },
+    ];
+  });
 
   // Chart max pour les barres relatives
   readonly chartMax = Math.max(...PROGRESSION_DATA.map(d => d.apprenants));

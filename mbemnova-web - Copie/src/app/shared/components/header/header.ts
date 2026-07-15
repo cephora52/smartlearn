@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
+import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 
 // ── Data interfaces ──────────────────────────────────────────────────────────
@@ -34,12 +36,14 @@ export interface Resource {
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ThemeToggleComponent],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header implements OnInit, OnDestroy {
   readonly #auth = inject(AuthService);
+  readonly themeSvc = inject(ThemeService);
+  readonly isDark = this.themeSvc.isDark;
   readonly isAuth = this.#auth.isAuthenticated;
   readonly role = this.#auth.userRole;
   readonly user = this.#auth.currentUser;
