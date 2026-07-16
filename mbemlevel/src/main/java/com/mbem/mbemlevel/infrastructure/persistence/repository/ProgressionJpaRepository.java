@@ -12,6 +12,10 @@ import java.util.UUID;
 public interface ProgressionJpaRepository extends JpaRepository<ProgressionJpaEntity, UUID> {
     Optional<ProgressionJpaEntity> findByApprenantIdAndCoursId(UUID apprenantId, UUID coursId);
     List<ProgressionJpaEntity>  findByApprenantId(UUID apprenantId);
+    boolean existsByCoursId(UUID coursId);
+
+    @Query("SELECT p, u FROM ProgressionJpaEntity p JOIN UtilisateurJpaEntity u ON p.apprenantId = u.id WHERE p.coursId = :coursId")
+    List<Object[]> findApprenantsByCoursId(@Param("coursId") UUID coursId);
     /** Active le paiement d'un cours (estPaye=true) — utilisé après confirmation paiement. */
     @Modifying
     @Query("UPDATE ProgressionJpaEntity p SET p.estPaye = true " +

@@ -42,7 +42,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC = {
         "/api/v1/auth/**", "/api/v1/cours", "/api/v1/cours/{id}",
         "/api/v1/categories", "/api/v1/talents", "/api/v1/certificats/verify/**",
-        "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health"
+        "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health",
+        "/api/v1/ai/**"
     };
 
     @Bean

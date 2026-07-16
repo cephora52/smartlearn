@@ -52,8 +52,8 @@ public class MoratoireRepositoryAdapter implements MoratoireRepository {
     private Moratoire toDomain(MoratoireJpaEntity e) {
         return new Moratoire(
             e.getId(), e.getPaiementId(), e.getRaison(),
-            e.getNouvelleDate(),        // nouvelleDateSouhaitee
-            e.getNouvelleDateAccordee(), // nouvelleDateAccordee
+            e.getNouvelleDateSouhaitee(),
+            e.getNouvelleDateAccordee(),
             e.getStatut(), e.getAdminId(),
             e.getJustificationRefus(), e.getDateDecision(),
             e.getCreatedAt(), e.getUpdatedAt());
@@ -64,12 +64,14 @@ public class MoratoireRepositoryAdapter implements MoratoireRepository {
             .id(m.getId() != null ? m.getId() : UUID.randomUUID())
             .paiementId(m.getPaiementId())
             .raison(m.getRaison())
-            .nouvelleDate(m.getNouvelleDate())   // getNouvelleDate() → nouvelleDateSouhaitee
+            .nouvelleDateSouhaitee(m.getNouvelledateSouhaitee())
             .nouvelleDateAccordee(m.getNouvelledateAccordee())
             .statut(m.getStatut())
             .adminId(m.getAdminId())
             .justificationRefus(m.getJustificationRefus())
             .dateDecision(m.getDateDecision())
+            .createdAt(m.getCreatedAt() != null ? m.getCreatedAt() : java.time.LocalDateTime.now())
+            .updatedAt(m.getUpdatedAt() != null ? m.getUpdatedAt() : java.time.LocalDateTime.now())
             .build();
     }
 }

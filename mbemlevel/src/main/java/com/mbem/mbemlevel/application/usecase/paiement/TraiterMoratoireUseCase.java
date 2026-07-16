@@ -30,7 +30,7 @@ public class TraiterMoratoireUseCase {
     private final EmailPort                emailPort;
 
     @Transactional
-    public void executer(UUID moratoireId, TraiterMoratoireRequest req, UUID adminId) {
+    public String executer(UUID moratoireId, TraiterMoratoireRequest req, UUID adminId) {
         Moratoire moratoire = moratoireRepo.findById(moratoireId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:MORATOIRE:" + moratoireId));
 
@@ -52,6 +52,10 @@ public class TraiterMoratoireUseCase {
 
             moratoire.accorder(adminId, req.nouvelleDateAccordee());
             moratoireRepo.save(moratoire);
+
+            // Mettre à jour le statut du paiement en MORATOIRE
+            paiement.accorderMoratoire();
+            paiementRepo.save(paiement);
 
             // Mettre à jour la date d'échéance de la prochaine tranche
             trancheRepo.updateDateEcheance(moratoire.getPaiementId(), req.nouvelleDateAccordee());
@@ -119,6 +123,9 @@ public class TraiterMoratoireUseCase {
         } else {
             throw new RuntimeException("VALIDATION:decision_invalide:" + req.decision());
         }
+
+        return (student.getPrenom() != null ? student.getPrenom() : "") 
+            + (student.getNom() != null ? " " + student.getNom() : "");
     }
 
     public record MoratoireDecideEvent(

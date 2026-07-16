@@ -42,6 +42,9 @@ class GenererCertificatUseCaseTest {
     void conditionsNonRemplies_lanceException() {
         UUID uid = UUID.randomUUID(), cid = UUID.randomUUID();
         Progression prog = Progression.commencer(uid, cid, 0.30);
+        Cours mockCours = mock(Cours.class);
+        when(mockCours.getPrixFcfa()).thenReturn(1000L);
+        when(coursRepo.findById(cid)).thenReturn(Optional.of(mockCours));
         when(certRepo.findByApprenantAndCours(uid, cid)).thenReturn(Optional.empty());
         when(progressionRepo.findByApprenantIdAndCoursId(uid, cid)).thenReturn(Optional.of(prog));
         when(domainService.peutObtenirCertificat(prog)).thenReturn(false);

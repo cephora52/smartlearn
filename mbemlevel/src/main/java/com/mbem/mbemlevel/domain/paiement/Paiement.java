@@ -69,12 +69,17 @@ public class Paiement extends AggregateRoot {
             getId(), apprenantId, coursId, prenom, email, telephone, nomCours));
     }
 
-    /** Enregistre un retard et publie PaiementEnRetardEvent. */
     public void marquerEnRetard(String prenom, String email, String telephone, int joursRetard) {
         if (this.statut == StatutPaiement.PAYE) return;
         this.statut = StatutPaiement.EN_RETARD; markUpdated();
         registerEvent(new PaiementEnRetardEvent(
             getId(), apprenantId, prenom, email, telephone, joursRetard));
+    }
+
+    public void accorderMoratoire() {
+        if (this.statut == StatutPaiement.PAYE) return;
+        this.statut = StatutPaiement.MORATOIRE;
+        markUpdated();
     }
 
     public UUID          getApprenantId()   { return apprenantId; }

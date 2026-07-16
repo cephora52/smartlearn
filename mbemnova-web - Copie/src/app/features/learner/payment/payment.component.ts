@@ -5,7 +5,7 @@ import {
 import {
   ReactiveFormsModule, FormBuilder, Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { PaymentService } from '../../../core/services/payment.service';
 import { AuthService }    from '../../../core/services/auth.service';
 import { ToastService }   from '../../../core/services/toast.service';
@@ -260,6 +260,27 @@ import { MOCK_PAIEMENTS } from '../../../core/services/mock.data';
                 </div>
               }
             </div>
+          } @else {
+            <div class="p-5 border-t border-slate-100">
+              <p class="text-sm text-slate-500 mb-3">
+                Aucun versement n'a encore été enregistré pour cette formation. Vous devez effectuer votre premier versement ou demander un moratoire (délai de paiement).
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button (click)="openMoratoire(p)"
+                        class="btn-secondary btn-sm">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Demander un délai
+                </button>
+                <a href="https://wa.me/237600000000?text=Bonjour, je souhaite payer ma formation"
+                   target="_blank" rel="noopener"
+                   class="btn-primary btn-sm inline-flex">
+                  Organiser mon paiement
+                </a>
+              </div>
+            </div>
           }
         </div>
       }
@@ -422,6 +443,7 @@ export class PaymentComponent implements OnInit {
   readonly #authSvc    = inject(AuthService);
   readonly #toast      = inject(ToastService);
   readonly #fb         = inject(FormBuilder);
+  readonly #route      = inject(ActivatedRoute);
 
   readonly paiements    = signal<PaiementResponse[]>(MOCK_PAIEMENTS);
   readonly loading      = signal(true);
@@ -450,10 +472,23 @@ export class PaymentComponent implements OnInit {
     this.loading.set(true);
     this.#paymentSvc.getMes().subscribe({
       next: r => {
-        if (r.success && r.data?.content?.length) {
-          this.paiements.set(r.data.content);
+        if (r.success && r.data) {
+          const list = (r.data as any).content || r.data;
+          if (Array.isArray(list)) {
+            this.paiements.set(list);
+          }
         }
         this.loading.set(false);
+
+        // Auto-open moratoire based on query parameters
+        this.#route.queryParams.subscribe(params => {
+          if (params['action'] === 'moratoire' && params['coursId']) {
+            const p = this.paiements().find(pay => pay.coursId === params['coursId']);
+            if (p) {
+              this.openMoratoire(p);
+            }
+          }
+        });
       },
       error: () => { this.loading.set(false); },
     });

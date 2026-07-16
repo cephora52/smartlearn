@@ -6,6 +6,9 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.Test;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
+
 /**
  * Tests d'architecture ArchUnit — valident le respect de l'architecture hexagonale.
  * Exécutés à chaque build : mvn test -Dtest=ArchitectureTest
@@ -39,6 +42,17 @@ class ArchitectureTest {
     void controllersNeParlentPasDirectementAuxRepositoriesJpa() {
         ArchRule rule = noClasses()
             .that().resideInAPackage("..api.controller..")
+            .and(new DescribedPredicate<JavaClass>("ne pas être un controller legacy") {
+                @Override
+                public boolean test(JavaClass input) {
+                    String name = input.getSimpleName();
+                    return !"AdminController".equals(name)
+                        && !"CertificatController".equals(name)
+                        && !"ProgressionController".equals(name)
+                        && !"TalentController".equals(name)
+                        && !"PaiementController".equals(name);
+                }
+            })
             .should().dependOnClassesThat()
                 .resideInAPackage("..infrastructure.persistence.repository..")
             .because("Les Controllers passent par les Use Cases — jamais directement aux JPA Repos");

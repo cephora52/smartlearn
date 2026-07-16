@@ -14,7 +14,6 @@ import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
         <a routerLink="/instructor" class="font-black text-lg text-blue-600">Smart<span class="text-[var(--tx)]">Learn</span></a>
         <nav class="hidden md:flex items-center gap-1">
           <a routerLink="/instructor" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-semibold" class="px-3 py-2 rounded-lg text-sm text-[var(--tx-sec)] hover:bg-[var(--bg-muted)] hover:text-[var(--tx)] transition-colors duration-150">Dashboard</a>
-          <a routerLink="/instructor/sessions" routerLinkActive="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-semibold" class="px-3 py-2 rounded-lg text-sm text-[var(--tx-sec)] hover:bg-[var(--bg-muted)] hover:text-[var(--tx)] transition-colors duration-150">Sessions</a>
           <a routerLink="/instructor/correction" routerLinkActive="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-semibold" class="px-3 py-2 rounded-lg text-sm text-[var(--tx-sec)] hover:bg-[var(--bg-muted)] hover:text-[var(--tx)] transition-colors duration-150">Correction</a>
           <a routerLink="/instructor/formations" routerLinkActive="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 font-semibold" class="px-3 py-2 rounded-lg text-sm text-[var(--tx-sec)] hover:bg-[var(--bg-muted)] hover:text-[var(--tx)] transition-colors duration-150">Formations</a>
         </nav>

@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface SessionJpaRepository extends JpaRepository<SessionJpaEntity, UUID> {
 
     List<SessionJpaEntity> findByCoursIdAndStatutNot(UUID coursId, String statut);
+    boolean existsByCoursId(UUID coursId);
 
     @Query("SELECT s FROM SessionJpaEntity s " +
            "WHERE s.coursId = :coursId " +

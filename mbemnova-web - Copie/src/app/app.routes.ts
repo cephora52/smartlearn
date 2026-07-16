@@ -229,6 +229,13 @@ export const routes: Routes = [
             .then(m => m.CourseModulesComponent),
       },
       {
+        path: 'cours/:id/apprenants',
+        loadComponent: () =>
+          import('./features/instructor/formations/enrolled-students/enrolled-students.component')
+            .then(m => m.EnrolledStudentsComponent),
+        title: 'Apprenants inscrits — Espace Formateur',
+      },
+      {
         path: 'cours/:id/lecons/:lessonId/contenu',
         loadComponent: () =>
           import('./features/instructor/course-builder/lesson-content-editor.component')

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import type { CoursResponse } from '../../../core/models';
 
 @Component({
@@ -15,6 +16,7 @@ import type { CoursResponse } from '../../../core/models';
 export class FormationsComponent implements OnInit {
   readonly #adminSvc = inject(AdminService);
   readonly #auth = inject(AuthService);
+  readonly #toast = inject(ToastService);
 
   readonly cours = signal<CoursResponse[]>([]);
   readonly isLoading = signal(true);
@@ -81,5 +83,19 @@ export class FormationsComponent implements OnInit {
   }
   levelLabel(n: string): string {
     return { DEBUTANT: 'Débutant', INTERMEDIAIRE: 'Intermédiaire', AVANCE: 'Avancé' }[n] ?? n;
+  }
+
+  supprimerCours(c: CoursResponse): void {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette formation ? Cette action est irréversible.")) {
+      this.#adminSvc.supprimerCours(c.id).subscribe({
+        next: () => {
+          this.#toast.success("Succès", "La formation a été supprimée avec succès.");
+          this.load();
+        },
+        error: (err) => {
+          this.#toast.error("Erreur de suppression", err?.error?.message || "Une erreur est survenue.");
+        }
+      });
+    }
   }
 }

@@ -5,8 +5,8 @@ import java.time.LocalDate;
 
 /** S17 — Décision admin sur une demande de moratoire */
 public record TraiterMoratoireRequest(
-    /** ACCORDE ou REFUSE */
-    @NotBlank @Pattern(regexp = "ACCORDE|REFUSE")
+    /** ACCORDE, APPROUVE ou REFUSE */
+    @NotBlank @Pattern(regexp = "ACCORDE|APPROUVE|REFUSE")
     String decision,
 
     /** Nouvelle date accordée (obligatoire si decision=ACCORDE) */

@@ -543,10 +543,10 @@ export class PaymentManagerComponent implements OnInit {
     };
 
     this.#paymentSvc.deciderMoratoire(m.id, req).subscribe({
-      next: () => {
+      next: r => {
         this.actionLoading.set(false);
         this.closeModal();
-        this.#toast.success('Moratoire accordé', "L'accès au cours a été déverrouillé.");
+        this.#toast.success('Moratoire accordé', r.message || "L'accès au cours a été déverrouillé.");
         this.loadData();
       },
       error: () => { this.actionLoading.set(false); }
@@ -567,10 +567,10 @@ export class PaymentManagerComponent implements OnInit {
     };
 
     this.#paymentSvc.deciderMoratoire(m.id, req).subscribe({
-      next: () => {
+      next: r => {
         this.actionLoading.set(false);
         this.closeModal();
-        this.#toast.success('Demande refusée', 'Le moratoire a été refusé avec succès.');
+        this.#toast.success('Demande refusée', r.message || 'Le moratoire a été refusé avec succès.');
         this.loadData();
       },
       error: () => { this.actionLoading.set(false); }

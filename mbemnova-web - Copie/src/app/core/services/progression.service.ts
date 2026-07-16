@@ -22,4 +22,9 @@ export class ProgressionService {
   getByCours(coursId: string): Observable<ApiResponse<ProgressionResponse>> {
     return this.#api.get<ProgressionResponse>(`/progression/cours/${coursId}`);
   }
+
+  // POST /api/v1/progression/cours/{coursId}/final-quiz-xp
+  validerQuizFinalXp(coursId: string): Observable<ApiResponse<ProgressionResponse>> {
+    return this.#api.post<ProgressionResponse>(`/progression/cours/${coursId}/final-quiz-xp`, {});
+  }
 }

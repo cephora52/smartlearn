@@ -23,11 +23,61 @@ public class GetLeconDetailUseCase {
     private final RessourceCoursJpaRepository ressourceRepo;
     private final ProgressionJpaRepository progressionRepo;
     private final StoragePort              storagePort;
+    private final CoursJpaRepository       coursRepo;
+    private final UtilisateurJpaRepository  utilisateurRepo;
+    private final PaiementJpaRepository    paiementRepo;
+    private final MoratoireJpaRepository   moratoireRepo;
 
     @Transactional(readOnly = true)
     public LeconDetailResponse executer(UUID leconId, UUID apprenantId) {
         LeconJpaEntity lecon = leconRepo.findById(leconId)
             .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:LECON:" + leconId));
+
+        UUID coursId = lecon.getCoursId();
+        CoursJpaEntity cours = coursRepo.findById(coursId)
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + coursId));
+
+        boolean isFormateur = apprenantId != null && apprenantId.equals(cours.getFormateurId());
+        boolean isAdmin = false;
+        if (apprenantId != null) {
+            isAdmin = utilisateurRepo.findById(apprenantId)
+                .map(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.ADMIN || u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.SUPER_ADMIN)
+                .orElse(false);
+        }
+
+        boolean aMoratoireApprouve = false;
+        if (apprenantId != null) {
+            var paiementOpt = paiementRepo.findByApprenantIdAndCoursId(apprenantId, coursId);
+            if (paiementOpt.isPresent()) {
+                aMoratoireApprouve = moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "APPROUVE")
+                                  || moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "ACCORDE");
+            }
+        }
+
+        boolean estPaye = (cours.getPrixFcfa() == 0)
+            || (apprenantId != null && progressionRepo.findByApprenantIdAndCoursId(apprenantId, coursId)
+                .map(ProgressionJpaEntity::isEstPaye).orElse(false))
+            || isFormateur || isAdmin;
+
+        List<LeconJpaEntity> lecons = leconRepo.findByCoursIdOrderByOrdreAsc(coursId);
+        int totalLecons = lecons.size();
+        double seuilVal = cours.getSeuilPaiement().doubleValue();
+        int maxLeconsGratuites = (int) Math.ceil(totalLecons * seuilVal);
+
+        int leconIndex = -1;
+        for (int i = 0; i < totalLecons; i++) {
+            if (lecons.get(i).getId().equals(leconId)) {
+                leconIndex = i;
+                break;
+            }
+        }
+
+        boolean estDansSeuilGratuit = (leconIndex >= 0 && leconIndex < maxLeconsGratuites);
+        boolean accessible = lecon.isEstPreview() || estDansSeuilGratuit || estPaye || aMoratoireApprouve;
+
+        if (!accessible) {
+            throw new com.mbem.mbemlevel.api.exception.AccesInterditException("Cette leçon est verrouillée. Veuillez payer ou demander un moratoire.");
+        }
 
         // Blocs de contenu dans l'ordre
         List<BlocContenuResponse> blocs = blocRepo

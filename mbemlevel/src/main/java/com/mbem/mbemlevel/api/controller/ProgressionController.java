@@ -31,6 +31,7 @@ public class ProgressionController {
     private final GetProgressionUseCase  getUC;
     private final PaiementJpaRepository  paiementRepo;
     private final MoratoireJpaRepository moratoireRepo;
+    private final ValiderQuizFinalXpUseCase validerQuizFinalXpUC;
 
     private ProgressionResponse mapToResponse(Progression p, UUID apprenantId) {
         boolean aMor = paiementRepo.findByApprenantIdAndCoursId(apprenantId, p.getCoursId())
@@ -93,5 +94,15 @@ public class ProgressionController {
         return getUC.parCoursId(UUID.fromString(userId), coursId)
             .map(p -> ResponseEntity.ok(ApiResponse.ok(mapToResponse(p, UUID.fromString(userId)))))
             .orElse(ResponseEntity.notFound().build());
+    }
+
+    /** POST /api/v1/progression/cours/{coursId}/final-quiz-xp */
+    @PostMapping("/cours/{coursId}/final-quiz-xp")
+    @Operation(summary="Valider le quiz final et attribuer les 50 XP")
+    public ResponseEntity<ApiResponse<ProgressionResponse>> validerQuizFinalXp(
+            @PathVariable UUID coursId,
+            @AuthenticationPrincipal String userId) {
+        Progression p = validerQuizFinalXpUC.executer(UUID.fromString(userId), coursId);
+        return ResponseEntity.ok(ApiResponse.ok(mapToResponse(p, UUID.fromString(userId)), "Quiz final validé, +50 XP !"));
     }
 }

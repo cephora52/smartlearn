@@ -4,6 +4,8 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ThemeService }       from '../../../core/services/theme.service';
 import { ThemeToggleComponent }from '../../../shared/components/theme-toggle/theme-toggle.component';
@@ -19,7 +21,7 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
 @Component({
   selector: 'app-course-player',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ThemeToggleComponent],
+  imports: [RouterLink, ThemeToggleComponent, FormsModule],
   styles: [`
     /* ── Contenu leçon — s'adapte au thème ───────────────── */
     :host { display: contents; }
@@ -65,6 +67,7 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
     :host-context(.dark) .lesson-body code  { background:#1e293b; color:#7dd3fc; }
     :host-context(.dark) .lesson-body pre   { background:#020617; border-color:#0f172a; }
     :host-context(.dark) .lesson-body .tip  { background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
+    .lesson-body ul { list-style-type: disc !important; }
   `],
   template: `
 <!-- Le player prend TOUT l'écran — pas de navbar globale visible -->
@@ -261,6 +264,9 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
             <div class="flex flex-col gap-3">
               <a routerLink="/app/paiements" class="btn-primary w-full justify-center py-3 text-base font-semibold">
                 Débloquer l'accès complet
+              </a>
+              <a routerLink="/app/paiements" [queryParams]="{ action: 'moratoire', coursId: detail()?.id }" class="btn-secondary w-full justify-center py-3 text-base font-semibold">
+                Demander un moratoire
               </a>
               <button (click)="showPaywall.set(false)"
                       [class]="'text-sm transition-colors ' + (dark() ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600')">
@@ -469,6 +475,69 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
             </div>
           }
 
+        <!-- ── Assistant SmartLearn ────────────────────── -->
+        @if (!showXP()) {
+          <div [class]="'rounded-2xl p-6 mb-8 border transition-all '
+                        + (dark() ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200')">
+            <div class="flex items-center gap-2.5 mb-4">
+              <div [class]="'w-8 h-8 rounded-lg flex items-center justify-center '
+                            + (dark() ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-100 text-indigo-700')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+              </div>
+              <h3 [class]="'font-bold text-sm tracking-tight ' + (dark() ? 'text-slate-200' : 'text-slate-900')">
+                Assistant SmartLearn
+              </h3>
+              <span class="inline-flex items-center text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500 text-white leading-none">
+                IA
+              </span>
+            </div>
+
+            <p [class]="'text-xs mb-5 leading-relaxed ' + (dark() ? 'text-slate-400' : 'text-slate-500')">
+              Optimisez votre apprentissage grâce à notre intelligence artificielle. Générez un résumé pédagogique complet et structuré de cette leçon en un clic.
+            </p>
+
+            <div class="flex flex-wrap gap-3">
+              <button (click)="genererResume()"
+                      [disabled]="summaryLoading()"
+                      [class]="'btn btn-sm flex items-center gap-2 font-semibold shadow-sm '
+                               + (dark() ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white')
+                               + (summaryLoading() ? ' opacity-75 cursor-not-allowed' : '')">
+                @if (summaryLoading()) {
+                  <svg class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  Génération en cours...
+                } @else {
+                  📄 Générer un résumé
+                }
+              </button>
+
+              <button (click)="ouvrirChat()"
+                      [class]="'btn btn-sm flex items-center gap-2 border font-semibold shadow-sm transition-all '
+                               + (dark() ? 'border-slate-700 hover:bg-slate-800 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700')">
+                💬 Poser une question
+              </button>
+
+              @if (progression()?.pourcentage === 100) {
+                <button (click)="ouvrirFinalQuiz()"
+                        [class]="'btn btn-sm flex items-center gap-2 font-bold shadow-sm transition-all '
+                                 + (dark() ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-slate-900')">
+                  🏆 Quiz Final
+                </button>
+              }
+            </div>
+
+            @if (summaryError()) {
+              <div class="mt-4 p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-red-500 text-xs flex items-start gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>{{ summaryError() }}</span>
+              </div>
+            }
+          </div>
+        }
+
           <!-- ── NAVIGATION ─────────────────────────────── -->
           @if (!activeLecon()!.aQuiz || qcmResult()?.leconValidee || !currentQCM()) {
             <div [class]="'flex items-center justify-between gap-4 pt-8 border-t '
@@ -513,6 +582,307 @@ import { MOCK_COURS_DETAIL, MOCK_QCM } from '../../../core/services/mock.data';
         </div>
       }
     </main>
+
+    <!-- ── PANNEAU LATÉRAL RÉSUMÉ IA ────────────────────── -->
+    @if (summaryVisible()) {
+      <aside [class]="'w-full lg:w-[400px] xl:w-[460px] flex flex-col shrink-0 border-l transition-all duration-300 '
+                     + 'fixed inset-y-14 right-0 z-20 lg:static lg:inset-auto '
+                     + (dark() ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900')"
+             aria-label="Résumé de la leçon par l'IA">
+        
+        <!-- Header Panneau -->
+        <div [class]="'p-4 border-b flex items-center justify-between shrink-0 sticky top-0 z-10 '
+                      + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold tracking-tight">Résumé de la leçon</span>
+            <span class="inline-flex items-center text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500 text-white leading-none">
+              IA
+            </span>
+          </div>
+          <button (click)="summaryVisible.set(false)"
+                  [class]="'p-1.5 rounded-lg transition-colors ' + (dark() ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-900')"
+                  aria-label="Fermer le résumé">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Contenu du Résumé -->
+        <div class="flex-1 p-6 overflow-y-auto lesson-body">
+          <div [innerHTML]="formattedSummary()"></div>
+        </div>
+      </aside>
+    }
+
+    <!-- ── PANNEAU LATÉRAL CHAT IA ────────────────────── -->
+    @if (chatVisible()) {
+      <aside [class]="'w-full lg:w-[400px] xl:w-[460px] flex flex-col shrink-0 border-l transition-all duration-300 '
+                     + 'fixed inset-y-14 right-0 z-20 lg:static lg:inset-auto '
+                     + (dark() ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900')"
+             aria-label="Assistant IA SmartLearn">
+        
+        <!-- Header Panneau -->
+        <div [class]="'p-4 border-b flex items-center justify-between shrink-0 sticky top-0 z-10 '
+                      + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold tracking-tight">Assistant IA SmartLearn</span>
+            <span class="inline-flex items-center text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500 text-white leading-none">
+              IA
+            </span>
+          </div>
+          <button (click)="chatVisible.set(false)"
+                  [class]="'p-1.5 rounded-lg transition-colors ' + (dark() ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-900')"
+                  aria-label="Fermer le chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Messages Log -->
+        <div class="flex-1 p-6 overflow-y-auto space-y-4 scroll-smooth" id="chat-messages-log">
+          <!-- Initial Welcome message -->
+          @if (chatHistory().length === 0) {
+            <div [class]="'p-4 rounded-xl text-xs leading-relaxed border '
+                          + (dark() ? 'bg-slate-800/40 border-slate-800 text-slate-400' : 'bg-white border-slate-100 text-slate-500')">
+              <p class="font-bold mb-1">Posez une question sur cette leçon !</p>
+              <p>SmartLearn AI répondra en se basant sur le contenu officiel de la leçon.</p>
+            </div>
+          }
+
+          <!-- Messages List -->
+          @for (msg of chatHistory(); track msg) {
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1.5 text-[10px] font-bold">
+                @if (msg.sender === 'user') {
+                  <span [class]="dark() ? 'text-indigo-400' : 'text-indigo-600'">Vous</span>
+                } @else {
+                  <span [class]="dark() ? 'text-green-400' : 'text-green-600'">SmartLearn AI</span>
+                }
+              </div>
+              <div [class]="'p-4 rounded-xl text-sm leading-relaxed border max-w-full '
+                            + (msg.sender === 'user'
+                              ? dark() ? 'bg-indigo-600/10 border-indigo-500/20 text-indigo-100' : 'bg-indigo-50 border-indigo-100 text-indigo-900'
+                              : dark() ? 'bg-slate-800/50 border-slate-700/60 text-slate-200' : 'bg-white border-slate-100 text-slate-800')">
+                <div [innerHTML]="formatChatMessage(msg.content)"></div>
+              </div>
+            </div>
+          }
+
+          <!-- Loading state -->
+          @if (chatLoading()) {
+            <div class="flex flex-col gap-1">
+              <div class="text-[10px] font-bold text-slate-400 animate-pulse">SmartLearn AI réfléchit...</div>
+              <div [class]="'p-4 rounded-xl border flex items-center gap-2.5 '
+                            + (dark() ? 'bg-slate-800/30 border-slate-800 text-slate-400' : 'bg-slate-50/50 border-slate-100 text-slate-500')">
+                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                <span class="text-xs">Recherche des explications pédagogiques...</span>
+              </div>
+            </div>
+          }
+
+          <!-- Error state -->
+          @if (chatError()) {
+            <div class="p-3 rounded-lg border border-red-500/20 bg-red-500/10 text-red-500 text-xs flex items-start gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>{{ chatError() }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Saisie et Bouton Envoyer -->
+        <div [class]="'p-4 border-t sticky bottom-0 z-10 '
+                      + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
+          <form (submit)="envoyerQuestion($event)" class="flex flex-col gap-2">
+            <textarea
+              name="question"
+              [(ngModel)]="rawQuestion"
+              [disabled]="chatLoading()"
+              placeholder="Posez une question concernant cette leçon..."
+              rows="2"
+              [class]="'w-full text-xs p-2.5 rounded-xl border outline-none resize-none transition-all '
+                       + (dark()
+                         ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-indigo-500'
+                         : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-400')">
+            </textarea>
+            <button
+              type="submit"
+              [disabled]="chatLoading() || !rawQuestion.trim()"
+              class="btn btn-sm flex items-center justify-center gap-1.5 font-semibold text-white transition-opacity hover:opacity-90 w-full"
+              style="background: linear-gradient(135deg,#4f46e5,#312e81)">
+              <span>Envoyer</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+      </aside>
+    }
+
+    <!-- ── PANNEAU LATÉRAL QUIZ FINAL ───────────────────── -->
+    @if (finalQuizVisible()) {
+      <aside [class]="'w-full lg:w-[400px] xl:w-[460px] flex flex-col shrink-0 border-l transition-all duration-300 '
+                     + 'fixed inset-y-14 right-0 z-20 lg:static lg:inset-auto '
+                     + (dark() ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900')"
+             aria-label="Quiz final de la formation">
+        
+        <!-- Header Panneau -->
+        <div [class]="'p-4 border-b flex items-center justify-between shrink-0 sticky top-0 z-10 '
+                      + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold tracking-tight">Quiz final de la formation</span>
+            <span class="inline-flex items-center text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-500 text-white leading-none">
+              EXAMEN
+            </span>
+          </div>
+          <button (click)="finalQuizVisible.set(false)"
+                  [class]="'p-1.5 rounded-lg transition-colors ' + (dark() ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-900')"
+                  aria-label="Fermer le quiz">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Contenu du Quiz -->
+        <div class="flex-1 p-6 overflow-y-auto space-y-6 scroll-smooth" id="final-quiz-scroll-container">
+          
+          <!-- Welcome Header -->
+          <div class="text-center pb-4 border-b border-dashed border-slate-700/30">
+            <h4 class="text-base font-bold text-indigo-500">🏆 Félicitations !</h4>
+            <p [class]="'text-xs mt-1 ' + (dark() ? 'text-slate-400' : 'text-slate-500')">
+              Vous avez terminé cette formation.
+            </p>
+            <p class="text-xs font-semibold mt-2 text-amber-500">
+              Répondez correctement aux 5 questions pour obtenir vos points XP.
+            </p>
+          </div>
+
+          <!-- Loading spinner -->
+          @if (finalQuizLoading()) {
+            <div class="py-12 flex flex-col items-center justify-center gap-3">
+              <svg class="animate-spin h-8 w-8 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              <p class="text-xs font-medium text-slate-400 animate-pulse">SmartLearn AI prépare votre quiz final...</p>
+            </div>
+          }
+
+          <!-- Error block -->
+          @if (finalQuizError()) {
+            <div class="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 text-xs flex flex-col gap-3">
+              <div class="flex items-start gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>{{ finalQuizError() }}</span>
+              </div>
+              <button (click)="genererQuizFinal()" class="btn btn-sm bg-red-600 hover:bg-red-700 text-white font-bold w-full">
+                Réessayer
+              </button>
+            </div>
+          }
+
+          <!-- Results Block -->
+          @if (finalQuizCorrected() && finalQuizResult()) {
+            <div [class]="'p-5 rounded-2xl border text-center '
+                          + (finalQuizResult()!.validated
+                            ? 'bg-green-500/10 border-green-500/20 text-green-500'
+                            : 'bg-red-500/10 border-red-500/20 text-red-500')">
+              
+              @if (finalQuizResult()!.validated) {
+                <p class="text-2xl font-black mb-1">5 / 5</p>
+                <p class="text-sm font-bold text-green-500">✅ Félicitations !</p>
+                <p class="text-xs mt-1">Vous avez réussi le Quiz Final.</p>
+                <p class="text-xs font-semibold mt-2 text-green-500">Les 50 XP de cette formation vous ont été attribués.</p>
+              } @else {
+                <p class="text-2xl font-black mb-1">{{ finalQuizResult()!.score }} / 5</p>
+                <p class="text-xs">Vous devez obtenir 5/5 pour valider cette formation et recevoir les points XP.</p>
+                <p class="text-xs font-semibold mt-2 text-amber-500">Les XP ne sont donc pas attribués.</p>
+              }
+            </div>
+          }
+
+          <!-- Questions List -->
+          @if (!finalQuizLoading() && finalQuizQuestions().length > 0) {
+            <div class="space-y-6">
+              @for (q of finalQuizQuestions(); track q; let qi = $index) {
+                <div [class]="'p-4 rounded-xl border '
+                              + (dark() ? 'bg-slate-800/20 border-slate-800' : 'bg-white border-slate-100')">
+                  
+                  <!-- Question Title -->
+                  <p class="text-xs font-bold mb-3">
+                    <span class="text-indigo-500">Q{{ qi + 1 }}.</span> {{ q.question }}
+                  </p>
+
+                  <!-- Options List -->
+                  <div class="space-y-2">
+                    @for (opt of q.options; track opt; let oi = $index) {
+                      <label [class]="'flex items-start gap-3 p-3 rounded-lg border text-xs cursor-pointer transition-all '
+                                     + (finalQuizAnswers()[qi] === oi
+                                       ? 'border-indigo-500 bg-indigo-500/5'
+                                       : dark() ? 'border-slate-700/60 hover:bg-slate-800/40' : 'border-slate-200 hover:bg-slate-50')
+                                     + (finalQuizCorrected() ? ' pointer-events-none' : '')">
+                        <input
+                          type="radio"
+                          [name]="'final-q-' + qi"
+                          [value]="oi"
+                          [(ngModel)]="finalQuizAnswers()[qi]"
+                          [disabled]="finalQuizCorrected()"
+                          class="mt-0.5 accent-indigo-500">
+                        
+                        <span>{{ opt }}</span>
+                      </label>
+                    }
+                  </div>
+
+                  <!-- Corrections explanations -->
+                  @if (finalQuizCorrected()) {
+                    <div class="mt-4 pt-3 border-t border-slate-700/20 text-[11px] space-y-2">
+                      <div class="flex items-center gap-1.5 font-bold">
+                        @if (finalQuizAnswers()[qi] === q.correctAnswer) {
+                          <span class="text-green-500">✅ Réponse correcte</span>
+                        } @else {
+                          <span class="text-red-500">❌ Votre réponse : {{ q.options[finalQuizAnswers()[qi]] || 'Aucune' }}</span>
+                        }
+                      </div>
+                      @if (finalQuizAnswers()[qi] !== q.correctAnswer) {
+                        <div class="text-green-500 font-bold">
+                          ✅ Bonne réponse : {{ q.options[q.correctAnswer] }}
+                        </div>
+                      }
+                      <div [class]="'p-3 rounded bg-blue-500/5 border border-blue-500/10 text-xs '
+                                    + (dark() ? 'text-slate-400' : 'text-slate-600')">
+                        <strong class="text-blue-500">📘 Explication :</strong> {{ q.explanation }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+
+        <!-- Footer Action Button -->
+        @if (!finalQuizLoading() && finalQuizQuestions().length > 0) {
+          <div [class]="'p-4 border-t sticky bottom-0 z-10 '
+                        + (dark() ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200')">
+            
+            @if (!finalQuizCorrected()) {
+              <button
+                (click)="corrigerQuiz()"
+                [disabled]="!allQuestionsAnswered()"
+                class="btn btn-sm font-semibold text-white transition-opacity hover:opacity-90 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                style="background: linear-gradient(135deg,#4f46e5,#312e81)">
+                Corriger mon quiz
+              </button>
+            } @else {
+              <button
+                (click)="recommencerQuiz()"
+                class="btn btn-sm border font-semibold w-full transition-all"
+                [class]="dark() ? 'border-slate-700 hover:bg-slate-800 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'">
+                🔄 Recommencer le quiz
+              </button>
+            }
+          </div>
+        }
+      </aside>
+    }
   </div>
 
   <!-- XP Burst -->
@@ -547,6 +917,29 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   readonly progression = signal<{ pourcentage: number; xpGagne: number } | null>(null);
   readonly activeLecon = signal<LeconDetail | null>(null);
   readonly sidebarOpen = signal(false);
+
+  // Assistant SmartLearn / Résumé
+  readonly summaryVisible = signal(false);
+  readonly summaryLoading = signal(false);
+  readonly summaryContent = signal<string | null>(null);
+  readonly summaryError = signal<string | null>(null);
+
+  // Chat
+  readonly chatVisible = signal(false);
+  readonly chatLoading = signal(false);
+  readonly chatHistory = signal<{ sender: 'user' | 'ai'; content: string }[]>([]);
+  readonly chatError = signal<string | null>(null);
+  rawQuestion = '';
+
+  // Quiz Final
+  readonly finalQuizVisible = signal(false);
+  readonly finalQuizLoading = signal(false);
+  readonly finalQuizError = signal<string | null>(null);
+  readonly finalQuizQuestions = signal<any[]>([]);
+  readonly finalQuizAnswers = signal<number[]>([]);
+  readonly finalQuizCorrected = signal(false);
+  readonly finalQuizResult = signal<{ score: number; validated: boolean } | null>(null);
+  readonly finalQuizXPGained = signal(false);
   readonly openModules = signal<Set<string>>(new Set());
   readonly showPaywall = signal(false);
   readonly completing  = signal(false);
@@ -571,6 +964,28 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
 
   readonly safeContent = computed((): SafeHtml => {
     return this.#sanitizer.bypassSecurityTrustHtml(this.activeLecon()?.contenu ?? '');
+  });
+  readonly formattedSummary = computed((): SafeHtml => {
+    const raw = this.summaryContent();
+    if (!raw) return '';
+    
+    // Parse markdown to HTML
+    let html = raw
+      .replace(/^### (.*$)/gim, '<h3 style="font-size:1.2rem; font-weight:600; margin:1.5rem 0 0.625rem; color:#1e293b;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 style="font-size:1.5rem; font-weight:700; margin:1.75rem 0 0.875rem; color:#0f172a;">$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1 style="font-size:1.8rem; font-weight:800; margin:2rem 0 1rem; color:#0f172a;">$1</h1>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^\s*[-*]\s+(.*$)/gim, '<li style="margin-bottom:0.375rem;">$1</li>')
+      .replace(/(<li>.*<\/li>)/gim, '<ul style="list-style-type:disc; padding-left:1.5rem; margin-bottom:1rem;">$1</ul>')
+      .replace(/<\/ul>\s*<ul style="list-style-type:disc; padding-left:1.5rem; margin-bottom:1rem;">/g, '')
+      .replace(/\n\n/g, '</p><p style="margin-bottom:1rem;">')
+      .replace(/\n/g, '<br>');
+
+    if (!html.startsWith('<h') && !html.startsWith('<p')) {
+      html = '<p style="margin-bottom:1rem;">' + html + '</p>';
+    }
+
+    return this.#sanitizer.bypassSecurityTrustHtml(html);
   });
   readonly safeVideoUrl = computed(() => {
     return this.#sanitizer.bypassSecurityTrustResourceUrl(this.activeLecon()?.videoUrl ?? '');
@@ -660,8 +1075,12 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
             this.activeLecon.set(l);
           }
         },
-        error: () => {
-          this.activeLecon.set(l);
+        error: (err: any) => {
+          if (err?.status === 403 || err?.error?.code === 'ACCESS_DENIED') {
+            this.showPaywall.set(true);
+          } else {
+            this.activeLecon.set(l);
+          }
         }
       });
     } else {
@@ -670,6 +1089,14 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
     this.sidebarOpen.set(false);
     this.selectedAnswer.set(null);
     this.qcmResult.set(null);
+    this.summaryVisible.set(false);
+    this.summaryContent.set(null);
+    this.summaryError.set(null);
+    this.chatVisible.set(false);
+    this.chatHistory.set([]);
+    this.chatError.set(null);
+    this.rawQuestion = '';
+    this.finalQuizVisible.set(false);
     if (isPlatformBrowser(this.#platform)) {
       document.getElementById('lesson-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -729,7 +1156,12 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
         this.showXP.set(true);
         this.#xpTimer = setTimeout(() => this.showXP.set(false), 2000);
         this.#toast.success(`+${lecon.xpReward} XP`, 'Leçon terminée !');
-        if (this.hasNext()) setTimeout(() => this.nextLecon(), 1000);
+        
+        if (this.progression()?.pourcentage === 100) {
+          setTimeout(() => this.ouvrirFinalQuiz(), 2200);
+        } else if (this.hasNext()) {
+          setTimeout(() => this.nextLecon(), 1000);
+        }
       },
       error: () => { this.completing.set(false); },
     });
@@ -743,7 +1175,14 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
   nextLecon(): void {
     const idx = this.activeLeconIndex();
     const lecons = this.detail()?.lecons ?? [];
-    if (idx >= 0 && idx < lecons.length - 1) this.selectLecon(lecons[idx + 1]);
+    if (idx >= 0 && idx < lecons.length - 1) {
+      const nextL = lecons[idx + 1];
+      if (nextL.estVerrouille) {
+        this.showPaywall.set(true);
+      } else {
+        this.selectLecon(nextL);
+      }
+    }
   }
 
   leconClass(lecon: LeconDetail): string {
@@ -790,5 +1229,207 @@ export class CoursePlayerComponent implements OnInit, OnDestroy {
       return `${h}h${m > 0 ? m + 'm' : ''}`;
     }
     return `${m} min`;
+  }
+
+  ouvrirChat(): void {
+    this.summaryVisible.set(false);
+    this.chatVisible.set(true);
+    this.chatError.set(null);
+  }
+
+  envoyerQuestion(event: Event): void {
+    event.preventDefault();
+    const questionText = this.rawQuestion.trim();
+    if (!questionText || this.chatLoading()) return;
+
+    this.chatError.set(null);
+    this.chatLoading.set(true);
+    
+    // Add user message to history
+    this.chatHistory.update(history => [...history, { sender: 'user', content: questionText }]);
+    this.rawQuestion = '';
+
+    // Scroll to bottom
+    this.scrollToBottom();
+
+    const lessonText = this.getLessonTextContent();
+
+    this.#courseSvc.poserQuestionLecon(lessonText, questionText).subscribe({
+      next: r => {
+        this.chatLoading.set(false);
+        if (r.success && r.data?.answer) {
+          this.chatHistory.update(history => [...history, { sender: 'ai', content: r.data!.answer }]);
+          this.scrollToBottom();
+        } else {
+          this.chatError.set("Impossible d'obtenir une réponse pour le moment. Veuillez réessayer dans quelques instants.");
+          this.scrollToBottom();
+        }
+      },
+      error: () => {
+        this.chatLoading.set(false);
+        this.chatError.set("Impossible d'obtenir une réponse pour le moment. Veuillez réessayer dans quelques instants.");
+        this.scrollToBottom();
+      }
+    });
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      const container = document.getElementById('chat-messages-log');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, 50);
+  }
+
+  getLessonTextContent(): string {
+    const lecon = this.activeLecon();
+    if (!lecon) return '';
+    const rawHtml = lecon.contenu || '';
+    return rawHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  formatChatMessage(content: string): SafeHtml {
+    const raw = content || '';
+    let html = raw
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^### (.*$)/gim, '<h3 class="font-bold text-sm my-1">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2 class="font-bold text-base my-2">$1</h2>')
+      .replace(/^\s*[-*]\s+(.*$)/gim, '<li style="margin-left: 1rem; list-style-type: disc;">$1</li>')
+      .replace(/\n/g, '<br>');
+    return this.#sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  ouvrirFinalQuiz(): void {
+    this.summaryVisible.set(false);
+    this.chatVisible.set(false);
+    this.finalQuizVisible.set(true);
+    this.finalQuizError.set(null);
+    if (this.finalQuizQuestions().length === 0) {
+      this.genererQuizFinal();
+    }
+  }
+
+  genererQuizFinal(): void {
+    const lecons = this.detail()?.lecons || [];
+    const coursId = this.detail()?.id;
+    if (!coursId) return;
+
+    this.finalQuizLoading.set(true);
+    this.finalQuizError.set(null);
+
+    // Fetch all lessons details in parallel!
+    const requests = lecons.map(l => this.#courseSvc.getLecon(coursId, l.id));
+    forkJoin(requests).subscribe({
+      next: responses => {
+        // Compile the lesson contents
+        const contents = responses.map(r => {
+          if (r.success && r.data) {
+            // Find text blocks or raw content
+            const textBloc = r.data.blocs?.find((b: any) => b.typeBloc === 'TEXTE_HTML');
+            let content = textBloc ? textBloc.contenuHtml : '';
+            // Strip HTML simple regex
+            return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          }
+          return '';
+        }).filter(c => c.length > 0);
+
+        // Now call the AI endpoint
+        const title = this.detail()?.titre || 'Formation';
+        this.#courseSvc.genererQuizFinal(title, contents).subscribe({
+          next: quizRes => {
+            this.finalQuizLoading.set(false);
+            if (quizRes.success && quizRes.data?.questions) {
+              this.finalQuizQuestions.set(quizRes.data.questions);
+              this.finalQuizAnswers.set(new Array(quizRes.data.questions.length).fill(-1));
+              this.finalQuizCorrected.set(false);
+              this.finalQuizResult.set(null);
+            } else {
+              this.finalQuizError.set("Impossible de générer le quiz final. Veuillez réessayer.");
+            }
+          },
+          error: () => {
+            this.finalQuizLoading.set(false);
+            this.finalQuizError.set("Impossible de générer le quiz final. Veuillez réessayer.");
+          }
+        });
+      },
+      error: () => {
+        this.finalQuizLoading.set(false);
+        this.finalQuizError.set("Impossible de générer le quiz final. Veuillez réessayer.");
+      }
+    });
+  }
+
+  allQuestionsAnswered(): boolean {
+    const answers = this.finalQuizAnswers();
+    if (answers.length === 0) return false;
+    return answers.every(a => a >= 0);
+  }
+
+  corrigerQuiz(): void {
+    const questions = this.finalQuizQuestions();
+    const answers = this.finalQuizAnswers();
+    let score = 0;
+    for (let i = 0; i < questions.length; i++) {
+      if (answers[i] === questions[i].correctAnswer) {
+        score++;
+      }
+    }
+    const validated = (score === 5);
+    this.finalQuizResult.set({ score, validated });
+    this.finalQuizCorrected.set(true);
+
+    if (validated && !this.finalQuizXPGained()) {
+      const coursId = this.detail()?.id;
+      if (coursId) {
+        this.#progressSvc.validerQuizFinalXp(coursId).subscribe({
+          next: r => {
+            if (r.success && r.data) {
+              this.progression.set({ pourcentage: r.data.pourcentage, xpGagne: r.data.xpGagne });
+              this.finalQuizXPGained.set(true);
+              this.#toast.success("+50 XP", "Quiz Final réussi !");
+            }
+          }
+        });
+      }
+    }
+
+    setTimeout(() => {
+      const container = document.getElementById('final-quiz-scroll-container');
+      if (container) {
+        container.scrollTop = 0;
+      }
+    }, 50);
+  }
+
+  recommencerQuiz(): void {
+    this.genererQuizFinal();
+  }
+
+  genererResume(): void {
+    const lecon = this.activeLecon();
+    if (!lecon || this.summaryLoading()) return;
+
+    this.summaryLoading.set(true);
+    this.summaryError.set(null);
+
+    this.#courseSvc.genererResumeLecon(lecon.id).subscribe({
+      next: r => {
+        this.summaryLoading.set(false);
+        if (r.success && r.data?.response) {
+          this.summaryContent.set(r.data.response);
+          this.summaryVisible.set(true);
+        } else {
+          this.summaryError.set("Une erreur inconnue est survenue lors de la génération du résumé.");
+        }
+      },
+      error: err => {
+        this.summaryLoading.set(false);
+        const msg = err?.error?.message || "Impossible de se connecter au service d'intelligence artificielle.";
+        this.summaryError.set(msg);
+        this.#toast.error(msg, "Erreur de génération");
+      }
+    });
   }
 }

@@ -89,6 +89,10 @@ public class Progression extends AggregateRoot {
     public LocalDateTime getDateCompletion(){ return dateCompletion; }
     public double        getSeuilPaiementCours() { return seuilPaiementCours; }
 
+    private boolean finalQuizDone;
+    public boolean isFinalQuizDone() { return finalQuizDone; }
+    public void setFinalQuizDone(boolean finalQuizDone) { this.finalQuizDone = finalQuizDone; markUpdated(); }
+
     private String leconsTerminees;
 
     public String getLeconsTerminees() {

@@ -37,4 +37,19 @@ export class CourseService {
   getLecon(coursId: string, leconId: string): Observable<ApiResponse<any>> {
     return this.#api.get<any>(`/cours/${coursId}/lecons/${leconId}`);
   }
+
+  // POST /api/v1/ai/lecons/{leconId}/resume
+  genererResumeLecon(leconId: string): Observable<ApiResponse<{ response: string }>> {
+    return this.#api.post<{ response: string }>(`/ai/lecons/${leconId}/resume`, {});
+  }
+
+  // POST /api/v1/ai/question
+  poserQuestionLecon(lessonContent: string, question: string): Observable<ApiResponse<{ answer: string }>> {
+    return this.#api.post<{ answer: string }>('/ai/question', { lessonContent, question });
+  }
+
+  // POST /api/v1/ai/final-quiz
+  genererQuizFinal(formationTitle: string, lessons: string[]): Observable<ApiResponse<{ questions: any[] }>> {
+    return this.#api.post<{ questions: any[] }>('/ai/final-quiz', { formationTitle, lessons });
+  }
 }

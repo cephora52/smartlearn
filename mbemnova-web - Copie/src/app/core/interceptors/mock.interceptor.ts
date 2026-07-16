@@ -153,6 +153,11 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
   if (m === 'POST' && p === '/admin/apprenants')                            return r(ok(MOCK_APPRENANTS[0], 'Apprenant inscrit'));
   if (m === 'POST' && p === '/admin/utilisateurs/role')                     return r(ok(null, 'Rôle mis à jour'));
   if (m === 'POST' && p === '/admin/cours')                                 return r(ok({ id: 'c-new' }, 'Cours créé en brouillon'));
+  if (m === 'GET'  && p.startsWith('/admin/cours/') && p.endsWith('/apprenants')) return r(ok([
+    { photoUrl: null, nom: 'Ngo', prenom: 'Marie', email: 'marie.ngo@example.com', dateInscription: new Date().toISOString(), progression: 45.0, statut: 'En cours' },
+    { photoUrl: null, nom: 'Talla', prenom: 'Jean', email: 'jean.talla@example.com', dateInscription: new Date().toISOString(), progression: 100.0, statut: 'Terminée' }
+  ]));
+  if (m === 'DELETE' && p.startsWith('/admin/cours/'))                       return r(ok(null, 'La formation a été supprimée avec succès.'));
   if (m === 'POST' && p.includes('/publier'))                               return r(ok(null, 'Cours publié'));
   if (m === 'POST' && p === '/admin/tirage')                                return r(ok(MOCK_DRAW, 'Tirage configuré'));
 

@@ -41,11 +41,11 @@ const MOCK_RENDUS_ATTENTE = [
 
 // Données progression mensuelle (6 derniers mois)
 const PROGRESSION_DATA = [
-  { mois: 'Déc', apprenants: 98,  revenus: 340000 },
-  { mois: 'Jan', apprenants: 110, revenus: 390000 },
-  { mois: 'Fév', apprenants: 119, revenus: 415000 },
-  { mois: 'Mar', apprenants: 128, revenus: 460000 },
-  { mois: 'Avr', apprenants: 135, revenus: 495000 },
+  { mois: 'Déc', apprenants: 15,  revenus: 50000 },
+  { mois: 'Jan', apprenants: 38,  revenus: 120000 },
+  { mois: 'Fév', apprenants: 65,  revenus: 210000 },
+  { mois: 'Mar', apprenants: 92,  revenus: 310000 },
+  { mois: 'Avr', apprenants: 118, revenus: 420000 },
   { mois: 'Mai', apprenants: 142, revenus: 530000 },
 ];
 
@@ -70,6 +70,7 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   readonly isLoading       = signal(true);
 
   readonly prenom = computed(() => this.#auth.currentUser()?.prenom ?? 'Formateur');
+  readonly coursesPreview = computed(() => this.cours().slice(0, 3));
   readonly rendusAttente = MOCK_RENDUS_ATTENTE.filter(r => r.note === null);
   readonly rendusTotal   = MOCK_RENDUS_ATTENTE.length;
   readonly progressionData = PROGRESSION_DATA;
@@ -80,10 +81,9 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     const nbPublies = list.filter(c => c.statut === 'PUBLIE').length;
     const nbApprenants = list.reduce((sum, c) => sum + (c.nbApprenants ?? 0), 0);
     const aCorriger = this.rendusAttente.length;
-    
-    const rated = list.filter(c => c.noteMoyenne);
+    const rated = list.filter(c => c.noteMoyenne !== null && c.noteMoyenne !== undefined);
     const noteMoy = rated.length > 0
-      ? (rated.reduce((sum, c) => sum + c.noteMoyenne, 0) / rated.length).toFixed(1)
+      ? (rated.reduce((sum, c) => sum + (c.noteMoyenne ?? 0), 0) / rated.length).toFixed(1)
       : '0.0';
 
     return [
@@ -100,7 +100,7 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   private loadTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    const courses$ = this.#adminSvc.getMesCours({ limit: 3, sortBy: 'nbApprenants', sortDir: 'DESC' });
+    const courses$ = this.#adminSvc.getMesCours({ sortBy: 'nbApprenants', sortDir: 'DESC' });
     const completion$ = this.#adminSvc.getMesCours({ limit: 3, sortBy: 'completionRate', sortDir: 'DESC' });
 
     forkJoin({ courses: courses$, completion: completion$ }).subscribe({

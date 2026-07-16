@@ -54,7 +54,6 @@ public class MoratoireController {
         return ResponseEntity.ok(ApiResponse.ok(list));
     }
 
-    /** S17 — Admin accorde ou refuse un moratoire */
     @PatchMapping("/{moratoireId}/decider")
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @Operation(summary = "Traiter une demande de moratoire — admin (S17)")
@@ -62,10 +61,10 @@ public class MoratoireController {
             @PathVariable UUID moratoireId,
             @Valid @RequestBody TraiterMoratoireRequest req,
             @AuthenticationPrincipal String adminId) {
-        traiterUC.executer(moratoireId, req, UUID.fromString(adminId));
+        String studentName = traiterUC.executer(moratoireId, req, UUID.fromString(adminId));
         String msg = "APPROUVE".equals(req.decision()) || "ACCORDE".equals(req.decision())
-            ? "Moratoire accordé. Le plan de paiement a été mis à jour."
-            : "Moratoire refusé. L'apprenant a été notifié.";
+            ? "Vous avez accepté la demande de moratoire de " + studentName + "."
+            : "Vous avez refusé la demande de moratoire de " + studentName + ".";
         return ResponseEntity.ok(ApiResponse.ok(msg));
     }
 }

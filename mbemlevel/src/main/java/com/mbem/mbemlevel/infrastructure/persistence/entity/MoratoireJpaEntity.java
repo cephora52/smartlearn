@@ -24,11 +24,14 @@ public class MoratoireJpaEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String raison;
 
-    @Column(name = "nouvelle_date", nullable = false)
-    private LocalDate nouvelleDate;
+    @Column(name = "nouvelle_date_souhaitee", nullable = false)
+    private LocalDate nouvelleDateSouhaitee;
+
+    @Column(name = "nouvelle_date_accordee")
+    private LocalDate nouvelleDateAccordee;
 
     @Column(nullable = false, length = 20)
-    private String statut; // EN_ATTENTE, ACCORDE, REFUSE
+    private String statut; // EN_ATTENTE, APPROUVE, REFUSE
 
     @Column(name = "admin_id")
     private UUID adminId;
@@ -38,12 +41,6 @@ public class MoratoireJpaEntity {
 
     @Column(name = "date_decision")
     private LocalDateTime dateDecision;
-
-    @Column(name = "nouvelle_date_souhaitee", nullable = false)
-private LocalDate nouvelleDateSouhaitee;  // ← renomme l'existant
-
-@Column(name = "nouvelle_date_accordee")
-private LocalDate nouvelleDateAccordee;   // ← ajouter
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

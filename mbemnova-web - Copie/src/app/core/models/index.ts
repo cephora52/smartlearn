@@ -493,3 +493,13 @@ export interface ApprenantAdminView {
   inscritLe: string;
 }
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+
+export interface ApprenantInscritResponse {
+  photoUrl: string | null;
+  nom: string;
+  prenom: string;
+  email: string;
+  dateInscription: string;
+  progression: number;
+  statut: string;
+}

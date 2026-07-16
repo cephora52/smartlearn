@@ -252,7 +252,7 @@
               </div>
             }
 
-            @for (c of cours(); track c.id; let i = $index) {
+            @for (c of coursesPreview(); track c.id; let i = $index) {
               <div class="cours-row flex items-center gap-4 px-5 py-3.5 border-b border-slate-50
                           last:border-0 hover:bg-slate-50/70 transition-colors duration-150 fade-in"
                    [style.animation-delay]="(i * 50) + 'ms'">

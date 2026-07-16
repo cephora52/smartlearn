@@ -9,6 +9,7 @@ import java.util.UUID;
 public interface PaiementJpaRepository extends JpaRepository<PaiementJpaEntity, UUID> {
     Optional<PaiementJpaEntity> findByApprenantIdAndCoursId(UUID aid, UUID cid);
     List<PaiementJpaEntity>     findByApprenantId(UUID aid);
+    boolean existsByCoursId(UUID coursId);
     /** Paiements en retard — pour le scheduler de relances. */
     @Query("SELECT p FROM PaiementJpaEntity p WHERE p.statut IN ('EN_ATTENTE','EN_RETARD') " +
            "AND p.accesActive = true")

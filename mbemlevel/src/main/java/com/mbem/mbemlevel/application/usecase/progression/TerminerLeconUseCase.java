@@ -19,12 +19,58 @@ public class TerminerLeconUseCase {
     private final UtilisateurJpaRepository utilisateurRepo;
     private final com.mbem.mbemlevel.infrastructure.persistence.repository.XpHistoriqueJpaRepository xpHistoriqueRepo;
     private final ApplicationEventPublisher publisher;
+    private final com.mbem.mbemlevel.infrastructure.persistence.repository.LeconJpaRepository leconRepo;
+    private final com.mbem.mbemlevel.infrastructure.persistence.repository.PaiementJpaRepository paiementRepo;
+    private final com.mbem.mbemlevel.infrastructure.persistence.repository.MoratoireJpaRepository moratoireRepo;
 
     @Transactional
     public Progression executer(UUID apprenantId, UUID coursId, UUID leconId,
                                  int nbLeconsTotales, int nbLeconsTerminees,
                                  int xpLecon, String prenom, String email,
                                  String telephone, String nomCours) {
+        // Vérification du verrouillage de la leçon
+        var lecon = leconRepo.findById(leconId)
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:LECON:" + leconId));
+
+        var coursForCheck = coursRepo.findById(coursId)
+            .orElseThrow(() -> new RuntimeException("RESOURCE_NOT_FOUND:COURS:" + coursId));
+
+        boolean isFormateur = apprenantId.equals(coursForCheck.getFormateurId());
+        boolean isAdmin = utilisateurRepo.findById(apprenantId)
+            .map(u -> u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.ADMIN || u.getRole() == com.mbem.mbemlevel.domain.shared.enums.Role.SUPER_ADMIN)
+            .orElse(false);
+
+        boolean aMoratoireApprouve = false;
+        var paiementOpt = paiementRepo.findByApprenantIdAndCoursId(apprenantId, coursId);
+        if (paiementOpt.isPresent()) {
+            aMoratoireApprouve = moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "APPROUVE")
+                              || moratoireRepo.existsByPaiementIdAndStatut(paiementOpt.get().getId(), "ACCORDE");
+        }
+
+        var progressionOpt = progressionRepo.findByApprenantIdAndCoursId(apprenantId, coursId);
+        boolean estPaye = (progressionOpt.isPresent() && progressionOpt.get().isEstPaye())
+            || (coursForCheck.getPrixFcfa() == 0)
+            || isFormateur || isAdmin;
+
+        var lecons = leconRepo.findByCoursIdOrderByOrdreAsc(coursId);
+        int totalLecons = lecons.size();
+        double seuilVal = coursForCheck.getSeuilPaiement().doubleValue();
+        int maxLeconsGratuites = (int) Math.ceil(totalLecons * seuilVal);
+
+        int leconIndex = -1;
+        for (int i = 0; i < totalLecons; i++) {
+            if (lecons.get(i).getId().equals(leconId)) {
+                leconIndex = i;
+                break;
+            }
+        }
+
+        boolean estDansSeuilGratuit = (leconIndex >= 0 && leconIndex < maxLeconsGratuites);
+        boolean accessible = lecon.isEstPreview() || estDansSeuilGratuit || estPaye || aMoratoireApprouve;
+
+        if (!accessible) {
+            throw new com.mbem.mbemlevel.api.exception.AccesInterditException("Cette leçon est verrouillée. Veuillez payer ou demander un moratoire.");
+        }
         Progression p = progressionRepo.findByApprenantIdAndCoursId(apprenantId, coursId)
             .orElseGet(() -> {
                 var cours = coursRepo.findById(coursId)

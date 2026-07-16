@@ -115,3 +115,9 @@ mbemnova:
   security:
     bcrypt-cost: 4
 
+  #api de gemini
+  gemini:
+    api:
+      key: ${GEMINI_API_KEY}
+      model: gemini-3.5-flash
+

@@ -336,7 +336,7 @@ const ACTIVITE = [
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              @for (a of derniersApprenants; track a.id; let i = $index) {
+              @for (a of apprenants(); track a.id; let i = $index) {
                 <tr class="hover:bg-slate-50 transition-colors">
                   <td class="px-5 py-3.5">
                     <div class="flex items-center gap-3">
@@ -346,7 +346,7 @@ const ACTIVITE = [
                       </div>
                       <div>
                         <p class="text-sm font-medium text-slate-900">{{ a.prenom }} {{ a.nom }}</p>
-                        <p class="text-xs text-slate-400">{{ a.nbCoursInscrits }} cours</p>
+                        <p class="text-xs text-slate-400">{{ a.nbCoursInscrits ?? 0 }} cours</p>
                       </div>
                     </div>
                   </td>
@@ -462,9 +462,12 @@ const ACTIVITE = [
 })
 export class AdminDashboardComponent implements OnInit {
   readonly #adminSvc = inject(AdminService);
+  readonly #auth     = inject(AuthService);
 
-  readonly stats      = signal<StatistiquesResponse | null>(MOCK_STATS);
+  readonly prenom = computed(() => this.#auth.currentUser()?.prenom ?? 'Admin');
+  readonly stats  = signal<StatistiquesResponse | null>(null);
   readonly statsLoading = signal(true);
+  readonly apprenants   = signal<ApprenantAdminView[]>([]);
 
   // ── Alertes ───────────────────────────────────────────
   readonly alertes = [
@@ -505,13 +508,23 @@ export class AdminDashboardComponent implements OnInit {
     { icon: '🛡️', label: 'Gérer les rôles',        href: '/admin/roles',      bg: 'bg-purple-100' },
   ];
 
-  // ── Tableau dernières inscriptions ───────────────────
-  readonly derniersApprenants = MOCK_APPRENANTS.slice(0, 5);
-
   ngOnInit(): void {
+    // 1. Charger les statistiques globales
     this.#adminSvc.getStats().subscribe({
       next: r => { if (r.success && r.data) this.stats.set(r.data); this.statsLoading.set(false); },
       error: () => { this.statsLoading.set(false); },
+    });
+
+    // 2. Charger les dernières inscriptions apprenants
+    this.#adminSvc.getApprenants({ size: 5 }).subscribe({
+      next: r => {
+        if (r.success && r.data) {
+          const list = r.data.content || r.data;
+          if (Array.isArray(list)) {
+            this.apprenants.set(list.slice(0, 5));
+          }
+        }
+      }
     });
   }
 

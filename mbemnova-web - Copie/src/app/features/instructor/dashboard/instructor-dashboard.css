@@ -4,6 +4,8 @@
 .dash-root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+:host-context(.dark) .dash-root {
   background-color: var(--bg) !important;
   color: var(--tx) !important;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -27,6 +29,9 @@
 .dash-header {
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.95);
+}
+:host-context(.dark) .dash-header {
   background: var(--bg-subtle) !important;
   border-color: var(--border) !important;
   transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -35,35 +40,58 @@
 /* ── KPI cards ── */
 .kpi-card {
   transition: border-color 0.15s ease;
+}
+.kpi-card:hover {
+  border-color: #e2e8f0;
+}
+:host-context(.dark) .kpi-card {
   background-color: var(--bg-subtle) !important;
   border-color: var(--border) !important;
 }
-.kpi-card:hover {
+:host-context(.dark) .kpi-card:hover {
   border-color: var(--border-md) !important;
 }
 
 .kpi-icon {
+  background: #f1f5f9;
+  color: #64748b;
+}
+:host-context(.dark) .kpi-icon {
   background: var(--bg-muted) !important;
   color: var(--tx-sec) !important;
 }
 
 .delta-badge.positive {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+.delta-badge.negative {
+  background: #fff7ed;
+  color: #ea580c;
+}
+:host-context(.dark) .delta-badge.positive {
   background: rgba(34, 197, 94, 0.15) !important;
   color: #4ade80 !important;
 }
-
-.delta-badge.negative {
+:host-context(.dark) .delta-badge.negative {
   background: rgba(239, 68, 68, 0.15) !important;
   color: #f87171 !important;
 }
 
 /* ── Statut badge ── */
 .statut-badge.published {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+.statut-badge.draft {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+:host-context(.dark) .statut-badge.published {
   background: rgba(34, 197, 94, 0.15) !important;
   color: #4ade80 !important;
 }
-
-.statut-badge.draft {
+:host-context(.dark) .statut-badge.draft {
   background: var(--bg-muted) !important;
   color: var(--tx-muted) !important;
 }
@@ -132,9 +160,12 @@
 .cours-row,
 .rendu-item {
   cursor: default;
+}
+:host-context(.dark) .cours-row,
+:host-context(.dark) .rendu-item {
   border-color: var(--border) !important;
 }
-.cours-row:hover {
+:host-context(.dark) .cours-row:hover {
   background-color: var(--bg-muted) !important;
 }
 
@@ -166,27 +197,27 @@
 }
 
 /* ── Component-wide element styles for theme adaptation ── */
-.bg-white {
+:host-context(.dark) .bg-white {
   background-color: var(--bg-subtle) !important;
 }
-.bg-slate-50, .bg-slate-100 {
+:host-context(.dark) .bg-slate-50, :host-context(.dark) .bg-slate-100 {
   background-color: var(--bg-muted) !important;
 }
-.border-slate-50, .border-slate-100, .border-slate-200 {
+:host-context(.dark) .border-slate-50, :host-context(.dark) .border-slate-100, :host-context(.dark) .border-slate-200 {
   border-color: var(--border) !important;
 }
-.text-slate-900, .text-slate-700, .text-slate-800 {
+:host-context(.dark) .text-slate-900, :host-context(.dark) .text-slate-700, :host-context(.dark) .text-slate-800 {
   color: var(--tx) !important;
 }
-.text-slate-600, .text-slate-500 {
+:host-context(.dark) .text-slate-600, :host-context(.dark) .text-slate-500 {
   color: var(--tx-sec) !important;
 }
-.text-slate-400 {
+:host-context(.dark) .text-slate-400 {
   color: var(--tx-muted) !important;
 }
-.hover\:bg-blue-50\/30:hover {
+:host-context(.dark) .hover\:bg-blue-50\/30:hover {
   background-color: var(--bg-muted) !important;
 }
-.bg-blue-50 {
+:host-context(.dark) .bg-blue-50 {
   background-color: var(--bg-muted) !important;
 }

@@ -39,6 +39,8 @@ public class CoursAdminController {
     private final GetCoursEnAttenteUseCase  enAttenteUC;
     private final ModifierBlocsLeconUseCase modifierBlocsUC;
     private final GetCoursFormateurUseCase  getCoursFormateurUC;
+    private final GetApprenantsInscritsUseCase getApprenantsInscritsUC;
+    private final SupprimerCoursUseCase       supprimerCoursUC;
 
     /**
      * S19 — Créer un cours complet avec modules, leçons, blocs, QCM.
@@ -113,5 +115,31 @@ public class CoursAdminController {
             UUID.fromString(userId), limit, sortBy, sortDir, domaine, niveau, statut, q
         );
         return ResponseEntity.ok(ApiResponse.ok(responses));
+    }
+
+    /**
+     * GET /api/v1/admin/cours/{coursId}/apprenants
+     * Lister les apprenants inscrits à cette formation.
+     */
+    @GetMapping("/{coursId}/apprenants")
+    @Operation(summary = "Lister les apprenants inscrits à une formation (Espace Formateur)")
+    public ResponseEntity<ApiResponse<List<ApprenantInscritResponse>>> getApprenants(
+            @PathVariable UUID coursId,
+            @AuthenticationPrincipal String userId) {
+        List<ApprenantInscritResponse> responses = getApprenantsInscritsUC.executer(coursId, UUID.fromString(userId));
+        return ResponseEntity.ok(ApiResponse.ok(responses));
+    }
+
+    /**
+     * DELETE /api/v1/admin/cours/{coursId}
+     * Supprimer une formation.
+     */
+    @DeleteMapping("/{coursId}")
+    @Operation(summary = "Supprimer une formation (Espace Formateur)")
+    public ResponseEntity<ApiResponse<Void>> supprimer(
+            @PathVariable UUID coursId,
+            @AuthenticationPrincipal String userId) {
+        supprimerCoursUC.executer(coursId, UUID.fromString(userId));
+        return ResponseEntity.ok(ApiResponse.ok(null, "La formation a été supprimée avec succès."));
     }
 }

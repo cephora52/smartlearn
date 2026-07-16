@@ -10,6 +10,7 @@ import type {
   AssignerRoleRequest,
   DrawResponse,
   CoursResponse,
+  ApprenantInscritResponse,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -55,6 +56,12 @@ export class AdminService {
   }
   publierCours(id: string): Observable<ApiResponse<null>> {
     return this.#api.post<null>(`/admin/cours/${id}/publier`, {});
+  }
+  getApprenantsInscrits(coursId: string): Observable<ApiResponse<ApprenantInscritResponse[]>> {
+    return this.#api.get<ApprenantInscritResponse[]>(`/admin/cours/${coursId}/apprenants`);
+  }
+  supprimerCours(coursId: string): Observable<ApiResponse<null>> {
+    return this.#api.delete<null>(`/admin/cours/${coursId}`);
   }
   configurerTirage(config: Partial<DrawResponse>): Observable<ApiResponse<DrawResponse>> {
     return this.#api.post<DrawResponse>('/admin/tirage', config);
